@@ -92,18 +92,17 @@ class Result_Data:
         # e = np.sqrt(np.sum((x_2-x_0)**2)+np.sum((y_2-y_0)**2)+np.sum((z_2-z_0)**2))
         return ang[2]
 
-    def plot_z_rotation_along_beam(self):
+    def z_rotation_along_beam(self):
 
-        rotation_z_list =[]
+        rotationz_list =[]
         for i in range(len(self.list_of_z_values)):
-            rotation_z_list.append(self.section_rotationz(i)*180/np.pi)
+            rotationz_list.append(self.section_rotationz(i)*180/np.pi)
         z_list = self.list_of_z_values
-        ax.plot(z_list, rotation_z_list, label="$S_x({},{},{})$".format(self.beam_df["LoadX"][0],self.beam_df["LoadY"][0],z_list[int(self.beam_df["LoadZ"][0])]))
+        # ax.plot(z_list, rotation_z_list, label="$S_x({},{},{})$".format(self.beam_df["LoadX"][0],self.beam_df["LoadY"][0],z_list[int(self.beam_df["LoadZ"][0])]))
+        return z_list, rotationz_list
 
-
-
-
-
+    def magnitude_of_w(self):
+        return 0
 
 
 class Beam:
@@ -125,7 +124,7 @@ class Beam:
             return completed
 
         #location of the script - different script for shape
-        script = r"C:\Users\touze\project\Shear_centre\tkinter_trial\0.4_0.02_5.0\shape_{}.py".format(self.ShapeId)
+        script = r"C:\Users\touze\project\wct24_shear_centre\abaqus_scripts\shape_{}.py".format(self.ShapeId)
         script_command = "abaqus cae noGUI={}".format(script)
         script_info = run(script_command)
         errormessage = str(script_info.stderr)
@@ -265,6 +264,35 @@ class Beam:
         print("hello")
         return Result_Data(folder_name +r'\beam.csv',folder_name + r"\displacement.csv", folder_name + r"\stress.csv")
 
+    def SimpleTorqueLoad(self, LoadZ, LoadX, LoadY=0.0, LoadMagnitude = 10, AnalysisType = "4. Simple_Torque_Load"):
+        # print(AnalysisType)
+        # print(LoadX)
+        assert LoadZ < self.length*20, "LoadZ is outside the length of beam"
+        assert type(LoadZ) == int, "LoadZ is a position, beam is split into 0.05m segments"
+
+        folder_name = self._navigate([AnalysisType,"Beam_Repository", LoadZ, LoadX], chdir = True)
+        print(os.path.exists(folder_name + r"\displacement.csv"))
+        if not os.path.exists(folder_name + r"\displacement.csv"):
+            print(LoadX)
+            # if the analyis hasn't been run before - run it
+            beam_data_frame = pd.DataFrame.copy(self.input_df)
+            pd.options.mode.chained_assignment = None  # get rid of panda warnings
+            beam_data_frame["LoadType"][0] = 2 # 1 for Torque
+            beam_data_frame["AnalysisType"][0] = int(AnalysisType[0])
+            beam_data_frame["LoadZ"][0] = LoadZ  # always an integer
+            beam_data_frame["LoadX"][0] = LoadX   # this can be anywhere
+            beam_data_frame["LoadY"][0] = LoadY   # this can be anywhere but set to zero by default
+            beam_data_frame["LoadMagnitude"][0] = LoadMagnitude
+            beam_data_frame["LoadSection"][0] = LoadZ #No Mx allied to the section
+            beam_data_frame["ResultSection"][0] = 0 #Not relevant to this type of analysis
+            # print(beam_data_frame)
+            beam_data_frame.to_csv('beam.csv')
+            self._run_script()
+        else:
+            pass
+        print("hello")
+        return Result_Data(folder_name +r'\beam.csv',folder_name + r"\displacement.csv", folder_name + r"\stress.csv")
+
 
     def TSC(self, LoadZ, tol = 1e-5):
         """ Newton-Raphson method to find the TSC
@@ -371,21 +399,21 @@ class Beam:
 # beam_name = r"D:\shear_centre\1-Semi-Circle\0.4_0.02_5.0\210.0_81.0_0.3\warping"
 # input_csv = Beam_name + "input.csv"
 
-Encatre = Beam(r"D:\shear_centre\1-Semi-Circle\0.4_0.02_5.0\210.0_81.0_0.3\encastre")
-Warping = Beam(r"D:\shear_centre\1-Semi-Circle\0.4_0.02_5.0\210.0_81.0_0.3\Warping")
+# Encatre = Beam(r"D:\shear_centre\1-Semi-Circle\0.4_0.02_5.0\210.0_81.0_0.3\encastre")
+# Warping = Beam(r"D:\shear_centre\1-Semi-Circle\0.4_0.02_5.0\210.0_81.0_0.3\Warping")
 
-fig, ax = plt.subplots()
-print(Encatre.SimpleShearLoad(0,1.0).plot_z_rotation_along_beam())
-print(Warping.SimpleShearLoad(0,1.0).plot_z_rotation_along_beam())
-plt.ylim(bottom=0)
-plt.xlim(left=0)
-ax.legend()
-ax.xaxis.tick_bottom()
-plt.xlabel(r'$z / m$ ', )
-plt.ylabel(r'$\theta_{z}$ / \textdegree ')
-plt.tight_layout()
-plt.grid()
-plt.show()
+# fig, ax = plt.subplots()
+# print(Encatre.SimpleShearLoad(0,1.0).plot_z_rotation_along_beam())
+# print(Warping.SimpleShearLoad(0,1.0).plot_z_rotation_along_beam())
+# plt.ylim(bottom=0)
+# plt.xlim(left=0)
+# ax.legend()
+# ax.xaxis.tick_bottom()
+# plt.xlabel(r'$z / m$ ', )
+# plt.ylabel(r'$\theta_{z}$ / \textdegree ')
+# plt.tight_layout()
+# plt.grid()
+# plt.show()
 
 
 
