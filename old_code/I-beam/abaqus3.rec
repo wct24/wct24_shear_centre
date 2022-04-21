@@ -1,0 +1,107 @@
+# -*- coding: mbcs -*-
+from part import *
+from material import *
+from section import *
+from assembly import *
+from step import *
+from interaction import *
+from load import *
+from mesh import *
+from optimization import *
+from job import *
+from sketch import *
+from visualization import *
+mdb.models['Model-1'].ConstrainedSketch(name='__profile__', sheetSize=1.0)
+mdb.models['Model-1'].sketches['__profile__'].rectangle(point1=(-0.00395, 
+    -0.1904), point2=(0.00395, 0.1904))
+mdb.models['Model-1'].sketches['__profile__'].rectangle(point1=(-0.08895, 
+    0.1904), point2=(0.08895, 0.2032))
+mdb.models['Model-1'].sketches['__profile__'].rectangle(point1=(-0.08895, 
+    -0.1904), point2=(0.08895, -0.2032))
+mdb.models['Model-1'].sketches['__profile__'].autoTrimCurve(curve1=
+    mdb.models['Model-1'].sketches['__profile__'].geometry[5], point1=(0.0, 
+    -0.1904))
+mdb.models['Model-1'].sketches['__profile__'].autoTrimCurve(curve1=
+    mdb.models['Model-1'].sketches['__profile__'].geometry[13], point1=(0.0, 
+    -0.1904))
+mdb.models['Model-1'].sketches['__profile__'].autoTrimCurve(curve1=
+    mdb.models['Model-1'].sketches['__profile__'].geometry[3], point1=(0.0, 
+    0.1904))
+mdb.models['Model-1'].sketches['__profile__'].autoTrimCurve(curve1=
+    mdb.models['Model-1'].sketches['__profile__'].geometry[9], point1=(0.0, 
+    0.1904))
+mdb.models['Model-1'].sketches['__profile__'].FilletByRadius(curve1=
+    mdb.models['Model-1'].sketches['__profile__'].geometry[15], curve2=
+    mdb.models['Model-1'].sketches['__profile__'].geometry[2], nearPoint1=(
+    -0.00495, -0.1904), nearPoint2=(0.00395, -0.1894), radius=0.0102)
+mdb.models['Model-1'].sketches['__profile__'].FilletByRadius(curve1=
+    mdb.models['Model-1'].sketches['__profile__'].geometry[14], curve2=
+    mdb.models['Model-1'].sketches['__profile__'].geometry[4], nearPoint1=(
+    0.00495, -0.1904), nearPoint2=(0.00395, -0.1894), radius=0.0102)
+mdb.models['Model-1'].sketches['__profile__'].FilletByRadius(curve1=
+    mdb.models['Model-1'].sketches['__profile__'].geometry[4], curve2=
+    mdb.models['Model-1'].sketches['__profile__'].geometry[16], nearPoint1=(
+    0.00395, 0.0942), nearPoint2=(0.00495, 0.0952), radius=0.0102)
+mdb.models['Model-1'].sketches['__profile__'].FilletByRadius(curve1=
+    mdb.models['Model-1'].sketches['__profile__'].geometry[2], curve2=
+    mdb.models['Model-1'].sketches['__profile__'].geometry[17], nearPoint1=(
+    -0.00395, 0.0942), nearPoint2=(-0.00495, 0.0952), radius=0.0102)
+mdb.models['Model-1'].Part(dimensionality=THREE_D, name='Part-1', type=
+    DEFORMABLE_BODY)
+mdb.models['Model-1'].parts['Part-1'].BaseSolidExtrude(depth=1.0, sketch=
+    mdb.models['Model-1'].sketches['__profile__'])
+del mdb.models['Model-1'].sketches['__profile__']
+mdb.models['Model-1'].parts['Part-1'].seedPart(deviationFactor=0.05, 
+    minSizeFactor=0.001, size=0.05)
+mdb.models['Model-1'].parts['Part-1'].generateMesh()
+mdb.models['Model-1'].parts['Part-1'].Set(cells=
+    mdb.models['Model-1'].parts['Part-1'].cells.getSequenceFromMask(('[#1 ]', 
+    ), ), name='I_section_geometry')
+mdb.models['Model-1'].Material(name='I-material')
+mdb.models['Model-1'].materials['I-material'].Elastic(table=((210000000000.0, 
+    210000000000.0, 210000000000.0, 0.3, 0.3, 0.3, 81000000000.0, 
+    81000000000.0, 81000000000.0), ), type=ENGINEERING_CONSTANTS)
+mdb.models['Model-1'].HomogeneousSolidSection(material='I-material', name=
+    'I-section', thickness=None)
+mdb.models['Model-1'].parts['Part-1'].SectionAssignment(offset=0.0, 
+    offsetField='', offsetType=MIDDLE_SURFACE, region=
+    mdb.models['Model-1'].parts['Part-1'].sets['I_section_geometry'], 
+    sectionName='I-section', thicknessAssignment=FROM_SECTION)
+mdb.models['Model-1'].parts['Part-1'].MaterialOrientation(
+    additionalRotationType=ROTATION_NONE, axis=AXIS_1, fieldName='', localCsys=
+    None, orientationType=GLOBAL, region=
+    mdb.models['Model-1'].parts['Part-1'].sets['I_section_geometry'], 
+    stackDirection=STACK_3)
+mdb.models['Model-1'].StaticStep(name='loading', previous='Initial')
+mdb.models['Model-1'].fieldOutputRequests['F-Output-1'].setValues(variables=(
+    'S', 'MISES', 'SEQUT', 'U', 'COORD'))
+mdb.models['Model-1'].rootAssembly.DatumCsysByDefault(CARTESIAN)
+mdb.models['Model-1'].rootAssembly.Instance(dependent=ON, name='I_beam-1', 
+    part=mdb.models['Model-1'].parts['Part-1'])
+mdb.models['Model-1'].rootAssembly.Set(name='nodes_at_z_1000mm', nodes=
+    mdb.models['Model-1'].rootAssembly.instances['I_beam-1'].nodes.getSequenceFromMask(
+    mask=('[#0:58 #fffffff0 #ffffffff:2 #1 ]', ), ))
+mdb.models['Model-1'].rootAssembly.Set(name='nodes_at_z_0mm', nodes=
+    mdb.models['Model-1'].rootAssembly.instances['I_beam-1'].nodes.getSequenceFromMask(
+    mask=('[#ffffffff:2 #1fffffff ]', ), ))
+mdb.models['Model-1'].DisplacementBC(amplitude=UNSET, createStepName='Initial', 
+    distributionType=UNIFORM, fieldName='', localCsys=None, name='BC-1', 
+    region=mdb.models['Model-1'].rootAssembly.sets['nodes_at_z_0mm'], u1=SET, 
+    u2=SET, u3=SET, ur1=UNSET, ur2=UNSET, ur3=UNSET)
+mdb.models['Model-1'].rootAssembly.DatumCsysByThreePoints(coordSysType=
+    CARTESIAN, name='end', origin=
+    mdb.models['Model-1'].rootAssembly.instances['I_beam-1'].vertices[4], 
+    point1=mdb.models['Model-1'].rootAssembly.instances['I_beam-1'].vertices[5]
+    , point2=
+    mdb.models['Model-1'].rootAssembly.instances['I_beam-1'].InterestingPoint(
+    mdb.models['Model-1'].rootAssembly.instances['I_beam-1'].edges[8], MIDDLE))
+mdb.models['Model-1'].ConcentratedForce(cf3=1.0, createStepName='loading', 
+    distributionType=UNIFORM, field='', localCsys=None, name='UDL', region=
+    mdb.models['Model-1'].rootAssembly.sets['nodes_at_z_1000mm'])
+mdb.Job(atTime=None, contactPrint=OFF, description='', echoPrint=OFF, 
+    explicitPrecision=SINGLE, getMemoryFromAnalysis=True, historyPrint=OFF, 
+    memory=90, memoryUnits=PERCENTAGE, model='Model-1', modelPrint=OFF, name=
+    'analysis', nodalOutputPrecision=SINGLE, queue=None, resultsFormat=ODB, 
+    scratch='', type=ANALYSIS, userSubroutine='', waitHours=0, waitMinutes=0)
+mdb.jobs['analysis'].submit(consistencyChecking=OFF)
+mdb.jobs['analysis'].waitForCompletion()

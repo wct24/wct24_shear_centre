@@ -1,0 +1,742 @@
+# -*- coding: mbcs -*-
+from part import *
+from material import *
+from section import *
+from assembly import *
+from step import *
+from interaction import *
+from load import *
+from mesh import *
+from optimization import *
+from job import *
+from sketch import *
+from visualization import *
+from connectorBehavior import *
+mdb.models['Model-1'].ConstrainedSketch(name='__profile__', sheetSize=1.0)
+mdb.models['Model-1'].sketches['__profile__'].ArcByCenterEnds(center=(0.0, 0.0)
+    , direction=CLOCKWISE, point1=(-0.39, 0.001), point2=(-0.39, -0.001))
+mdb.models['Model-1'].sketches['__profile__'].ArcByCenterEnds(center=(0.0, 0.0)
+    , direction=CLOCKWISE, point1=(-0.41, 0.001), point2=(-0.41, -0.001))
+mdb.models['Model-1'].sketches['__profile__'].Line(point1=(-0.39, 0.001), 
+    point2=(-0.41, 0.001))
+mdb.models['Model-1'].sketches['__profile__'].Line(point1=(-0.39, -0.001), 
+    point2=(-0.41, -0.001))
+mdb.models['Model-1'].Part(dimensionality=THREE_D, name='part', type=
+    DEFORMABLE_BODY)
+mdb.models['Model-1'].parts['part'].BaseSolidExtrude(depth=1.0, sketch=
+    mdb.models['Model-1'].sketches['__profile__'])
+del mdb.models['Model-1'].sketches['__profile__']
+mdb.models['Model-1'].parts['part'].seedPart(deviationFactor=0.1, 
+    minSizeFactor=0.01, size=0.05)
+mdb.models['Model-1'].parts['part'].generateMesh()
+mdb.models['Model-1'].parts['part'].Set(cells=
+    mdb.models['Model-1'].parts['part'].cells.getSequenceFromMask(('[#1 ]', ), 
+    ), name='SC_section_geometry')
+mdb.models['Model-1'].Material(name='SC-material')
+mdb.models['Model-1'].materials['SC-material'].Elastic(table=((210000000000.0, 
+    210000000000.0, 210000000000.0, 0.3, 0.3, 0.3, 81000000000.0, 
+    81000000000.0, 81000000000.0), ), type=ENGINEERING_CONSTANTS)
+mdb.models['Model-1'].HomogeneousSolidSection(material='SC-material', name=
+    'SC-section', thickness=None)
+mdb.models['Model-1'].parts['part'].SectionAssignment(offset=0.0, offsetField=
+    '', offsetType=MIDDLE_SURFACE, region=
+    mdb.models['Model-1'].parts['part'].sets['SC_section_geometry'], 
+    sectionName='SC-section', thicknessAssignment=FROM_SECTION)
+mdb.models['Model-1'].parts['part'].MaterialOrientation(additionalRotationType=
+    ROTATION_NONE, axis=AXIS_1, fieldName='', localCsys=None, orientationType=
+    GLOBAL, region=
+    mdb.models['Model-1'].parts['part'].sets['SC_section_geometry'], 
+    stackDirection=STACK_3)
+mdb.models['Model-1'].StaticStep(name='loading', previous='Initial')
+mdb.models['Model-1'].fieldOutputRequests['F-Output-1'].setValues(variables=(
+    'S', 'MISES', 'SEQUT', 'U', 'COORD'))
+mdb.models['Model-1'].rootAssembly.DatumCsysByDefault(CARTESIAN)
+mdb.models['Model-1'].rootAssembly.Instance(dependent=ON, name='SC_beam-1', 
+    part=mdb.models['Model-1'].parts['part'])
+mdb.models['Model-1'].rootAssembly.Set(name='nodes_at_z_949mm', nodes=
+    mdb.models['Model-1'].rootAssembly.instances['SC_beam-1'].nodes.getSequenceFromMask(
+    mask=('[#0:60 #fffc0000 #ffffffff:2 #ffffff ]', ), ))
+mdb.models['Model-1'].rootAssembly.Set(name='nodes_at_z_0mm', nodes=
+    mdb.models['Model-1'].rootAssembly.instances['SC_beam-1'].nodes.getSequenceFromMask(
+    mask=('[#ffffffff:3 #3f ]', ), ))
+mdb.models['Model-1'].DisplacementBC(amplitude=UNSET, createStepName='Initial', 
+    distributionType=UNIFORM, fieldName='', localCsys=None, name='BC-1', 
+    region=mdb.models['Model-1'].rootAssembly.sets['nodes_at_z_0mm'], u1=SET, 
+    u2=SET, u3=SET, ur1=UNSET, ur2=UNSET, ur3=UNSET)
+mdb.models['Model-1'].rootAssembly.SetFromNodeLabels(name='wall-0', nodeLabels=
+    (('SC_beam-1', (1, )), ))
+mdb.models['Model-1'].rootAssembly.SetFromNodeLabels(name='wall-1', nodeLabels=
+    (('SC_beam-1', (2, )), ))
+mdb.models['Model-1'].rootAssembly.SetFromNodeLabels(name='wall-2', nodeLabels=
+    (('SC_beam-1', (3, )), ))
+mdb.models['Model-1'].rootAssembly.SetFromNodeLabels(name='wall-3', nodeLabels=
+    (('SC_beam-1', (4, )), ))
+mdb.models['Model-1'].rootAssembly.SetFromNodeLabels(name='wall-4', nodeLabels=
+    (('SC_beam-1', (5, )), ))
+mdb.models['Model-1'].rootAssembly.SetFromNodeLabels(name='wall-5', nodeLabels=
+    (('SC_beam-1', (6, )), ))
+mdb.models['Model-1'].rootAssembly.SetFromNodeLabels(name='wall-6', nodeLabels=
+    (('SC_beam-1', (7, )), ))
+mdb.models['Model-1'].rootAssembly.SetFromNodeLabels(name='wall-7', nodeLabels=
+    (('SC_beam-1', (8, )), ))
+mdb.models['Model-1'].rootAssembly.SetFromNodeLabels(name='wall-8', nodeLabels=
+    (('SC_beam-1', (9, )), ))
+mdb.models['Model-1'].rootAssembly.SetFromNodeLabels(name='wall-9', nodeLabels=
+    (('SC_beam-1', (10, )), ))
+mdb.models['Model-1'].rootAssembly.SetFromNodeLabels(name='wall-10', 
+    nodeLabels=(('SC_beam-1', (11, )), ))
+mdb.models['Model-1'].rootAssembly.SetFromNodeLabels(name='wall-11', 
+    nodeLabels=(('SC_beam-1', (12, )), ))
+mdb.models['Model-1'].rootAssembly.SetFromNodeLabels(name='wall-12', 
+    nodeLabels=(('SC_beam-1', (13, )), ))
+mdb.models['Model-1'].rootAssembly.SetFromNodeLabels(name='wall-13', 
+    nodeLabels=(('SC_beam-1', (14, )), ))
+mdb.models['Model-1'].rootAssembly.SetFromNodeLabels(name='wall-14', 
+    nodeLabels=(('SC_beam-1', (15, )), ))
+mdb.models['Model-1'].rootAssembly.SetFromNodeLabels(name='wall-15', 
+    nodeLabels=(('SC_beam-1', (16, )), ))
+mdb.models['Model-1'].rootAssembly.SetFromNodeLabels(name='wall-16', 
+    nodeLabels=(('SC_beam-1', (17, )), ))
+mdb.models['Model-1'].rootAssembly.SetFromNodeLabels(name='wall-17', 
+    nodeLabels=(('SC_beam-1', (18, )), ))
+mdb.models['Model-1'].rootAssembly.SetFromNodeLabels(name='wall-18', 
+    nodeLabels=(('SC_beam-1', (19, )), ))
+mdb.models['Model-1'].rootAssembly.SetFromNodeLabels(name='wall-19', 
+    nodeLabels=(('SC_beam-1', (20, )), ))
+mdb.models['Model-1'].rootAssembly.SetFromNodeLabels(name='wall-20', 
+    nodeLabels=(('SC_beam-1', (21, )), ))
+mdb.models['Model-1'].rootAssembly.SetFromNodeLabels(name='wall-21', 
+    nodeLabels=(('SC_beam-1', (22, )), ))
+mdb.models['Model-1'].rootAssembly.SetFromNodeLabels(name='wall-22', 
+    nodeLabels=(('SC_beam-1', (23, )), ))
+mdb.models['Model-1'].rootAssembly.SetFromNodeLabels(name='wall-23', 
+    nodeLabels=(('SC_beam-1', (24, )), ))
+mdb.models['Model-1'].rootAssembly.SetFromNodeLabels(name='wall-24', 
+    nodeLabels=(('SC_beam-1', (25, )), ))
+mdb.models['Model-1'].rootAssembly.SetFromNodeLabels(name='wall-25', 
+    nodeLabels=(('SC_beam-1', (26, )), ))
+mdb.models['Model-1'].rootAssembly.SetFromNodeLabels(name='wall-26', 
+    nodeLabels=(('SC_beam-1', (27, )), ))
+mdb.models['Model-1'].rootAssembly.SetFromNodeLabels(name='wall-27', 
+    nodeLabels=(('SC_beam-1', (28, )), ))
+mdb.models['Model-1'].rootAssembly.SetFromNodeLabels(name='wall-28', 
+    nodeLabels=(('SC_beam-1', (29, )), ))
+mdb.models['Model-1'].rootAssembly.SetFromNodeLabels(name='wall-29', 
+    nodeLabels=(('SC_beam-1', (30, )), ))
+mdb.models['Model-1'].rootAssembly.SetFromNodeLabels(name='wall-30', 
+    nodeLabels=(('SC_beam-1', (31, )), ))
+mdb.models['Model-1'].rootAssembly.SetFromNodeLabels(name='wall-31', 
+    nodeLabels=(('SC_beam-1', (32, )), ))
+mdb.models['Model-1'].rootAssembly.SetFromNodeLabels(name='wall-32', 
+    nodeLabels=(('SC_beam-1', (33, )), ))
+mdb.models['Model-1'].rootAssembly.SetFromNodeLabels(name='wall-33', 
+    nodeLabels=(('SC_beam-1', (34, )), ))
+mdb.models['Model-1'].rootAssembly.SetFromNodeLabels(name='wall-34', 
+    nodeLabels=(('SC_beam-1', (35, )), ))
+mdb.models['Model-1'].rootAssembly.SetFromNodeLabels(name='wall-35', 
+    nodeLabels=(('SC_beam-1', (36, )), ))
+mdb.models['Model-1'].rootAssembly.SetFromNodeLabels(name='wall-36', 
+    nodeLabels=(('SC_beam-1', (37, )), ))
+mdb.models['Model-1'].rootAssembly.SetFromNodeLabels(name='wall-37', 
+    nodeLabels=(('SC_beam-1', (38, )), ))
+mdb.models['Model-1'].rootAssembly.SetFromNodeLabels(name='wall-38', 
+    nodeLabels=(('SC_beam-1', (39, )), ))
+mdb.models['Model-1'].rootAssembly.SetFromNodeLabels(name='wall-39', 
+    nodeLabels=(('SC_beam-1', (40, )), ))
+mdb.models['Model-1'].rootAssembly.SetFromNodeLabels(name='wall-40', 
+    nodeLabels=(('SC_beam-1', (41, )), ))
+mdb.models['Model-1'].rootAssembly.SetFromNodeLabels(name='wall-41', 
+    nodeLabels=(('SC_beam-1', (42, )), ))
+mdb.models['Model-1'].rootAssembly.SetFromNodeLabels(name='wall-42', 
+    nodeLabels=(('SC_beam-1', (43, )), ))
+mdb.models['Model-1'].rootAssembly.SetFromNodeLabels(name='wall-43', 
+    nodeLabels=(('SC_beam-1', (44, )), ))
+mdb.models['Model-1'].rootAssembly.SetFromNodeLabels(name='wall-44', 
+    nodeLabels=(('SC_beam-1', (45, )), ))
+mdb.models['Model-1'].rootAssembly.SetFromNodeLabels(name='wall-45', 
+    nodeLabels=(('SC_beam-1', (46, )), ))
+mdb.models['Model-1'].rootAssembly.SetFromNodeLabels(name='wall-46', 
+    nodeLabels=(('SC_beam-1', (47, )), ))
+mdb.models['Model-1'].rootAssembly.SetFromNodeLabels(name='wall-47', 
+    nodeLabels=(('SC_beam-1', (48, )), ))
+mdb.models['Model-1'].rootAssembly.SetFromNodeLabels(name='wall-48', 
+    nodeLabels=(('SC_beam-1', (49, )), ))
+mdb.models['Model-1'].rootAssembly.SetFromNodeLabels(name='wall-49', 
+    nodeLabels=(('SC_beam-1', (50, )), ))
+mdb.models['Model-1'].rootAssembly.SetFromNodeLabels(name='wall-50', 
+    nodeLabels=(('SC_beam-1', (51, )), ))
+mdb.models['Model-1'].rootAssembly.SetFromNodeLabels(name='wall-51', 
+    nodeLabels=(('SC_beam-1', (52, )), ))
+mdb.models['Model-1'].rootAssembly.SetFromNodeLabels(name='wall-52', 
+    nodeLabels=(('SC_beam-1', (53, )), ))
+mdb.models['Model-1'].rootAssembly.SetFromNodeLabels(name='wall-53', 
+    nodeLabels=(('SC_beam-1', (54, )), ))
+mdb.models['Model-1'].rootAssembly.SetFromNodeLabels(name='wall-54', 
+    nodeLabels=(('SC_beam-1', (55, )), ))
+mdb.models['Model-1'].rootAssembly.SetFromNodeLabels(name='wall-55', 
+    nodeLabels=(('SC_beam-1', (56, )), ))
+mdb.models['Model-1'].rootAssembly.SetFromNodeLabels(name='wall-56', 
+    nodeLabels=(('SC_beam-1', (57, )), ))
+mdb.models['Model-1'].rootAssembly.SetFromNodeLabels(name='wall-57', 
+    nodeLabels=(('SC_beam-1', (58, )), ))
+mdb.models['Model-1'].rootAssembly.SetFromNodeLabels(name='wall-58', 
+    nodeLabels=(('SC_beam-1', (59, )), ))
+mdb.models['Model-1'].rootAssembly.SetFromNodeLabels(name='wall-59', 
+    nodeLabels=(('SC_beam-1', (60, )), ))
+mdb.models['Model-1'].rootAssembly.SetFromNodeLabels(name='wall-60', 
+    nodeLabels=(('SC_beam-1', (61, )), ))
+mdb.models['Model-1'].rootAssembly.SetFromNodeLabels(name='wall-61', 
+    nodeLabels=(('SC_beam-1', (62, )), ))
+mdb.models['Model-1'].rootAssembly.SetFromNodeLabels(name='wall-62', 
+    nodeLabels=(('SC_beam-1', (63, )), ))
+mdb.models['Model-1'].rootAssembly.SetFromNodeLabels(name='wall-63', 
+    nodeLabels=(('SC_beam-1', (64, )), ))
+mdb.models['Model-1'].rootAssembly.SetFromNodeLabels(name='wall-64', 
+    nodeLabels=(('SC_beam-1', (65, )), ))
+mdb.models['Model-1'].rootAssembly.SetFromNodeLabels(name='wall-65', 
+    nodeLabels=(('SC_beam-1', (66, )), ))
+mdb.models['Model-1'].rootAssembly.SetFromNodeLabels(name='wall-66', 
+    nodeLabels=(('SC_beam-1', (67, )), ))
+mdb.models['Model-1'].rootAssembly.SetFromNodeLabels(name='wall-67', 
+    nodeLabels=(('SC_beam-1', (68, )), ))
+mdb.models['Model-1'].rootAssembly.SetFromNodeLabels(name='wall-68', 
+    nodeLabels=(('SC_beam-1', (69, )), ))
+mdb.models['Model-1'].rootAssembly.SetFromNodeLabels(name='wall-69', 
+    nodeLabels=(('SC_beam-1', (70, )), ))
+mdb.models['Model-1'].rootAssembly.SetFromNodeLabels(name='wall-70', 
+    nodeLabels=(('SC_beam-1', (71, )), ))
+mdb.models['Model-1'].rootAssembly.SetFromNodeLabels(name='wall-71', 
+    nodeLabels=(('SC_beam-1', (72, )), ))
+mdb.models['Model-1'].rootAssembly.SetFromNodeLabels(name='wall-72', 
+    nodeLabels=(('SC_beam-1', (73, )), ))
+mdb.models['Model-1'].rootAssembly.SetFromNodeLabels(name='wall-73', 
+    nodeLabels=(('SC_beam-1', (74, )), ))
+mdb.models['Model-1'].rootAssembly.SetFromNodeLabels(name='wall-74', 
+    nodeLabels=(('SC_beam-1', (75, )), ))
+mdb.models['Model-1'].rootAssembly.SetFromNodeLabels(name='wall-75', 
+    nodeLabels=(('SC_beam-1', (76, )), ))
+mdb.models['Model-1'].rootAssembly.SetFromNodeLabels(name='wall-76', 
+    nodeLabels=(('SC_beam-1', (77, )), ))
+mdb.models['Model-1'].rootAssembly.SetFromNodeLabels(name='wall-77', 
+    nodeLabels=(('SC_beam-1', (78, )), ))
+mdb.models['Model-1'].rootAssembly.SetFromNodeLabels(name='wall-78', 
+    nodeLabels=(('SC_beam-1', (79, )), ))
+mdb.models['Model-1'].rootAssembly.SetFromNodeLabels(name='wall-79', 
+    nodeLabels=(('SC_beam-1', (80, )), ))
+mdb.models['Model-1'].rootAssembly.SetFromNodeLabels(name='wall-80', 
+    nodeLabels=(('SC_beam-1', (81, )), ))
+mdb.models['Model-1'].rootAssembly.SetFromNodeLabels(name='wall-81', 
+    nodeLabels=(('SC_beam-1', (82, )), ))
+mdb.models['Model-1'].rootAssembly.SetFromNodeLabels(name='wall-82', 
+    nodeLabels=(('SC_beam-1', (83, )), ))
+mdb.models['Model-1'].rootAssembly.SetFromNodeLabels(name='wall-83', 
+    nodeLabels=(('SC_beam-1', (84, )), ))
+mdb.models['Model-1'].rootAssembly.SetFromNodeLabels(name='wall-84', 
+    nodeLabels=(('SC_beam-1', (85, )), ))
+mdb.models['Model-1'].rootAssembly.SetFromNodeLabels(name='wall-85', 
+    nodeLabels=(('SC_beam-1', (86, )), ))
+mdb.models['Model-1'].rootAssembly.SetFromNodeLabels(name='wall-86', 
+    nodeLabels=(('SC_beam-1', (87, )), ))
+mdb.models['Model-1'].rootAssembly.SetFromNodeLabels(name='wall-87', 
+    nodeLabels=(('SC_beam-1', (88, )), ))
+mdb.models['Model-1'].rootAssembly.SetFromNodeLabels(name='wall-88', 
+    nodeLabels=(('SC_beam-1', (89, )), ))
+mdb.models['Model-1'].rootAssembly.SetFromNodeLabels(name='wall-89', 
+    nodeLabels=(('SC_beam-1', (90, )), ))
+mdb.models['Model-1'].rootAssembly.SetFromNodeLabels(name='wall-90', 
+    nodeLabels=(('SC_beam-1', (91, )), ))
+mdb.models['Model-1'].rootAssembly.SetFromNodeLabels(name='wall-91', 
+    nodeLabels=(('SC_beam-1', (92, )), ))
+mdb.models['Model-1'].rootAssembly.SetFromNodeLabels(name='wall-92', 
+    nodeLabels=(('SC_beam-1', (93, )), ))
+mdb.models['Model-1'].rootAssembly.SetFromNodeLabels(name='wall-93', 
+    nodeLabels=(('SC_beam-1', (94, )), ))
+mdb.models['Model-1'].rootAssembly.SetFromNodeLabels(name='wall-94', 
+    nodeLabels=(('SC_beam-1', (95, )), ))
+mdb.models['Model-1'].rootAssembly.SetFromNodeLabels(name='wall-95', 
+    nodeLabels=(('SC_beam-1', (96, )), ))
+mdb.models['Model-1'].rootAssembly.SetFromNodeLabels(name='wall-96', 
+    nodeLabels=(('SC_beam-1', (97, )), ))
+mdb.models['Model-1'].rootAssembly.SetFromNodeLabels(name='wall-97', 
+    nodeLabels=(('SC_beam-1', (98, )), ))
+mdb.models['Model-1'].rootAssembly.SetFromNodeLabels(name='wall-98', 
+    nodeLabels=(('SC_beam-1', (99, )), ))
+mdb.models['Model-1'].rootAssembly.SetFromNodeLabels(name='wall-99', 
+    nodeLabels=(('SC_beam-1', (100, )), ))
+mdb.models['Model-1'].rootAssembly.SetFromNodeLabels(name='wall-100', 
+    nodeLabels=(('SC_beam-1', (101, )), ))
+mdb.models['Model-1'].rootAssembly.SetFromNodeLabels(name='wall-101', 
+    nodeLabels=(('SC_beam-1', (102, )), ))
+mdb.models['Model-1'].Equation(name='sum_of_u3', terms=[[1.0, 'wall-3', 3], 
+    [1.0, 'wall-1', 3], [1.0, 'wall-2', 3], [1.0, 'wall-0', 3], [1.0, 'wall-4', 
+    3], [1.0, 'wall-5', 3], [1.0, 'wall-6', 3], [1.0, 'wall-7', 3], [1.0, 
+    'wall-8', 3], [1.0, 'wall-9', 3], [1.0, 'wall-10', 3], [1.0, 'wall-11', 3], 
+    [1.0, 'wall-12', 3], [1.0, 'wall-13', 3], [1.0, 'wall-14', 3], [1.0, 
+    'wall-15', 3], [1.0, 'wall-16', 3], [1.0, 'wall-17', 3], [1.0, 'wall-18', 
+    3], [1.0, 'wall-19', 3], [1.0, 'wall-20', 3], [1.0, 'wall-21', 3], [1.0, 
+    'wall-22', 3], [1.0, 'wall-23', 3], [1.0, 'wall-24', 3], [1.0, 'wall-25', 
+    3], [1.0, 'wall-26', 3], [1.0, 'wall-27', 3], [1.0, 'wall-28', 3], [1.0, 
+    'wall-29', 3], [1.0, 'wall-30', 3], [1.0, 'wall-31', 3], [1.0, 'wall-32', 
+    3], [1.0, 'wall-33', 3], [1.0, 'wall-34', 3], [1.0, 'wall-35', 3], [1.0, 
+    'wall-36', 3], [1.0, 'wall-37', 3], [1.0, 'wall-38', 3], [1.0, 'wall-39', 
+    3], [1.0, 'wall-40', 3], [1.0, 'wall-41', 3], [1.0, 'wall-42', 3], [1.0, 
+    'wall-43', 3], [1.0, 'wall-44', 3], [1.0, 'wall-45', 3], [1.0, 'wall-46', 
+    3], [1.0, 'wall-47', 3], [1.0, 'wall-48', 3], [1.0, 'wall-49', 3], [1.0, 
+    'wall-50', 3], [1.0, 'wall-51', 3], [1.0, 'wall-52', 3], [1.0, 'wall-53', 
+    3], [1.0, 'wall-54', 3], [1.0, 'wall-55', 3], [1.0, 'wall-56', 3], [1.0, 
+    'wall-57', 3], [1.0, 'wall-58', 3], [1.0, 'wall-59', 3], [1.0, 'wall-60', 
+    3], [1.0, 'wall-61', 3], [1.0, 'wall-62', 3], [1.0, 'wall-63', 3], [1.0, 
+    'wall-64', 3], [1.0, 'wall-65', 3], [1.0, 'wall-66', 3], [1.0, 'wall-67', 
+    3], [1.0, 'wall-68', 3], [1.0, 'wall-69', 3], [1.0, 'wall-70', 3], [1.0, 
+    'wall-71', 3], [1.0, 'wall-72', 3], [1.0, 'wall-73', 3], [1.0, 'wall-74', 
+    3], [1.0, 'wall-75', 3], [1.0, 'wall-76', 3], [1.0, 'wall-77', 3], [1.0, 
+    'wall-78', 3], [1.0, 'wall-79', 3], [1.0, 'wall-80', 3], [1.0, 'wall-81', 
+    3], [1.0, 'wall-82', 3], [1.0, 'wall-83', 3], [1.0, 'wall-84', 3], [1.0, 
+    'wall-85', 3], [1.0, 'wall-86', 3], [1.0, 'wall-87', 3], [1.0, 'wall-88', 
+    3], [1.0, 'wall-89', 3], [1.0, 'wall-90', 3], [1.0, 'wall-91', 3], [1.0, 
+    'wall-92', 3], [1.0, 'wall-93', 3], [1.0, 'wall-94', 3], [1.0, 'wall-95', 
+    3], [1.0, 'wall-96', 3], [1.0, 'wall-97', 3], [1.0, 'wall-98', 3], [1.0, 
+    'wall-99', 3], [1.0, 'wall-100', 3], [1.0, 'wall-101', 3]])
+mdb.models['Model-1'].Equation(name='moment_x_u3', terms=[[-0.0513390694977716, 
+    'wall-1', 3], [-0.0513390694977716, 'wall-0', 3], [-0.00250666588544846, 
+    'wall-2', 3], [0.0455411300063133, 'wall-4', 3], [0.050514928996563, 
+    'wall-5', 3], [0.092047818005085, 'wall-6', 3], [0.0994103029370308, 
+    'wall-7', 3], [0.13628114014864, 'wall-8', 3], [0.145916201174259, 
+    'wall-9', 3], [0.177544660866261, 'wall-10', 3], [0.18930035084486, 
+    'wall-11', 3], [0.215188689529896, 'wall-12', 3], [0.228879608213902, 
+    'wall-13', 3], [0.248620517551899, 'wall-14', 3], [0.264030762016773, 
+    'wall-15', 3], [0.277313776314259, 'wall-16', 3], [0.29420030862093, 
+    'wall-17', 3], [0.300816662609577, 'wall-18', 3], [0.318913169205189, 
+    'wall-19', 3], [0.318759150803089, 'wall-20', 3], [0.337780244648457, 
+    'wall-21', 3], [0.330858744680882, 'wall-22', 3], [0.350504465401173, 
+    'wall-23', 3], [0.336924947798252, 'wall-24', 3], [0.356885440647602, 
+    'wall-25', 3], [0.336862213909626, 'wall-26', 3], [0.356822676956654, 
+    'wall-27', 3], [0.330671526491642, 'wall-28', 3], [0.350317217409611, 
+    'wall-29', 3], [0.318450398743153, 'wall-30', 3], [0.337471462786198, 
+    'wall-31', 3], [0.30039120465517, 'wall-32', 3], [0.318487711250782, 
+    'wall-33', 3], [0.276778317987919, 'wall-34', 3], [0.29366485029459, 
+    'wall-35', 3], [0.247983522713184, 'wall-36', 3], [0.263393737375736, 
+    'wall-37', 3], [0.214460171759129, 'wall-38', 3], [0.228151090443134, 
+    'wall-39', 3], [0.17673609405756, 'wall-40', 3], [0.188491769134998, 
+    'wall-41', 3], [0.135405249893665, 'wall-42', 3], [0.145040296018124, 
+    'wall-43', 3], [0.0911184027791023, 'wall-44', 3], [0.0984808728098869, 
+    'wall-45', 3], [0.0445728152990341, 'wall-46', 3], [0.0495465993881226, 
+    'wall-47', 3], [-0.0034986324608326, 'wall-48', 3], [-0.000991974025964737, 
+    'wall-49', 3], [-0.0523390695452693, 'wall-50', 3], [-0.0523390695452715, 
+    'wall-51', 3], [-0.101179506629705, 'wall-52', 3], [-0.103686165064573, 
+    'wall-53', 3], [-0.149250954389572, 'wall-54', 3], [-0.154224738478661, 
+    'wall-55', 3], [-0.19579654186964, 'wall-56', 3], [-0.203159011900425, 
+    'wall-57', 3], [-0.240083388984203, 'wall-58', 3], [-0.249718435108662, 
+    'wall-59', 3], [-0.281414233148098, 'wall-60', 3], [-0.293169908225536, 
+    'wall-61', 3], [-0.319138310849667, 'wall-62', 3], [-0.332829229533672, 
+    'wall-63', 3], [-0.352661661803722, 'wall-64', 3], [-0.368071876466274, 
+    'wall-65', 3], [-0.381456457078457, 'wall-66', 3], [-0.398342989385128, 
+    'wall-67', 3], [-0.405069343745708, 'wall-68', 3], [-0.42316585034132, 
+    'wall-69', 3], [-0.423128537833691, 'wall-70', 3], [-0.442149601876736, 
+    'wall-71', 3], [-0.43534966558218, 'wall-72', 3], [-0.454995356500149, 
+    'wall-73', 3], [-0.441540353000164, 'wall-74', 3], [-0.461500816047192, 
+    'wall-75', 3], [-0.44160308688879, 'wall-76', 3], [-0.46156357973814, 
+    'wall-77', 3], [-0.43553688377142, 'wall-78', 3], [-0.455182604491711, 
+    'wall-79', 3], [-0.423437289893627, 'wall-80', 3], [-0.442458383738995, 
+    'wall-81', 3], [-0.405494801700115, 'wall-82', 3], [-0.423591308295727, 
+    'wall-83', 3], [-0.381991915404797, 'wall-84', 3], [-0.398878447711468, 
+    'wall-85', 3], [-0.353298656642437, 'wall-86', 3], [-0.368708901107311, 
+    'wall-87', 3], [-0.319866828620434, 'wall-88', 3], [-0.33355774730444, 
+    'wall-89', 3], [-0.282222799956799, 'wall-90', 3], [-0.293978489935398, 
+    'wall-91', 3], [-0.240959279239178, 'wall-92', 3], [-0.250594340264797, 
+    'wall-93', 3], [-0.196725957095623, 'wall-94', 3], [-0.204088442027569, 
+    'wall-95', 3], [-0.150219269096851, 'wall-96', 3], [-0.155193068087101, 
+    'wall-97', 3], [-0.10217147320509, 'wall-98', 3], [-0.104678139090538, 
+    'wall-99', 3], [-0.0533390695927665, 'wall-100', 3], [-0.0533390695927665, 
+    'wall-101', 3]])
+mdb.models['Model-1'].Equation(name='moment_y_u3', terms=[[-0.0289834306236503, 
+    'wall-2', 3], [-0.983353197574615, 'wall-0', 3], [0.916193701891073, 
+    'wall-4', 3], [0.993703405590278, 'wall-5', 3], [1.83729659020883, 
+    'wall-6', 3], [1.96211007964998, 'wall-7', 3], [2.71982230296428, 'wall-8', 
+    3], [2.88997120556547, 'wall-9', 3], [3.54987578581322, 'wall-10', 3], 
+    [3.76267683960502, 'wall-11', 3], [4.31438797904733, 'wall-12', 3], 
+    [4.56648503211516, 'wall-13', 3], [5.00132150758438, 'wall-14', 3], 
+    [5.28873905364756, 'wall-15', 3], [5.599860944945, 'wall-16', 3], 
+    [5.91806608395698, 'wall-17', 3], [6.10058173349071, 'wall-18', 3], 
+    [6.4445561277195, 'wall-19', 3], [6.49560058211161, 'wall-20', 3], 
+    [6.85991964676199, 'wall-21', 3], [6.77869807507216, 'wall-22', 3], 
+    [7.15761654015061, 'wall-23', 3], [6.94541706628398, 'wall-24', 3], 
+    [7.33295858398158, 'wall-25', 3], [6.9931319188462, 'wall-26', 3], 
+    [7.38318447097756, 'wall-27', 3], [6.92109128559895, 'wall-28', 3], 
+    [7.30750440210399, 'wall-29', 3], [6.7304302349433, 'wall-30', 3], 
+    [7.10710937386515, 'wall-31', 3], [6.42414981465258, 'wall-32', 3], 
+    [6.78515534205627, 'wall-33', 3], [6.0070730268858, 'wall-34', 3], 
+    [6.34671119149631, 'wall-35', 3], [5.48576673374081, 'wall-36', 3], 
+    [5.79868061428693, 'wall-37', 3], [4.86843848145891, 'wall-38', 3], 
+    [5.14969421615784, 'wall-39', 3], [4.16480820602816, 'wall-40', 3], 
+    [4.40996958291614, 'wall-41', 3], [3.38595447000797, 'wall-42', 3], 
+    [3.59115526264945, 'wall-43', 3], [2.54414045507372, 'wall-44', 3], 
+    [2.70614465782596, 'wall-45', 3], [1.65261994481338, 'wall-46', 3], 
+    [1.76887261578524, 'wall-47', 3], [0.725430227496552, 'wall-48', 3], 
+    [0.794098017265792, 'wall-49', 3], [-0.222830288513189, 'wall-50', 3], 
+    [-0.202830337389039, 'wall-51', 3], [-1.17723133463232, 'wall-52', 3], 
+    [-1.20621464993333, 'wall-53', 3], [-2.12274590393889, 'wall-54', 3], 
+    [-2.20025537699282, 'wall-55', 3], [-3.0444872207979, 'wall-56', 3], 
+    [-3.16930044979144, 'wall-57', 3], [-3.92794199424655, 'wall-58', 3], 
+    [-4.09809066620246, 'wall-59', 3], [-4.7592009684183, 'wall-60', 3], 
+    [-4.97200173196018, 'wall-61', 3], [-5.52517573533083, 'wall-62', 3], 
+    [-5.77727281820099, 'wall-63', 3], [-6.21380613333226, 'wall-64', 3], 
+    [-6.50122314359906, 'wall-65', 3], [-6.81424963255482, 'wall-66', 3], 
+    [-7.13245480136913, 'wall-67', 3], [-7.31705265165819, 'wall-68', 3], 
+    [-7.66102704588698, 'wall-69', 3], [-7.71429858136359, 'wall-70', 3], 
+    [-8.07861705806353, 'wall-71', 3], [-7.99973216460152, 'wall-72', 3], 
+    [-8.3786500566307, 'wall-73', 3], [-8.16886019602019, 'wall-74', 3], 
+    [-8.55640113135529, 'wall-75', 3], [-8.21901895297101, 'wall-76', 3], 
+    [-8.60907208373958, 'wall-77', 3], [-8.1494187753037, 'wall-78', 3], 
+    [-8.53583247975918, 'wall-79', 3], [-7.9611561911862, 'wall-80', 3], 
+    [-8.33783590315733, 'wall-81', 3], [-7.65719516467357, 'wall-82', 3], 
+    [-8.01820069207726, 'wall-83', 3], [-7.24232139627709, 'wall-84', 3], 
+    [-7.58195959068992, 'wall-85', 3], [-6.72306656728057, 'wall-86', 3], 
+    [-7.03598107303003, 'wall-87', 3], [-6.10760687564232, 'wall-88', 3], 
+    [-6.38886264014357, 'wall-89', 3], [-5.405632471753, 'wall-90', 3], 
+    [-5.65079413889091, 'wall-91', 3], [-4.62819594275386, 'wall-92', 3], 
+    [-4.83339708524992, 'wall-93', 3], [-3.78753802260476, 'wall-94', 3], 
+    [-3.94954254540925, 'wall-95', 3], [-2.89689447867406, 'wall-96', 3], 
+    [-3.01314749950049, 'wall-97', 3], [-1.97028872295987, 'wall-98', 3], 
+    [-2.0389566876564, 'wall-99', 3], [-1.02230988523102, 'wall-100', 3], 
+    [-1.04230989595985, 'wall-101', 3]])
+mdb.models['Model-1'].rootAssembly.DatumCsysByThreePoints(coordSysType=
+    CARTESIAN, name='end', origin=
+    mdb.models['Model-1'].rootAssembly.instances['SC_beam-1'].vertices[4], 
+    point1=
+    mdb.models['Model-1'].rootAssembly.instances['SC_beam-1'].vertices[5], 
+    point2=
+    mdb.models['Model-1'].rootAssembly.instances['SC_beam-1'].InterestingPoint(
+    mdb.models['Model-1'].rootAssembly.instances['SC_beam-1'].edges[8], 
+    MIDDLE))
+mdb.models['Model-1'].rootAssembly.ReferencePoint(point=(1.0, 0.0, 
+    0.949999988079071))
+mdb.models['Model-1'].ConnectorSection(name='warping', translationalType=SLOT)
+mdb.models['Model-1'].rootAssembly.WirePolyLine(mergeType=IMPRINT, meshable=OFF
+    , points=((mdb.models['Model-1'].rootAssembly.referencePoints[109], 
+    mdb.models['Model-1'].rootAssembly.instances['SC_beam-1'].nodes[1938]), ))
+mdb.models['Model-1'].rootAssembly.WirePolyLine(mergeType=IMPRINT, meshable=OFF
+    , points=((mdb.models['Model-1'].rootAssembly.referencePoints[109], 
+    mdb.models['Model-1'].rootAssembly.instances['SC_beam-1'].nodes[1939]), ))
+mdb.models['Model-1'].rootAssembly.WirePolyLine(mergeType=IMPRINT, meshable=OFF
+    , points=((mdb.models['Model-1'].rootAssembly.referencePoints[109], 
+    mdb.models['Model-1'].rootAssembly.instances['SC_beam-1'].nodes[1940]), ))
+mdb.models['Model-1'].rootAssembly.WirePolyLine(mergeType=IMPRINT, meshable=OFF
+    , points=((mdb.models['Model-1'].rootAssembly.referencePoints[109], 
+    mdb.models['Model-1'].rootAssembly.instances['SC_beam-1'].nodes[1941]), ))
+mdb.models['Model-1'].rootAssembly.WirePolyLine(mergeType=IMPRINT, meshable=OFF
+    , points=((mdb.models['Model-1'].rootAssembly.referencePoints[109], 
+    mdb.models['Model-1'].rootAssembly.instances['SC_beam-1'].nodes[1942]), ))
+mdb.models['Model-1'].rootAssembly.WirePolyLine(mergeType=IMPRINT, meshable=OFF
+    , points=((mdb.models['Model-1'].rootAssembly.referencePoints[109], 
+    mdb.models['Model-1'].rootAssembly.instances['SC_beam-1'].nodes[1943]), ))
+mdb.models['Model-1'].rootAssembly.WirePolyLine(mergeType=IMPRINT, meshable=OFF
+    , points=((mdb.models['Model-1'].rootAssembly.referencePoints[109], 
+    mdb.models['Model-1'].rootAssembly.instances['SC_beam-1'].nodes[1944]), ))
+mdb.models['Model-1'].rootAssembly.WirePolyLine(mergeType=IMPRINT, meshable=OFF
+    , points=((mdb.models['Model-1'].rootAssembly.referencePoints[109], 
+    mdb.models['Model-1'].rootAssembly.instances['SC_beam-1'].nodes[1945]), ))
+mdb.models['Model-1'].rootAssembly.WirePolyLine(mergeType=IMPRINT, meshable=OFF
+    , points=((mdb.models['Model-1'].rootAssembly.referencePoints[109], 
+    mdb.models['Model-1'].rootAssembly.instances['SC_beam-1'].nodes[1946]), ))
+mdb.models['Model-1'].rootAssembly.WirePolyLine(mergeType=IMPRINT, meshable=OFF
+    , points=((mdb.models['Model-1'].rootAssembly.referencePoints[109], 
+    mdb.models['Model-1'].rootAssembly.instances['SC_beam-1'].nodes[1947]), ))
+mdb.models['Model-1'].rootAssembly.WirePolyLine(mergeType=IMPRINT, meshable=OFF
+    , points=((mdb.models['Model-1'].rootAssembly.referencePoints[109], 
+    mdb.models['Model-1'].rootAssembly.instances['SC_beam-1'].nodes[1948]), ))
+mdb.models['Model-1'].rootAssembly.WirePolyLine(mergeType=IMPRINT, meshable=OFF
+    , points=((mdb.models['Model-1'].rootAssembly.referencePoints[109], 
+    mdb.models['Model-1'].rootAssembly.instances['SC_beam-1'].nodes[1949]), ))
+mdb.models['Model-1'].rootAssembly.WirePolyLine(mergeType=IMPRINT, meshable=OFF
+    , points=((mdb.models['Model-1'].rootAssembly.referencePoints[109], 
+    mdb.models['Model-1'].rootAssembly.instances['SC_beam-1'].nodes[1950]), ))
+mdb.models['Model-1'].rootAssembly.WirePolyLine(mergeType=IMPRINT, meshable=OFF
+    , points=((mdb.models['Model-1'].rootAssembly.referencePoints[109], 
+    mdb.models['Model-1'].rootAssembly.instances['SC_beam-1'].nodes[1951]), ))
+mdb.models['Model-1'].rootAssembly.WirePolyLine(mergeType=IMPRINT, meshable=OFF
+    , points=((mdb.models['Model-1'].rootAssembly.referencePoints[109], 
+    mdb.models['Model-1'].rootAssembly.instances['SC_beam-1'].nodes[1952]), ))
+mdb.models['Model-1'].rootAssembly.WirePolyLine(mergeType=IMPRINT, meshable=OFF
+    , points=((mdb.models['Model-1'].rootAssembly.referencePoints[109], 
+    mdb.models['Model-1'].rootAssembly.instances['SC_beam-1'].nodes[1953]), ))
+mdb.models['Model-1'].rootAssembly.WirePolyLine(mergeType=IMPRINT, meshable=OFF
+    , points=((mdb.models['Model-1'].rootAssembly.referencePoints[109], 
+    mdb.models['Model-1'].rootAssembly.instances['SC_beam-1'].nodes[1954]), ))
+mdb.models['Model-1'].rootAssembly.WirePolyLine(mergeType=IMPRINT, meshable=OFF
+    , points=((mdb.models['Model-1'].rootAssembly.referencePoints[109], 
+    mdb.models['Model-1'].rootAssembly.instances['SC_beam-1'].nodes[1955]), ))
+mdb.models['Model-1'].rootAssembly.WirePolyLine(mergeType=IMPRINT, meshable=OFF
+    , points=((mdb.models['Model-1'].rootAssembly.referencePoints[109], 
+    mdb.models['Model-1'].rootAssembly.instances['SC_beam-1'].nodes[1956]), ))
+mdb.models['Model-1'].rootAssembly.WirePolyLine(mergeType=IMPRINT, meshable=OFF
+    , points=((mdb.models['Model-1'].rootAssembly.referencePoints[109], 
+    mdb.models['Model-1'].rootAssembly.instances['SC_beam-1'].nodes[1957]), ))
+mdb.models['Model-1'].rootAssembly.WirePolyLine(mergeType=IMPRINT, meshable=OFF
+    , points=((mdb.models['Model-1'].rootAssembly.referencePoints[109], 
+    mdb.models['Model-1'].rootAssembly.instances['SC_beam-1'].nodes[1958]), ))
+mdb.models['Model-1'].rootAssembly.WirePolyLine(mergeType=IMPRINT, meshable=OFF
+    , points=((mdb.models['Model-1'].rootAssembly.referencePoints[109], 
+    mdb.models['Model-1'].rootAssembly.instances['SC_beam-1'].nodes[1959]), ))
+mdb.models['Model-1'].rootAssembly.WirePolyLine(mergeType=IMPRINT, meshable=OFF
+    , points=((mdb.models['Model-1'].rootAssembly.referencePoints[109], 
+    mdb.models['Model-1'].rootAssembly.instances['SC_beam-1'].nodes[1960]), ))
+mdb.models['Model-1'].rootAssembly.WirePolyLine(mergeType=IMPRINT, meshable=OFF
+    , points=((mdb.models['Model-1'].rootAssembly.referencePoints[109], 
+    mdb.models['Model-1'].rootAssembly.instances['SC_beam-1'].nodes[1961]), ))
+mdb.models['Model-1'].rootAssembly.WirePolyLine(mergeType=IMPRINT, meshable=OFF
+    , points=((mdb.models['Model-1'].rootAssembly.referencePoints[109], 
+    mdb.models['Model-1'].rootAssembly.instances['SC_beam-1'].nodes[1962]), ))
+mdb.models['Model-1'].rootAssembly.WirePolyLine(mergeType=IMPRINT, meshable=OFF
+    , points=((mdb.models['Model-1'].rootAssembly.referencePoints[109], 
+    mdb.models['Model-1'].rootAssembly.instances['SC_beam-1'].nodes[1963]), ))
+mdb.models['Model-1'].rootAssembly.WirePolyLine(mergeType=IMPRINT, meshable=OFF
+    , points=((mdb.models['Model-1'].rootAssembly.referencePoints[109], 
+    mdb.models['Model-1'].rootAssembly.instances['SC_beam-1'].nodes[1964]), ))
+mdb.models['Model-1'].rootAssembly.WirePolyLine(mergeType=IMPRINT, meshable=OFF
+    , points=((mdb.models['Model-1'].rootAssembly.referencePoints[109], 
+    mdb.models['Model-1'].rootAssembly.instances['SC_beam-1'].nodes[1965]), ))
+mdb.models['Model-1'].rootAssembly.WirePolyLine(mergeType=IMPRINT, meshable=OFF
+    , points=((mdb.models['Model-1'].rootAssembly.referencePoints[109], 
+    mdb.models['Model-1'].rootAssembly.instances['SC_beam-1'].nodes[1966]), ))
+mdb.models['Model-1'].rootAssembly.WirePolyLine(mergeType=IMPRINT, meshable=OFF
+    , points=((mdb.models['Model-1'].rootAssembly.referencePoints[109], 
+    mdb.models['Model-1'].rootAssembly.instances['SC_beam-1'].nodes[1967]), ))
+mdb.models['Model-1'].rootAssembly.WirePolyLine(mergeType=IMPRINT, meshable=OFF
+    , points=((mdb.models['Model-1'].rootAssembly.referencePoints[109], 
+    mdb.models['Model-1'].rootAssembly.instances['SC_beam-1'].nodes[1968]), ))
+mdb.models['Model-1'].rootAssembly.WirePolyLine(mergeType=IMPRINT, meshable=OFF
+    , points=((mdb.models['Model-1'].rootAssembly.referencePoints[109], 
+    mdb.models['Model-1'].rootAssembly.instances['SC_beam-1'].nodes[1969]), ))
+mdb.models['Model-1'].rootAssembly.WirePolyLine(mergeType=IMPRINT, meshable=OFF
+    , points=((mdb.models['Model-1'].rootAssembly.referencePoints[109], 
+    mdb.models['Model-1'].rootAssembly.instances['SC_beam-1'].nodes[1970]), ))
+mdb.models['Model-1'].rootAssembly.WirePolyLine(mergeType=IMPRINT, meshable=OFF
+    , points=((mdb.models['Model-1'].rootAssembly.referencePoints[109], 
+    mdb.models['Model-1'].rootAssembly.instances['SC_beam-1'].nodes[1971]), ))
+mdb.models['Model-1'].rootAssembly.WirePolyLine(mergeType=IMPRINT, meshable=OFF
+    , points=((mdb.models['Model-1'].rootAssembly.referencePoints[109], 
+    mdb.models['Model-1'].rootAssembly.instances['SC_beam-1'].nodes[1972]), ))
+mdb.models['Model-1'].rootAssembly.WirePolyLine(mergeType=IMPRINT, meshable=OFF
+    , points=((mdb.models['Model-1'].rootAssembly.referencePoints[109], 
+    mdb.models['Model-1'].rootAssembly.instances['SC_beam-1'].nodes[1973]), ))
+mdb.models['Model-1'].rootAssembly.WirePolyLine(mergeType=IMPRINT, meshable=OFF
+    , points=((mdb.models['Model-1'].rootAssembly.referencePoints[109], 
+    mdb.models['Model-1'].rootAssembly.instances['SC_beam-1'].nodes[1974]), ))
+mdb.models['Model-1'].rootAssembly.WirePolyLine(mergeType=IMPRINT, meshable=OFF
+    , points=((mdb.models['Model-1'].rootAssembly.referencePoints[109], 
+    mdb.models['Model-1'].rootAssembly.instances['SC_beam-1'].nodes[1975]), ))
+mdb.models['Model-1'].rootAssembly.WirePolyLine(mergeType=IMPRINT, meshable=OFF
+    , points=((mdb.models['Model-1'].rootAssembly.referencePoints[109], 
+    mdb.models['Model-1'].rootAssembly.instances['SC_beam-1'].nodes[1976]), ))
+mdb.models['Model-1'].rootAssembly.WirePolyLine(mergeType=IMPRINT, meshable=OFF
+    , points=((mdb.models['Model-1'].rootAssembly.referencePoints[109], 
+    mdb.models['Model-1'].rootAssembly.instances['SC_beam-1'].nodes[1977]), ))
+mdb.models['Model-1'].rootAssembly.WirePolyLine(mergeType=IMPRINT, meshable=OFF
+    , points=((mdb.models['Model-1'].rootAssembly.referencePoints[109], 
+    mdb.models['Model-1'].rootAssembly.instances['SC_beam-1'].nodes[1978]), ))
+mdb.models['Model-1'].rootAssembly.WirePolyLine(mergeType=IMPRINT, meshable=OFF
+    , points=((mdb.models['Model-1'].rootAssembly.referencePoints[109], 
+    mdb.models['Model-1'].rootAssembly.instances['SC_beam-1'].nodes[1979]), ))
+mdb.models['Model-1'].rootAssembly.WirePolyLine(mergeType=IMPRINT, meshable=OFF
+    , points=((mdb.models['Model-1'].rootAssembly.referencePoints[109], 
+    mdb.models['Model-1'].rootAssembly.instances['SC_beam-1'].nodes[1980]), ))
+mdb.models['Model-1'].rootAssembly.WirePolyLine(mergeType=IMPRINT, meshable=OFF
+    , points=((mdb.models['Model-1'].rootAssembly.referencePoints[109], 
+    mdb.models['Model-1'].rootAssembly.instances['SC_beam-1'].nodes[1981]), ))
+mdb.models['Model-1'].rootAssembly.WirePolyLine(mergeType=IMPRINT, meshable=OFF
+    , points=((mdb.models['Model-1'].rootAssembly.referencePoints[109], 
+    mdb.models['Model-1'].rootAssembly.instances['SC_beam-1'].nodes[1982]), ))
+mdb.models['Model-1'].rootAssembly.WirePolyLine(mergeType=IMPRINT, meshable=OFF
+    , points=((mdb.models['Model-1'].rootAssembly.referencePoints[109], 
+    mdb.models['Model-1'].rootAssembly.instances['SC_beam-1'].nodes[1983]), ))
+mdb.models['Model-1'].rootAssembly.WirePolyLine(mergeType=IMPRINT, meshable=OFF
+    , points=((mdb.models['Model-1'].rootAssembly.referencePoints[109], 
+    mdb.models['Model-1'].rootAssembly.instances['SC_beam-1'].nodes[1984]), ))
+mdb.models['Model-1'].rootAssembly.WirePolyLine(mergeType=IMPRINT, meshable=OFF
+    , points=((mdb.models['Model-1'].rootAssembly.referencePoints[109], 
+    mdb.models['Model-1'].rootAssembly.instances['SC_beam-1'].nodes[1985]), ))
+mdb.models['Model-1'].rootAssembly.WirePolyLine(mergeType=IMPRINT, meshable=OFF
+    , points=((mdb.models['Model-1'].rootAssembly.referencePoints[109], 
+    mdb.models['Model-1'].rootAssembly.instances['SC_beam-1'].nodes[1986]), ))
+mdb.models['Model-1'].rootAssembly.WirePolyLine(mergeType=IMPRINT, meshable=OFF
+    , points=((mdb.models['Model-1'].rootAssembly.referencePoints[109], 
+    mdb.models['Model-1'].rootAssembly.instances['SC_beam-1'].nodes[1987]), ))
+mdb.models['Model-1'].rootAssembly.WirePolyLine(mergeType=IMPRINT, meshable=OFF
+    , points=((mdb.models['Model-1'].rootAssembly.referencePoints[109], 
+    mdb.models['Model-1'].rootAssembly.instances['SC_beam-1'].nodes[1988]), ))
+mdb.models['Model-1'].rootAssembly.WirePolyLine(mergeType=IMPRINT, meshable=OFF
+    , points=((mdb.models['Model-1'].rootAssembly.referencePoints[109], 
+    mdb.models['Model-1'].rootAssembly.instances['SC_beam-1'].nodes[1989]), ))
+mdb.models['Model-1'].rootAssembly.WirePolyLine(mergeType=IMPRINT, meshable=OFF
+    , points=((mdb.models['Model-1'].rootAssembly.referencePoints[109], 
+    mdb.models['Model-1'].rootAssembly.instances['SC_beam-1'].nodes[1990]), ))
+mdb.models['Model-1'].rootAssembly.WirePolyLine(mergeType=IMPRINT, meshable=OFF
+    , points=((mdb.models['Model-1'].rootAssembly.referencePoints[109], 
+    mdb.models['Model-1'].rootAssembly.instances['SC_beam-1'].nodes[1991]), ))
+mdb.models['Model-1'].rootAssembly.WirePolyLine(mergeType=IMPRINT, meshable=OFF
+    , points=((mdb.models['Model-1'].rootAssembly.referencePoints[109], 
+    mdb.models['Model-1'].rootAssembly.instances['SC_beam-1'].nodes[1992]), ))
+mdb.models['Model-1'].rootAssembly.WirePolyLine(mergeType=IMPRINT, meshable=OFF
+    , points=((mdb.models['Model-1'].rootAssembly.referencePoints[109], 
+    mdb.models['Model-1'].rootAssembly.instances['SC_beam-1'].nodes[1993]), ))
+mdb.models['Model-1'].rootAssembly.WirePolyLine(mergeType=IMPRINT, meshable=OFF
+    , points=((mdb.models['Model-1'].rootAssembly.referencePoints[109], 
+    mdb.models['Model-1'].rootAssembly.instances['SC_beam-1'].nodes[1994]), ))
+mdb.models['Model-1'].rootAssembly.WirePolyLine(mergeType=IMPRINT, meshable=OFF
+    , points=((mdb.models['Model-1'].rootAssembly.referencePoints[109], 
+    mdb.models['Model-1'].rootAssembly.instances['SC_beam-1'].nodes[1995]), ))
+mdb.models['Model-1'].rootAssembly.WirePolyLine(mergeType=IMPRINT, meshable=OFF
+    , points=((mdb.models['Model-1'].rootAssembly.referencePoints[109], 
+    mdb.models['Model-1'].rootAssembly.instances['SC_beam-1'].nodes[1996]), ))
+mdb.models['Model-1'].rootAssembly.WirePolyLine(mergeType=IMPRINT, meshable=OFF
+    , points=((mdb.models['Model-1'].rootAssembly.referencePoints[109], 
+    mdb.models['Model-1'].rootAssembly.instances['SC_beam-1'].nodes[1997]), ))
+mdb.models['Model-1'].rootAssembly.WirePolyLine(mergeType=IMPRINT, meshable=OFF
+    , points=((mdb.models['Model-1'].rootAssembly.referencePoints[109], 
+    mdb.models['Model-1'].rootAssembly.instances['SC_beam-1'].nodes[1998]), ))
+mdb.models['Model-1'].rootAssembly.WirePolyLine(mergeType=IMPRINT, meshable=OFF
+    , points=((mdb.models['Model-1'].rootAssembly.referencePoints[109], 
+    mdb.models['Model-1'].rootAssembly.instances['SC_beam-1'].nodes[1999]), ))
+mdb.models['Model-1'].rootAssembly.WirePolyLine(mergeType=IMPRINT, meshable=OFF
+    , points=((mdb.models['Model-1'].rootAssembly.referencePoints[109], 
+    mdb.models['Model-1'].rootAssembly.instances['SC_beam-1'].nodes[2000]), ))
+mdb.models['Model-1'].rootAssembly.WirePolyLine(mergeType=IMPRINT, meshable=OFF
+    , points=((mdb.models['Model-1'].rootAssembly.referencePoints[109], 
+    mdb.models['Model-1'].rootAssembly.instances['SC_beam-1'].nodes[2001]), ))
+mdb.models['Model-1'].rootAssembly.WirePolyLine(mergeType=IMPRINT, meshable=OFF
+    , points=((mdb.models['Model-1'].rootAssembly.referencePoints[109], 
+    mdb.models['Model-1'].rootAssembly.instances['SC_beam-1'].nodes[2002]), ))
+mdb.models['Model-1'].rootAssembly.WirePolyLine(mergeType=IMPRINT, meshable=OFF
+    , points=((mdb.models['Model-1'].rootAssembly.referencePoints[109], 
+    mdb.models['Model-1'].rootAssembly.instances['SC_beam-1'].nodes[2003]), ))
+mdb.models['Model-1'].rootAssembly.WirePolyLine(mergeType=IMPRINT, meshable=OFF
+    , points=((mdb.models['Model-1'].rootAssembly.referencePoints[109], 
+    mdb.models['Model-1'].rootAssembly.instances['SC_beam-1'].nodes[2004]), ))
+mdb.models['Model-1'].rootAssembly.WirePolyLine(mergeType=IMPRINT, meshable=OFF
+    , points=((mdb.models['Model-1'].rootAssembly.referencePoints[109], 
+    mdb.models['Model-1'].rootAssembly.instances['SC_beam-1'].nodes[2005]), ))
+mdb.models['Model-1'].rootAssembly.WirePolyLine(mergeType=IMPRINT, meshable=OFF
+    , points=((mdb.models['Model-1'].rootAssembly.referencePoints[109], 
+    mdb.models['Model-1'].rootAssembly.instances['SC_beam-1'].nodes[2006]), ))
+mdb.models['Model-1'].rootAssembly.WirePolyLine(mergeType=IMPRINT, meshable=OFF
+    , points=((mdb.models['Model-1'].rootAssembly.referencePoints[109], 
+    mdb.models['Model-1'].rootAssembly.instances['SC_beam-1'].nodes[2007]), ))
+mdb.models['Model-1'].rootAssembly.WirePolyLine(mergeType=IMPRINT, meshable=OFF
+    , points=((mdb.models['Model-1'].rootAssembly.referencePoints[109], 
+    mdb.models['Model-1'].rootAssembly.instances['SC_beam-1'].nodes[2008]), ))
+mdb.models['Model-1'].rootAssembly.WirePolyLine(mergeType=IMPRINT, meshable=OFF
+    , points=((mdb.models['Model-1'].rootAssembly.referencePoints[109], 
+    mdb.models['Model-1'].rootAssembly.instances['SC_beam-1'].nodes[2009]), ))
+mdb.models['Model-1'].rootAssembly.WirePolyLine(mergeType=IMPRINT, meshable=OFF
+    , points=((mdb.models['Model-1'].rootAssembly.referencePoints[109], 
+    mdb.models['Model-1'].rootAssembly.instances['SC_beam-1'].nodes[2010]), ))
+mdb.models['Model-1'].rootAssembly.WirePolyLine(mergeType=IMPRINT, meshable=OFF
+    , points=((mdb.models['Model-1'].rootAssembly.referencePoints[109], 
+    mdb.models['Model-1'].rootAssembly.instances['SC_beam-1'].nodes[2011]), ))
+mdb.models['Model-1'].rootAssembly.WirePolyLine(mergeType=IMPRINT, meshable=OFF
+    , points=((mdb.models['Model-1'].rootAssembly.referencePoints[109], 
+    mdb.models['Model-1'].rootAssembly.instances['SC_beam-1'].nodes[2012]), ))
+mdb.models['Model-1'].rootAssembly.WirePolyLine(mergeType=IMPRINT, meshable=OFF
+    , points=((mdb.models['Model-1'].rootAssembly.referencePoints[109], 
+    mdb.models['Model-1'].rootAssembly.instances['SC_beam-1'].nodes[2013]), ))
+mdb.models['Model-1'].rootAssembly.WirePolyLine(mergeType=IMPRINT, meshable=OFF
+    , points=((mdb.models['Model-1'].rootAssembly.referencePoints[109], 
+    mdb.models['Model-1'].rootAssembly.instances['SC_beam-1'].nodes[2014]), ))
+mdb.models['Model-1'].rootAssembly.WirePolyLine(mergeType=IMPRINT, meshable=OFF
+    , points=((mdb.models['Model-1'].rootAssembly.referencePoints[109], 
+    mdb.models['Model-1'].rootAssembly.instances['SC_beam-1'].nodes[2015]), ))
+mdb.models['Model-1'].rootAssembly.WirePolyLine(mergeType=IMPRINT, meshable=OFF
+    , points=((mdb.models['Model-1'].rootAssembly.referencePoints[109], 
+    mdb.models['Model-1'].rootAssembly.instances['SC_beam-1'].nodes[2016]), ))
+mdb.models['Model-1'].rootAssembly.WirePolyLine(mergeType=IMPRINT, meshable=OFF
+    , points=((mdb.models['Model-1'].rootAssembly.referencePoints[109], 
+    mdb.models['Model-1'].rootAssembly.instances['SC_beam-1'].nodes[2017]), ))
+mdb.models['Model-1'].rootAssembly.WirePolyLine(mergeType=IMPRINT, meshable=OFF
+    , points=((mdb.models['Model-1'].rootAssembly.referencePoints[109], 
+    mdb.models['Model-1'].rootAssembly.instances['SC_beam-1'].nodes[2018]), ))
+mdb.models['Model-1'].rootAssembly.WirePolyLine(mergeType=IMPRINT, meshable=OFF
+    , points=((mdb.models['Model-1'].rootAssembly.referencePoints[109], 
+    mdb.models['Model-1'].rootAssembly.instances['SC_beam-1'].nodes[2019]), ))
+mdb.models['Model-1'].rootAssembly.WirePolyLine(mergeType=IMPRINT, meshable=OFF
+    , points=((mdb.models['Model-1'].rootAssembly.referencePoints[109], 
+    mdb.models['Model-1'].rootAssembly.instances['SC_beam-1'].nodes[2020]), ))
+mdb.models['Model-1'].rootAssembly.WirePolyLine(mergeType=IMPRINT, meshable=OFF
+    , points=((mdb.models['Model-1'].rootAssembly.referencePoints[109], 
+    mdb.models['Model-1'].rootAssembly.instances['SC_beam-1'].nodes[2021]), ))
+mdb.models['Model-1'].rootAssembly.WirePolyLine(mergeType=IMPRINT, meshable=OFF
+    , points=((mdb.models['Model-1'].rootAssembly.referencePoints[109], 
+    mdb.models['Model-1'].rootAssembly.instances['SC_beam-1'].nodes[2022]), ))
+mdb.models['Model-1'].rootAssembly.WirePolyLine(mergeType=IMPRINT, meshable=OFF
+    , points=((mdb.models['Model-1'].rootAssembly.referencePoints[109], 
+    mdb.models['Model-1'].rootAssembly.instances['SC_beam-1'].nodes[2023]), ))
+mdb.models['Model-1'].rootAssembly.WirePolyLine(mergeType=IMPRINT, meshable=OFF
+    , points=((mdb.models['Model-1'].rootAssembly.referencePoints[109], 
+    mdb.models['Model-1'].rootAssembly.instances['SC_beam-1'].nodes[2024]), ))
+mdb.models['Model-1'].rootAssembly.WirePolyLine(mergeType=IMPRINT, meshable=OFF
+    , points=((mdb.models['Model-1'].rootAssembly.referencePoints[109], 
+    mdb.models['Model-1'].rootAssembly.instances['SC_beam-1'].nodes[2025]), ))
+mdb.models['Model-1'].rootAssembly.WirePolyLine(mergeType=IMPRINT, meshable=OFF
+    , points=((mdb.models['Model-1'].rootAssembly.referencePoints[109], 
+    mdb.models['Model-1'].rootAssembly.instances['SC_beam-1'].nodes[2026]), ))
+mdb.models['Model-1'].rootAssembly.WirePolyLine(mergeType=IMPRINT, meshable=OFF
+    , points=((mdb.models['Model-1'].rootAssembly.referencePoints[109], 
+    mdb.models['Model-1'].rootAssembly.instances['SC_beam-1'].nodes[2027]), ))
+mdb.models['Model-1'].rootAssembly.WirePolyLine(mergeType=IMPRINT, meshable=OFF
+    , points=((mdb.models['Model-1'].rootAssembly.referencePoints[109], 
+    mdb.models['Model-1'].rootAssembly.instances['SC_beam-1'].nodes[2028]), ))
+mdb.models['Model-1'].rootAssembly.WirePolyLine(mergeType=IMPRINT, meshable=OFF
+    , points=((mdb.models['Model-1'].rootAssembly.referencePoints[109], 
+    mdb.models['Model-1'].rootAssembly.instances['SC_beam-1'].nodes[2029]), ))
+mdb.models['Model-1'].rootAssembly.WirePolyLine(mergeType=IMPRINT, meshable=OFF
+    , points=((mdb.models['Model-1'].rootAssembly.referencePoints[109], 
+    mdb.models['Model-1'].rootAssembly.instances['SC_beam-1'].nodes[2030]), ))
+mdb.models['Model-1'].rootAssembly.WirePolyLine(mergeType=IMPRINT, meshable=OFF
+    , points=((mdb.models['Model-1'].rootAssembly.referencePoints[109], 
+    mdb.models['Model-1'].rootAssembly.instances['SC_beam-1'].nodes[2031]), ))
+mdb.models['Model-1'].rootAssembly.WirePolyLine(mergeType=IMPRINT, meshable=OFF
+    , points=((mdb.models['Model-1'].rootAssembly.referencePoints[109], 
+    mdb.models['Model-1'].rootAssembly.instances['SC_beam-1'].nodes[2032]), ))
+mdb.models['Model-1'].rootAssembly.WirePolyLine(mergeType=IMPRINT, meshable=OFF
+    , points=((mdb.models['Model-1'].rootAssembly.referencePoints[109], 
+    mdb.models['Model-1'].rootAssembly.instances['SC_beam-1'].nodes[2033]), ))
+mdb.models['Model-1'].rootAssembly.WirePolyLine(mergeType=IMPRINT, meshable=OFF
+    , points=((mdb.models['Model-1'].rootAssembly.referencePoints[109], 
+    mdb.models['Model-1'].rootAssembly.instances['SC_beam-1'].nodes[2034]), ))
+mdb.models['Model-1'].rootAssembly.WirePolyLine(mergeType=IMPRINT, meshable=OFF
+    , points=((mdb.models['Model-1'].rootAssembly.referencePoints[109], 
+    mdb.models['Model-1'].rootAssembly.instances['SC_beam-1'].nodes[2035]), ))
+mdb.models['Model-1'].rootAssembly.WirePolyLine(mergeType=IMPRINT, meshable=OFF
+    , points=((mdb.models['Model-1'].rootAssembly.referencePoints[109], 
+    mdb.models['Model-1'].rootAssembly.instances['SC_beam-1'].nodes[2036]), ))
+mdb.models['Model-1'].rootAssembly.WirePolyLine(mergeType=IMPRINT, meshable=OFF
+    , points=((mdb.models['Model-1'].rootAssembly.referencePoints[109], 
+    mdb.models['Model-1'].rootAssembly.instances['SC_beam-1'].nodes[2037]), ))
+mdb.models['Model-1'].rootAssembly.WirePolyLine(mergeType=IMPRINT, meshable=OFF
+    , points=((mdb.models['Model-1'].rootAssembly.referencePoints[109], 
+    mdb.models['Model-1'].rootAssembly.instances['SC_beam-1'].nodes[2038]), ))
+mdb.models['Model-1'].rootAssembly.WirePolyLine(mergeType=IMPRINT, meshable=OFF
+    , points=((mdb.models['Model-1'].rootAssembly.referencePoints[109], 
+    mdb.models['Model-1'].rootAssembly.instances['SC_beam-1'].nodes[2039]), ))
+mdb.models['Model-1'].rootAssembly.Set(edges=
+    mdb.models['Model-1'].rootAssembly.edges, name='Wire-Set-loading')
+mdb.models['Model-1'].rootAssembly.SectionAssignment(region=
+    mdb.models['Model-1'].rootAssembly.sets['Wire-Set-loading'], sectionName=
+    'warping')
+mdb.models['Model-1'].rootAssembly.sectionAssignments[0].getSet()
+mdb.models['Model-1'].rootAssembly.ConnectorOrientation(localCsys1=
+    mdb.models['Model-1'].rootAssembly.datums[108], region=
+    mdb.models['Model-1'].rootAssembly.allSets['Wire-Set-loading'])
+mdb.models['Model-1'].rootAssembly.Set(name='loading', referencePoints=(
+    mdb.models['Model-1'].rootAssembly.referencePoints[109], ))
+mdb.models['Model-1'].Moment(cm3=-100.0, createStepName='loading', 
+    distributionType=UNIFORM, field='', localCsys=None, name='Load-2', region=
+    mdb.models['Model-1'].rootAssembly.sets['loading'])
+mdb.Job(atTime=None, contactPrint=OFF, description='', echoPrint=OFF, 
+    explicitPrecision=SINGLE, getMemoryFromAnalysis=True, historyPrint=OFF, 
+    memory=90, memoryUnits=PERCENTAGE, model='Model-1', modelPrint=OFF, name=
+    'analysis', nodalOutputPrecision=SINGLE, queue=None, resultsFormat=ODB, 
+    scratch='', type=ANALYSIS, userSubroutine='', waitHours=0, waitMinutes=0)
+mdb.jobs['analysis'].submit(consistencyChecking=OFF)
+mdb.jobs['analysis'].waitForCompletion()
+#* ipc_CONNECTION_BROKEN

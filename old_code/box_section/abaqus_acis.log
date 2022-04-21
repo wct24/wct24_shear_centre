@@ -1,0 +1,4 @@
+????????
+*** Warning (spaacis/src:PENDING_FP_EXCEPTION_CLEARED)
+    An fp-exception was pending upon entering the API block; it was cleared.
+????????

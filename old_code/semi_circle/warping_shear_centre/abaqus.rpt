@@ -1,0 +1,24 @@
+********************************************************************************
+Probe Values Report, written on Fri Mar  4 18:03:30 2022
+
+Source
+-------
+
+   ODB: E:/temp/SC/analysis.odb
+   Step: loading
+   Frame: Increment      1: Step Time =    1.000
+   Variable: S, Mises (Avg: 75)
+
+Probe values reported at nodes
+
+  Part Instance     Node ID            Orig. Coords                     Def. Coords          
+                                 X          Y          Z          X          Y          Z    
+-------------------------------------------------------------------------------------------
+    ASSEMBLY  SC_BEAM-1.5570   192.E-03   362.E-03        1.0   192.E-03   362.E-03  1000.E-03
+
+
+  Part Instance     Node ID  Attached elements   S, Mises
+----------------------------------------------------------
+    ASSEMBLY  SC_BEAM-1.5570         21    NoValue
+
+

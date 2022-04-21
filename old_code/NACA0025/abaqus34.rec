@@ -1,0 +1,193 @@
+# -*- coding: mbcs -*-
+from part import *
+from material import *
+from section import *
+from assembly import *
+from step import *
+from interaction import *
+from load import *
+from mesh import *
+from optimization import *
+from job import *
+from sketch import *
+from visualization import *
+mdb.models['Model-1'].ConstrainedSketch(name='__profile__', sheetSize=1.0)
+mdb.models['Model-1'].sketches['__profile__'].Line(point1=(0.599285714, 
+    0.00252), point2=(0.549285714, 0.01613))
+mdb.models['Model-1'].sketches['__profile__'].Line(point1=(0.569321429, 
+    0.002394), point2=(0.521821429, 0.0153235))
+mdb.models['Model-1'].sketches['__profile__'].Line(point1=(0.549285714, 
+    0.01613), point2=(0.499285714, 0.02896))
+mdb.models['Model-1'].sketches['__profile__'].Line(point1=(0.521821429, 
+    0.0153235), point2=(0.474321429, 0.027512))
+mdb.models['Model-1'].sketches['__profile__'].Line(point1=(0.499285714, 
+    0.02896), point2=(0.399285714, 0.05247))
+mdb.models['Model-1'].sketches['__profile__'].Line(point1=(0.474321429, 
+    0.027512), point2=(0.379321429, 0.0498465))
+mdb.models['Model-1'].sketches['__profile__'].Line(point1=(0.399285714, 
+    0.05247), point2=(0.299285714, 0.07328))
+mdb.models['Model-1'].sketches['__profile__'].Line(point1=(0.379321429, 
+    0.0498465), point2=(0.284321429, 0.069616))
+mdb.models['Model-1'].sketches['__profile__'].Line(point1=(0.299285714, 
+    0.07328), point2=(0.199285714, 0.09127))
+mdb.models['Model-1'].sketches['__profile__'].Line(point1=(0.284321429, 
+    0.069616), point2=(0.189321429, 0.0867065))
+mdb.models['Model-1'].sketches['__profile__'].Line(point1=(0.199285714, 
+    0.09127), point2=(0.099285714, 0.10588))
+mdb.models['Model-1'].sketches['__profile__'].Line(point1=(0.189321429, 
+    0.0867065), point2=(0.094321429, 0.100586))
+mdb.models['Model-1'].sketches['__profile__'].Line(point1=(0.099285714, 
+    0.10588), point2=(-0.000714286, 0.11607))
+mdb.models['Model-1'].sketches['__profile__'].Line(point1=(0.094321429, 
+    0.100586), point2=(-0.000678571, 0.1102665))
+mdb.models['Model-1'].sketches['__profile__'].Line(point1=(-0.000714286, 
+    0.11607), point2=(-0.100714286, 0.12004))
+mdb.models['Model-1'].sketches['__profile__'].Line(point1=(-0.000678571, 
+    0.1102665), point2=(-0.095678571, 0.114038))
+mdb.models['Model-1'].sketches['__profile__'].Line(point1=(-0.100714286, 
+    0.12004), point2=(-0.150714286, 0.11883))
+mdb.models['Model-1'].sketches['__profile__'].Line(point1=(-0.095678571, 
+    0.114038), point2=(-0.143178571, 0.1128885))
+mdb.models['Model-1'].sketches['__profile__'].Line(point1=(-0.150714286, 
+    0.11883), point2=(-0.200714286, 0.11475))
+mdb.models['Model-1'].sketches['__profile__'].Line(point1=(-0.143178571, 
+    0.1128885), point2=(-0.190678571, 0.1090125))
+mdb.models['Model-1'].sketches['__profile__'].Line(point1=(-0.200714286, 
+    0.11475), point2=(-0.250714286, 0.10691))
+mdb.models['Model-1'].sketches['__profile__'].Line(point1=(-0.190678571, 
+    0.1090125), point2=(-0.238178571, 0.1015645))
+mdb.models['Model-1'].sketches['__profile__'].Line(point1=(-0.250714286, 
+    0.10691), point2=(-0.300714286, 0.09365))
+mdb.models['Model-1'].sketches['__profile__'].Line(point1=(-0.238178571, 
+    0.1015645), point2=(-0.285678571, 0.0889675))
+mdb.models['Model-1'].sketches['__profile__'].Line(point1=(-0.300714286, 
+    0.09365), point2=(-0.325714286, 0.084))
+mdb.models['Model-1'].sketches['__profile__'].Line(point1=(-0.285678571, 
+    0.0889675), point2=(-0.309428571, 0.0798))
+mdb.models['Model-1'].sketches['__profile__'].Line(point1=(-0.325714286, 0.084)
+    , point2=(-0.350714286, 0.07109))
+mdb.models['Model-1'].sketches['__profile__'].Line(point1=(-0.309428571, 
+    0.0798), point2=(-0.333178571, 0.0675355))
+mdb.models['Model-1'].sketches['__profile__'].Line(point1=(-0.350714286, 
+    0.07109), point2=(-0.375714286, 0.05229))
+mdb.models['Model-1'].sketches['__profile__'].Line(point1=(-0.333178571, 
+    0.0675355), point2=(-0.356928571, 0.0496755))
+mdb.models['Model-1'].sketches['__profile__'].Line(point1=(-0.375714286, 
+    0.05229), point2=(-0.388214286, 0.03788))
+mdb.models['Model-1'].sketches['__profile__'].Line(point1=(-0.356928571, 
+    0.0496755), point2=(-0.368803571, 0.035986))
+mdb.models['Model-1'].sketches['__profile__'].Line(point1=(-0.388214286, 
+    0.03788), point2=(-0.400714286, 0.0))
+mdb.models['Model-1'].sketches['__profile__'].Line(point1=(-0.368803571, 
+    0.035986), point2=(-0.380678571, 0.0))
+mdb.models['Model-1'].sketches['__profile__'].Line(point1=(-0.400714286, 0.0), 
+    point2=(-0.388214286, -0.03788))
+mdb.models['Model-1'].sketches['__profile__'].Line(point1=(-0.380678571, 0.0), 
+    point2=(-0.368803571, -0.035986))
+mdb.models['Model-1'].sketches['__profile__'].Line(point1=(-0.388214286, 
+    -0.03788), point2=(-0.375714286, -0.05229))
+mdb.models['Model-1'].sketches['__profile__'].Line(point1=(-0.368803571, 
+    -0.035986), point2=(-0.356928571, -0.0496755))
+mdb.models['Model-1'].sketches['__profile__'].Line(point1=(-0.375714286, 
+    -0.05229), point2=(-0.350714286, -0.07109))
+mdb.models['Model-1'].sketches['__profile__'].Line(point1=(-0.356928571, 
+    -0.0496755), point2=(-0.333178571, -0.0675355))
+mdb.models['Model-1'].sketches['__profile__'].Line(point1=(-0.350714286, 
+    -0.07109), point2=(-0.325714286, -0.084))
+mdb.models['Model-1'].sketches['__profile__'].Line(point1=(-0.333178571, 
+    -0.0675355), point2=(-0.309428571, -0.0798))
+mdb.models['Model-1'].sketches['__profile__'].Line(point1=(-0.325714286, 
+    -0.084), point2=(-0.300714286, -0.09365))
+mdb.models['Model-1'].sketches['__profile__'].Line(point1=(-0.309428571, 
+    -0.0798), point2=(-0.285678571, -0.0889675))
+mdb.models['Model-1'].sketches['__profile__'].Line(point1=(-0.300714286, 
+    -0.09365), point2=(-0.250714286, -0.10691))
+mdb.models['Model-1'].sketches['__profile__'].Line(point1=(-0.285678571, 
+    -0.0889675), point2=(-0.238178571, -0.1015645))
+mdb.models['Model-1'].sketches['__profile__'].Line(point1=(-0.250714286, 
+    -0.10691), point2=(-0.200714286, -0.11475))
+mdb.models['Model-1'].sketches['__profile__'].Line(point1=(-0.238178571, 
+    -0.1015645), point2=(-0.190678571, -0.1090125))
+mdb.models['Model-1'].sketches['__profile__'].Line(point1=(-0.200714286, 
+    -0.11475), point2=(-0.150714286, -0.11883))
+mdb.models['Model-1'].sketches['__profile__'].Line(point1=(-0.190678571, 
+    -0.1090125), point2=(-0.143178571, -0.1128885))
+mdb.models['Model-1'].sketches['__profile__'].Line(point1=(-0.150714286, 
+    -0.11883), point2=(-0.100714286, -0.12004))
+mdb.models['Model-1'].sketches['__profile__'].Line(point1=(-0.143178571, 
+    -0.1128885), point2=(-0.095678571, -0.114038))
+mdb.models['Model-1'].sketches['__profile__'].Line(point1=(-0.100714286, 
+    -0.12004), point2=(-0.000714286, -0.11607))
+mdb.models['Model-1'].sketches['__profile__'].Line(point1=(-0.095678571, 
+    -0.114038), point2=(-0.000678571, -0.1102665))
+mdb.models['Model-1'].sketches['__profile__'].Line(point1=(-0.000714286, 
+    -0.11607), point2=(0.099285714, -0.10588))
+mdb.models['Model-1'].sketches['__profile__'].Line(point1=(-0.000678571, 
+    -0.1102665), point2=(0.094321429, -0.100586))
+mdb.models['Model-1'].sketches['__profile__'].Line(point1=(0.099285714, 
+    -0.10588), point2=(0.199285714, -0.09127))
+mdb.models['Model-1'].sketches['__profile__'].Line(point1=(0.094321429, 
+    -0.100586), point2=(0.189321429, -0.0867065))
+mdb.models['Model-1'].sketches['__profile__'].Line(point1=(0.199285714, 
+    -0.09127), point2=(0.299285714, -0.07328))
+mdb.models['Model-1'].sketches['__profile__'].Line(point1=(0.189321429, 
+    -0.0867065), point2=(0.284321429, -0.069616))
+mdb.models['Model-1'].sketches['__profile__'].Line(point1=(0.299285714, 
+    -0.07328), point2=(0.399285714, -0.05247))
+mdb.models['Model-1'].sketches['__profile__'].Line(point1=(0.284321429, 
+    -0.069616), point2=(0.379321429, -0.0498465))
+mdb.models['Model-1'].sketches['__profile__'].Line(point1=(0.399285714, 
+    -0.05247), point2=(0.499285714, -0.02896))
+mdb.models['Model-1'].sketches['__profile__'].Line(point1=(0.379321429, 
+    -0.0498465), point2=(0.474321429, -0.027512))
+mdb.models['Model-1'].sketches['__profile__'].Line(point1=(0.499285714, 
+    -0.02896), point2=(0.549285714, -0.01613))
+mdb.models['Model-1'].sketches['__profile__'].Line(point1=(0.474321429, 
+    -0.027512), point2=(0.521821429, -0.0153235))
+mdb.models['Model-1'].sketches['__profile__'].Line(point1=(0.549285714, 
+    -0.01613), point2=(0.599285714, -0.00252))
+mdb.models['Model-1'].sketches['__profile__'].Line(point1=(0.521821429, 
+    -0.0153235), point2=(0.569321429, -0.002394))
+mdb.models['Model-1'].sketches['__profile__'].Line(point1=(0.599285714, 
+    -0.00252), point2=(0.599285714, 0.00252))
+mdb.models['Model-1'].sketches['__profile__'].Line(point1=(0.569321429, 
+    -0.002394), point2=(0.569321429, 0.002394))
+mdb.models['Model-1'].Part(dimensionality=THREE_D, name='part', type=
+    DEFORMABLE_BODY)
+mdb.models['Model-1'].parts['part'].BaseSolidExtrude(depth=1.0, sketch=
+    mdb.models['Model-1'].sketches['__profile__'])
+del mdb.models['Model-1'].sketches['__profile__']
+mdb.models['Model-1'].parts['part'].seedEdgeBySize(constraint=FINER, 
+    deviationFactor=0.1, edges=
+    mdb.models['Model-1'].parts['part'].edges.getSequenceFromMask((
+    '[#92492491 #24924924 #49249249 #92492292 #24924924 #49249249 #12492 ]', ), 
+    ), size=0.01)
+mdb.models['Model-1'].parts['part'].generateMesh()
+mdb.models['Model-1'].parts['part'].seedPart(deviationFactor=0.1, 
+    minSizeFactor=0.1, size=0.05)
+mdb.models['Model-1'].parts['part'].generateMesh()
+mdb.models['Model-1'].parts['part'].generateMesh()
+mdb.models['Model-1'].parts['part'].Set(cells=
+    mdb.models['Model-1'].parts['part'].cells.getSequenceFromMask(('[#1 ]', ), 
+    ), name='SC_section_geometry')
+mdb.models['Model-1'].Material(name='SC-material')
+mdb.models['Model-1'].materials['SC-material'].Elastic(table=((210000000000.0, 
+    210000000000.0, 210000000000.0, 0.3, 0.3, 0.3, 81000000000.0, 
+    81000000000.0, 81000000000.0), ), type=ENGINEERING_CONSTANTS)
+mdb.models['Model-1'].HomogeneousSolidSection(material='SC-material', name=
+    'SC-section', thickness=None)
+mdb.models['Model-1'].parts['part'].SectionAssignment(offset=0.0, offsetField=
+    '', offsetType=MIDDLE_SURFACE, region=
+    mdb.models['Model-1'].parts['part'].sets['SC_section_geometry'], 
+    sectionName='SC-section', thicknessAssignment=FROM_SECTION)
+mdb.models['Model-1'].parts['part'].MaterialOrientation(additionalRotationType=
+    ROTATION_NONE, axis=AXIS_1, fieldName='', localCsys=None, orientationType=
+    GLOBAL, region=
+    mdb.models['Model-1'].parts['part'].sets['SC_section_geometry'], 
+    stackDirection=STACK_3)
+mdb.models['Model-1'].StaticStep(name='loading', previous='Initial')
+mdb.models['Model-1'].fieldOutputRequests['F-Output-1'].setValues(variables=(
+    'S', 'MISES', 'SEQUT', 'U', 'COORD'))
+mdb.models['Model-1'].rootAssembly.DatumCsysByDefault(CARTESIAN)
+mdb.models['Model-1'].rootAssembly.Instance(dependent=ON, name='SC_beam-1', 
+    part=mdb.models['Model-1'].parts['part'])

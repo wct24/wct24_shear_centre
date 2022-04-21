@@ -1,0 +1,4 @@
+<?xml version="1.0"?><msgwrapper><Started><phase type="symconst">BATCHPRE_PHASE</phase><jobName type="string">Job-1</jobName><clientHost type="string">DESKTOP-S175MNL</clientHost><handle type="integer">0</handle></Started>
+<Error><message type="string">Process terminated by external request (SIGTERM or SIGINT received).</message><phase type="symconst">BATCHPRE_PHASE</phase><jobName type="string">Job-1</jobName></Error>
+<Interrupted><message type="string">Analysis interrupted by external signal</message><phase type="symconst">BATCHPRE_PHASE</phase><jobName type="string">Job-1</jobName></Interrupted>
+<ERROR><message type="string">Analysis Input File Processor exited with an error.</message><jobName type="string">Job-1</jobName></ERROR><JOB_ABORTED><message type="string">Analysis Input File Processor exited with an error.</message><jobName type="string">Job-1</jobName></JOB_ABORTED></msgwrapper>

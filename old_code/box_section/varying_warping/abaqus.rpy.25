@@ -1,0 +1,27 @@
+# -*- coding: mbcs -*-
+#
+# Abaqus/CAE Release 2018 replay file
+# Internal Version: 2017_11_07-17.21.41 127140
+# Run by wct24 on Mon Jan 31 10:16:47 2022
+#
+
+# from driverUtils import executeOnCaeGraphicsStartup
+# executeOnCaeGraphicsStartup()
+#: Executing "onCaeGraphicsStartup()" in the site directory ...
+from abaqus import *
+from abaqusConstants import *
+session.Viewport(name='Viewport: 1', origin=(1.55729, 1.55556), width=229.233, 
+    height=154.311)
+session.viewports['Viewport: 1'].makeCurrent()
+from driverUtils import executeOnCaeStartup
+executeOnCaeStartup()
+execfile('box_script.py', __main__.__dict__)
+#: ['Face object', 'Face object', 'Face object', 'Face object', 'Face object', 'Face object', 'Face object', 'Face object', 'Face object', 'Face object']
+#: ['Cell object']
+#* ZeroDivisionError: float division by zero
+#* File "box_script.py", line 257, in <module>
+#*     main()
+#* File "box_script.py", line 191, in main
+#*     node_elimination(11,17,21)
+#* File "box_script.py", line 173, in node_elimination
+#*     terms_3[i][0] = terms_3[i][0]-terms_2[i][0]/coefficient_node_2

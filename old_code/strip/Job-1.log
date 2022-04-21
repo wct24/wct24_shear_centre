@@ -1,0 +1,22 @@
+Analysis initiated from SIMULIA established products
+Abaqus JOB Job-1
+Abaqus 3DEXPERIENCE R2018x
+Abaqus License Manager checked out the following licenses:
+Abaqus/Standard checked out 6 tokens from Flexnet server localhost.
+<421 out of 599 licenses remain available>.
+Begin Analysis Input File Processor
+28/11/2021 20:42:07
+Run pre.exe
+28/11/2021 20:42:14
+End Analysis Input File Processor
+Begin Abaqus/Standard Analysis
+28/11/2021 20:42:14
+Run standard.exe
+28/11/2021 20:42:21
+End Abaqus/Standard Analysis
+Begin Convert MFS to SFS
+28/11/2021 20:42:23
+Run SMASimUtility.exe
+28/11/2021 20:42:23
+End Convert MFS to SFS
+Abaqus JOB Job-1 COMPLETED

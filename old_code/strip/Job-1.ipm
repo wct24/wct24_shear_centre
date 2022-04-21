@@ -1,0 +1,24 @@
+<?xml version="1.0"?><msgwrapper><Started><phase type="symconst">BATCHPRE_PHASE</phase><jobName type="string">Job-1</jobName><clientHost type="string">DESKTOP-S175MNL</clientHost><handle type="integer">0</handle></Started>
+<Warning><message type="string">STRAIN OUTPUT REQUEST LE IS NOT VALID FOR SOME ELEMENTS IN THIS ANALYSIS. THIS REQUEST IS SWITCHED TO THE STRAIN MEASURE, E.</message><phase type="symconst">BATCHPRE_PHASE</phase><jobName type="string">Job-1</jobName></Warning>
+<Warning><message type="string">OUTPUT REQUEST EEQUT IS NOT AVAILABLE FOR THE MATERIAL FOR ELEMENT TYPE C3D8R</message><phase type="symconst">BATCHPRE_PHASE</phase><jobName type="string">Job-1</jobName></Warning>
+<Warning><message type="string">OUTPUT REQUEST MVF IS NOT AVAILABLE FOR THE MATERIAL FOR ELEMENT TYPE C3D8R</message><phase type="symconst">BATCHPRE_PHASE</phase><jobName type="string">Job-1</jobName></Warning>
+<Warning><message type="string">OUTPUT REQUEST PE IS NOT AVAILABLE FOR THE MATERIAL FOR ELEMENT TYPE C3D8R</message><phase type="symconst">BATCHPRE_PHASE</phase><jobName type="string">Job-1</jobName></Warning>
+<Warning><message type="string">OUTPUT REQUEST PEEQ IS NOT AVAILABLE FOR THE MATERIAL FOR ELEMENT TYPE C3D8R</message><phase type="symconst">BATCHPRE_PHASE</phase><jobName type="string">Job-1</jobName></Warning>
+<Warning><message type="string">OUTPUT REQUEST PEMAG IS NOT AVAILABLE FOR THE MATERIAL FOR ELEMENT TYPE C3D8R</message><phase type="symconst">BATCHPRE_PHASE</phase><jobName type="string">Job-1</jobName></Warning>
+<Warning><message type="string">OUTPUT REQUEST SEQUT IS NOT AVAILABLE FOR THE MATERIAL FOR ELEMENT TYPE C3D8R</message><phase type="symconst">BATCHPRE_PHASE</phase><jobName type="string">Job-1</jobName></Warning>
+<Warning><message type="string">OUTPUT REQUEST TE IS NOT AVAILABLE FOR THE MATERIAL FOR ELEMENT TYPE C3D8R</message><phase type="symconst">BATCHPRE_PHASE</phase><jobName type="string">Job-1</jobName></Warning>
+<Warning><message type="string">OUTPUT REQUEST TEEQ IS NOT AVAILABLE FOR THE MATERIAL FOR ELEMENT TYPE C3D8R</message><phase type="symconst">BATCHPRE_PHASE</phase><jobName type="string">Job-1</jobName></Warning>
+<Warning><message type="string">OUTPUT REQUEST TEVOL IS NOT AVAILABLE FOR THE MATERIAL FOR ELEMENT TYPE C3D8R</message><phase type="symconst">BATCHPRE_PHASE</phase><jobName type="string">Job-1</jobName></Warning>
+<Odb_File><file type="string">C:\Users\touze\project\Shear_centre\strip\Job-1.odb</file><phase type="symconst">BATCHPRE_PHASE</phase><jobName type="string">Job-1</jobName></Odb_File>
+<Completed><message type="string">Analysis phase complete</message><phase type="symconst">BATCHPRE_PHASE</phase><jobName type="string">Job-1</jobName></Completed>
+<Started><phase type="symconst">STANDARD_PHASE</phase><jobName type="string">Job-1</jobName><clientHost type="string">DESKTOP-S175MNL</clientHost><handle type="integer">14176</handle></Started>
+<Step><stepId type="integer">1</stepId><phase type="symconst">STANDARD_PHASE</phase><jobName type="string">Job-1</jobName></Step>
+<Odb_Frame><step type="integer">0</step><frame type="integer">0</frame><phase type="symconst">STANDARD_PHASE</phase><jobName type="string">Job-1</jobName></Odb_Frame>
+<MEMORY_ESTIMATE><memory type="float">38</memory><phase type="symconst">STANDARD_PHASE</phase><jobName type="string">Job-1</jobName></MEMORY_ESTIMATE>
+<PHYSICAL_MEMORY><physical_memory type="float">16332</physical_memory><phase type="symconst">STANDARD_PHASE</phase><jobName type="string">Job-1</jobName></PHYSICAL_MEMORY>
+<MINIMUM_MEMORY><minimum_memory type="float">19</minimum_memory><phase type="symconst">STANDARD_PHASE</phase><jobName type="string">Job-1</jobName></MINIMUM_MEMORY>
+<Odb_Frame><step type="integer">0</step><frame type="integer">1</frame><phase type="symconst">STANDARD_PHASE</phase><jobName type="string">Job-1</jobName></Odb_Frame>
+<Status><step type="integer">1</step><increment type="integer">1</increment><attempts type="integer">1</attempts><severe type="integer">0</severe><equilibrium type="integer">1</equilibrium><iterations type="integer">1</iterations><totalTime type="float">1</totalTime><stepTime type="float">1</stepTime><timeIncrement type="float">1</timeIncrement><phase type="symconst">STANDARD_PHASE</phase><jobName type="string">Job-1</jobName></Status>
+<End_Step><stepId type="integer">1</stepId><phase type="symconst">STANDARD_PHASE</phase><jobName type="string">Job-1</jobName></End_Step>
+<Completed><message type="string">Analysis phase complete</message><phase type="symconst">STANDARD_PHASE</phase><jobName type="string">Job-1</jobName></Completed>
+<JOB_COMPLETED><jobName type="string">Job-1</jobName><time type="string">Sun Nov 28 18:55:19 2021</time></JOB_COMPLETED></msgwrapper>

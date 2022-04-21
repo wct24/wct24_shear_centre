@@ -1,0 +1,81 @@
+# -*- coding: mbcs -*-
+#
+# Abaqus/CAE Release 2018 replay file
+# Internal Version: 2017_11_07-17.21.41 127140
+# Run by wct24 on Sun Jan 30 15:48:03 2022
+#
+
+# from driverUtils import executeOnCaeGraphicsStartup
+# executeOnCaeGraphicsStartup()
+#: Executing "onCaeGraphicsStartup()" in the site directory ...
+from abaqus import *
+from abaqusConstants import *
+session.Viewport(name='Viewport: 1', origin=(0.0, 0.0), width=217.709365844727, 
+    height=211.244445800781)
+session.viewports['Viewport: 1'].makeCurrent()
+session.viewports['Viewport: 1'].maximize()
+from caeModules import *
+from driverUtils import executeOnCaeStartup
+executeOnCaeStartup()
+session.viewports['Viewport: 1'].partDisplay.geometryOptions.setValues(
+    referenceRepresentation=ON)
+execfile('box_script.py', __main__.__dict__)
+#: ['Face object', 'Face object', 'Face object', 'Face object', 'Face object', 'Face object', 'Face object', 'Face object', 'Face object', 'Face object']
+#: ['Cell object']
+#: The section "warping" has been assigned to 1440 wires or attachment lines.
+#: Job analysis: Analysis Input File Processor completed successfully.
+#: Job analysis: Abaqus/Standard completed successfully.
+#: Job analysis completed successfully. 
+#: Model: E:/temp/box/analysis.odb
+#: Number of Assemblies:         1
+#: Number of Assembly instances: 0
+#: Number of Part instances:     1
+#: Number of Meshes:             2
+#: Number of Element Sets:       3
+#: Number of Node Sets:          1446
+#: Number of Steps:              1
+a = mdb.models['Model-1'].rootAssembly
+session.viewports['Viewport: 1'].setValues(displayedObject=a)
+o3 = session.openOdb(name='E:/temp/box/analysis.odb')
+session.viewports['Viewport: 1'].setValues(displayedObject=o3)
+a = mdb.models['Model-1'].rootAssembly
+session.viewports['Viewport: 1'].setValues(displayedObject=a)
+session.viewports['Viewport: 1'].setValues(
+    displayedObject=session.odbs['E:/temp/box/analysis.odb'])
+session.viewports['Viewport: 1'].assemblyDisplay.setValues(
+    optimizationTasks=OFF, geometricRestrictions=OFF, stopConditions=OFF)
+session.viewports['Viewport: 1'].odbDisplay.display.setValues(plotState=(
+    CONTOURS_ON_DEF, ))
+session.viewports['Viewport: 1'].odbDisplay.setPrimaryVariable(
+    variableLabel='U', outputPosition=NODAL, refinement=(INVARIANT, 
+    'Magnitude'), )
+session.viewports['Viewport: 1'].odbDisplay.setPrimaryVariable(
+    variableLabel='U', outputPosition=NODAL, refinement=(COMPONENT, 'U3'), )
+session.viewports['Viewport: 1'].view.setValues(nearPlane=4.9807, 
+    farPlane=8.7514, width=4.06542, height=1.53011, cameraPosition=(5.15241, 
+    2.04048, -2.55481), cameraUpVector=(-0.657176, 0.743154, 0.125861), 
+    cameraTarget=(-0.0220985, -0.10754, 1.62942))
+session.viewports['Viewport: 1'].view.setValues(nearPlane=4.9149, 
+    farPlane=8.73299, width=4.01171, height=1.5099, cameraPosition=(0.918393, 
+    -0.293445, -5.25626), cameraUpVector=(-0.167871, 0.944001, 0.284044), 
+    cameraTarget=(0.0559756, -0.0645033, 1.67923))
+session.viewports['Viewport: 1'].view.setValues(nearPlane=5.0949, 
+    farPlane=8.61147, width=4.15863, height=1.5652, cameraPosition=(5.48, 
+    2.4658, -1.79582), cameraUpVector=(-0.610509, 0.747031, 0.263102), 
+    cameraTarget=(-0.0568029, -0.132721, 1.59368))
+session.viewports['Viewport: 1'].view.setValues(nearPlane=5.16849, 
+    farPlane=8.58713, width=4.2187, height=1.58781, cameraPosition=(5.66186, 
+    2.52421, 4.48029), cameraUpVector=(-0.743864, 0.666362, 0.0512588), 
+    cameraTarget=(-0.0605035, -0.13391, 1.46596))
+session.viewports['Viewport: 1'].view.setValues(nearPlane=4.94313, 
+    farPlane=8.80955, width=4.03476, height=1.51858, cameraPosition=(0.267094, 
+    1.26421, 8.25454), cameraUpVector=(-0.612831, 0.649869, -0.449565), 
+    cameraTarget=(0.0295779, -0.112871, 1.40294))
+session.viewports['Viewport: 1'].odbDisplay.commonOptions.setValues(
+    deformationScaling=NONUNIFORM, nonuniformScaleFactor=(0, 0, 10000))
+session.viewports['Viewport: 1'].view.setValues(cameraPosition=(0.0295779, 
+    6.87978, 1.40294), cameraUpVector=(0, 0, 1))
+session.viewports['Viewport: 1'].view.setValues(cameraPosition=(7.02223, 
+    -0.112871, 1.40294), cameraUpVector=(0, 1, 0))
+session.viewports['Viewport: 1'].view.setValues(cameraPosition=(0.0295779, 
+    -0.112871, 8.39559))
