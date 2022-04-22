@@ -7,7 +7,7 @@ import numpy as np
 from transforms3d.euler import mat2euler
 import math
 import matplotlib.pyplot as plt
-
+from matplotlib import cm
 from decimal import Decimal
 
 # class AnalysisMethod:
@@ -23,6 +23,7 @@ class Result_Data:
         self.output_csv_displacement = output_csv_displacement
         self.output_csv_stress = output_csv_stress
         self.U_df = self._displacement_csv_to_data_frame(self.output_csv_displacement)
+        self.S_df = self._stress_csv_to_data_frame(self.output_csv_stress)
         self.list_of_z_values = np.flip(np.unique(self.U_df["z"].values))
 
     def _displacement_csv_to_data_frame(self, csv_filename):
@@ -34,6 +35,73 @@ class Result_Data:
         u.drop(labels = "Part Instance", axis=1, inplace = True)
         u = u.astype(np.float64)
         return u
+    def _stress_csv_to_data_frame(self, csv_filename):
+        # be careful to make sure that the csv matches to the index
+        s = pd.read_csv(csv_filename, header = 0, usecols = [4,5,6,7,8])
+        s.columns=["Element", "Node","x", "y" ,"z"]
+        s = s.astype(np.float64)
+        return s
+    def _order_points(pts):
+        # sort the points based on their x-coordinates
+        xSorted = pts[np.argsort(pts[:, 0]), :]
+        # grab the left-most and right-most points from the sorted
+        # x-roodinate points
+        leftMost = xSorted[:2, :]
+        rightMost = xSorted[2:, :]
+        # now, sort the left-most coordinates according to their
+        # y-coordinates so we can grab the top-left and bottom-left
+        # points, respectively
+        leftMost = leftMost[np.argsort(leftMost[:, 1]), :]
+        (tl, bl) = leftMost
+        # now that we have the top-left coordinate, use it as an
+        # anchor to calculate the Euclidean distance between the
+        # top-left and right-most points; by the Pythagorean
+        # theorem, the point with the largest distance will be
+        # our bottom-right point
+        D = dist.cdist(tl[np.newaxis], rightMost, "euclidean")[0]
+        (br, tr) = rightMost[np.argsort(D)[::-1], :]
+        # return the coordinates in top-left, top-right,
+        # bottom-right, and bottom-left order
+        return np.array([tl, tr, br, bl], dtype="float64")
+
+    def _element_list(self, z):
+        """ returns a list of connected nodes
+            1. find the element the node belongs to
+            2. find the coordinates of all the nodes in the element"""
+        DF = self.S_df.loc[self.S_df["z"]==z]
+        DF.drop(labels = "z", axis=1, inplace = True)
+        element_labels = np.flip(np.unique(DF["Element"].values))
+        # condition = (DF['x'] ==x) & (DF['y'] == y)
+        # b = DF.index[condition].tolist()
+        # element = DF.loc[b]["Element"].values[0]
+        # print(element)
+
+        element_array = an_array = np.full([len(element_labels), 8], None)
+        n = 0
+        for element in element_labels:
+            condition = (DF['Element'] ==element)
+            b = DF.index[condition].tolist()
+            xy = DF.loc[b]
+            x = xy["x"].values.T
+            y = xy["y"].values.T
+            xy = np.array(list(zip(x,y)))
+            xSorted = xy[xy[:, 0].argsort()]
+            y_sorted = xy[xy[:, 1].argsort()]
+            leftMost = xSorted[:2, :]
+            rightMost = xSorted[2:, :]
+
+            leftMost = leftMost[leftMost[:, 1].argsort()]
+            (tl, bl) = leftMost
+
+            rightMost = rightMost[rightMost[:, 1].argsort()]
+            (tr, br) = rightMost
+            # element = order_points(element)
+            element_array[n] = np.array([tl[0], tl[1], tr[0],tr[1],br[0],br[1], bl[0], bl[1]])
+            n+=1
+        return element_array
+
+
+
     def section_rotationz(self, ResultSection):
         ''''takes a z coordinate and an abaqus output file directory and returns the axial rotation'''
         z = self.list_of_z_values[ResultSection]
@@ -101,6 +169,94 @@ class Result_Data:
         # ax.plot(z_list, rotation_z_list, label="$S_x({},{},{})$".format(self.beam_df["LoadX"][0],self.beam_df["LoadY"][0],z_list[int(self.beam_df["LoadZ"][0])]))
         return z_list, rotationz_list
 
+    def plot_deformed_cross_section_3D(self,LoadZ):
+        # get the z coordinates of the sections
+        fig = plt.figure()
+        ax = fig.gca(projection='3d')
+    #######
+        # get the z coordinates of the sections
+        z = self.list_of_z_values[LoadZ]
+        df1 = self.U_df.loc[self.U_df["z"]==z]
+        element_array = self._element_list(z)
+
+        maximum_warp = df1["U3"].max()
+        minimum_warp = df1["U3"].min()
+        for i in range(np.shape(element_array)[0]):
+            [X0_0,Y0_0,X1_0,Y1_0, X2_0,Y2_0, X3_0,Y3_0] = element_array[i]
+            AFxy = 1
+            AFz  = 1
+            condition = (df1['x'] == X0_0) & (df1['y'] == Y0_0)
+            b = df1.index[condition].tolist()
+            X0_1 = df1.loc[b]["U1"].values[0]*AFxy + X0_0
+            Y0_1 = df1.loc[b]["U2"].values[0] *AFxy + Y0_0
+            W0 = df1.loc[b]["U3"].values[0] *AFz
+
+
+            condition = (df1['x'] == X1_0) & (df1['y'] == Y1_0)
+            b = df1.index[condition].tolist()
+            X1_1 = df1.loc[b]["U1"].values[0]*AFxy  + X1_0
+            Y1_1 = df1.loc[b]["U2"].values[0]*AFxy  + Y1_0
+            W1 = df1.loc[b]["U3"].values[0] *AFz
+
+            condition = (df1['x'] == X2_0) & (df1['y'] == Y2_0)
+            b = df1.index[condition].tolist()
+            X2_1 = df1.loc[b]["U1"].values[0]*AFxy + X2_0
+            Y2_1 = df1.loc[b]["U2"].values[0]*AFxy + Y2_0
+            W2 = df1.loc[b]["U3"].values[0] *AFz
+
+
+            condition = (df1['x'] == X3_0) & (df1['y'] == Y3_0)
+            b = df1.index[condition].tolist()
+            X3_1 = df1.loc[b]["U1"].values[0]*AFxy  + X3_0
+            Y3_1 = df1.loc[b]["U2"].values[0]*AFxy + Y3_0
+            W3 = df1.loc[b]["U3"].values[0] *AFz
+
+            # ax.plot([X0_0,X1_0],[Y0_0,Y1_0],[0.0,0.0], color="grey")
+            # ax.plot([X1_0,X2_0],[Y1_0,Y2_0],[0,0], color="grey")
+            # ax.plot([X2_0,X3_0],[Y2_0,Y3_0], [0,0], color="grey")
+            # ax.plot([X3_0,X0_0],[Y3_0,Y0_0], [0,0], color="grey")
+
+
+
+            ax.plot_surface(np.array([[X0_0,X1_0],[X3_0,X2_0]]),np.array([[Y0_0,Y1_0],[Y3_0,Y2_0]]), np.array([[0.0,0.0],[0.0,0.0]]), color = (0.1,0.1,0.1, 0.5))
+            # ax.plot([X0_1,X1_1],[Y0_1,Y1_1], [W0,W1], color=(1,1,1,0.1))
+            # ax.plot([X1_1,X2_1],[Y1_1,Y2_1], [W1,W2], color=(1,1,1,0.1))
+            # ax.plot([X2_1,X3_1],[Y2_1,Y3_1], [W2,W3], color=(1,1,1,0.1))
+            # ax.plot([X3_1,X0_1],[Y3_1,Y0_1], [W3,W0], color=(1,1,1,0.1))
+            surf = ax.plot_surface(np.array([[X0_1,X1_1],[X3_1,X2_1]]),np.array([[Y0_1,Y1_1],[Y3_1,Y2_1]]), np.array([[W0,W1],[W3,W2]]),vmin=minimum_warp, vmax=maximum_warp, rstride=1, cstride=1, cmap=cm.seismic,
+        linewidth=0.3, antialiased=False, edgecolor=(0,0,0,1))
+
+
+
+
+
+
+
+        # def fun(x, y):
+        #     return x**2 + y
+        # fig = plt.figure()
+        # ax = fig.add_subplot(111, projection='3d')
+        # x = y = np.arange(-3.0, 3.0, 0.05)
+        # X, Y = np.meshgrid(x, y)
+        # print(X)
+        # zs = np.array(fun(np.ravel(X), np.ravel(Y)))
+        # Z = zs.reshape(X.shape)
+
+        # ax.plot_surface(X, Y, Z)
+
+        # ax.set_xlabel('X Label')
+        # ax.set_ylabel('Y Label')
+        # ax.set_zlabel('Z Label')
+
+        # plt.show()
+
+
+
+
+        fig.suptitle("Deflection".format(z))
+        plt.show()
+
+
     def magnitude_of_w(self):
         return 0
 
@@ -125,7 +281,7 @@ class Beam:
 
         #location of the script - different script for shape
         script = r"C:\Users\touze\project\wct24_shear_centre\abaqus_scripts\shape_{}.py".format(self.ShapeId)
-        script_command = "abaqus cae noGUI={}".format(script)
+        script_command = "abaqus cae script={}".format(script)
         script_info = run(script_command)
         errormessage = str(script_info.stderr)
         print("run")
@@ -399,7 +555,7 @@ class Beam:
 # beam_name = r"D:\shear_centre\1-Semi-Circle\0.4_0.02_5.0\210.0_81.0_0.3\warping"
 # input_csv = Beam_name + "input.csv"
 
-# Encatre = Beam(r"D:\shear_centre\1-Semi-Circle\0.4_0.02_5.0\210.0_81.0_0.3\encastre")
+Encastre = Beam(r"D:\shear_centre\1-Semi-Circle\0.4_0.02_5.0\210.0_81.0_0.3\encastre")
 # Warping = Beam(r"D:\shear_centre\1-Semi-Circle\0.4_0.02_5.0\210.0_81.0_0.3\Warping")
 
 # fig, ax = plt.subplots()
@@ -417,10 +573,11 @@ class Beam:
 
 
 
-# sc.TSC_every_n_m(0.5)
-# print("hello")
-# sc.LSC_every_n_m(0.5)
-#print(sc.SimpleShearLoad(89,1.0).plot_z_rotation_along_beam())
+# Encastre.TSC_every_n_m(0.5)
+# Encastre.LSC_every_n_m(0.5)
+# # print("hello")
+# # sc.LSC_every_n_m(0.5)
+# #print(sc.SimpleShearLoad(89,1.0).plot_z_rotation_along_beam())
 
 
 

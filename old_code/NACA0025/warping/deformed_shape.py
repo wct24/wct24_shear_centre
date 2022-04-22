@@ -309,7 +309,6 @@ def plot_deformed_shape_xy(DF,z):
     fig,ax = plt.subplots()
 
 
-
 #######
 
     # get the z coordinates of the sections

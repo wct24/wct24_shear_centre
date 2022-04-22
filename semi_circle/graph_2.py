@@ -18,8 +18,6 @@ line5 = warping.SimpleShearLoad(80,1.0).z_rotation_along_beam()
 """
 applying a shear load at the end of the beam and at a position closer to the support
 
-
-
 """
 
 
