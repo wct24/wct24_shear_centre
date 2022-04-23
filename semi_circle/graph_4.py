@@ -11,7 +11,8 @@ applying a torque and seeing the resulting warping plot
  """
 
 warping = Beam(r"D:\shear_centre\1-Semi-Circle\0.4_0.02_5.0\210.0_81.0_0.3\Warping")
-warping.SimpleTorqueLoad(0,1.0, LoadMagnitude = -4.91).plot_deformed_cross_section_3D(0)
+warping.SimpleTorqueLoad(0,1.0, LoadMagnitude = -4.91).section_warping_magnitude(0)
+warping.SimpleTorqueLoad(0,1.0, LoadMagnitude = -4.91).plot_deformed_cross_section_3D(1)
 # print(warping.SimpleTorqueLoad(0,1.0, LoadMagnitude = -4.91)._connected_nodes(0.0398765,0.408056,5))
 
 

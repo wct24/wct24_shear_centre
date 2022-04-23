@@ -176,7 +176,7 @@ def angle(DF,z):
 
     x_2 = XYZ_2[0]
     y_2 = XYZ_2[1]
-    z_2 = XYZ_2[2]
+    z_2 = XYZ_2[2]-z_0
     ang = eul.mat2euler(R, axes='sxyz')
     return ang[2]
 
