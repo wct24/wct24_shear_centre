@@ -12,11 +12,6 @@ from decimal import Decimal
 from shapely.geometry import Polygon
 
 
-# class AnalysisMethod:
-#     def __init__(self):
-#         pass
-
-#     def create_folder(self):
 
 class Result_Data:
     def __init__(self, analysis_folder):
@@ -39,12 +34,14 @@ class Result_Data:
         u.drop(labels = "Part Instance", axis=1, inplace = True)
         u = u.astype(np.float64)
         return u
+
     def _stress_csv_to_data_frame(self, csv_filename):
         # be careful to make sure that the csv matches to the index
         s = pd.read_csv(csv_filename, header = 0, usecols = [4,5,6,7,8])
         s.columns=["Element", "Node","x", "y" ,"z"]
         s = s.astype(np.float64)
         return s
+
     def _result_folder(self):
         path = self.analysis_folder + r"\results"
         if not os.path.exists(path):
@@ -689,6 +686,7 @@ class Beam:
             LoadX_UB = LoadX+tol
             LoadX_LB = LoadX-tol
         return LoadX
+
     def TSC_every_n_m(self,n):
         """" calculates the TSC at regular intervals down the beam and sends results to a
         datafram in the results directory"""
@@ -697,6 +695,7 @@ class Beam:
         while LoadZ < self.length*20:
             self.TSC(LoadZ)
             LoadZ += int(20*n)
+
     def LSC_every_n_m(self,n):
         """" calculates the TSC at regular intervals down the beam and sends results to a
         datafram in the results directory"""
@@ -746,12 +745,14 @@ class Beam:
 
 
 
+
+
 #### what's important is the location of the input csv
 # beam_name = r"D:\shear_centre\1-Semi-Circle\0.4_0.02_5.0\210.0_81.0_0.3\warping"
 # input_csv = Beam_name + "input.csv"
 
 # Encastre = Beam(r"D:\shear_centre\1-Semi-Circle\0.4_0.02_5.0\210.0_81.0_0.3\encastre")
-Warping = Beam(r"D:\shear_centre\1-Semi-Circle\0.4_0.02_5.0\210.0_81.0_0.3\Warping")
+# Warping = Beam(r"D:\shear_centre\1-Semi-Circle\0.4_0.02_5.0\210.0_81.0_0.3\Warping")
 
 
 
@@ -822,12 +823,6 @@ Warping = Beam(r"D:\shear_centre\1-Semi-Circle\0.4_0.02_5.0\210.0_81.0_0.3\Warpi
 #             print("CANNOT DO A SHEAR SWEEP ON AN ANAYSIS 3 beam")
 
 # def get_LSC()
-
-
-
-
-
-
 
 
 
