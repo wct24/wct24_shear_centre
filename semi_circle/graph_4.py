@@ -17,6 +17,52 @@ warping.SimpleTorqueLoad(0,1.0, LoadMagnitude = -4.91).plot_deformed_cross_secti
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # plt.plot(line1[0],line1[1] , label="$T_z(1.0,0.0,5.0) = 10Nm$")
 # plt.plot(line2[0],line2[1] , label="$T_z(1.0,0.0,4.0) = 10Nm$")
 # plt.plot(line3[0],line3[1] , label="$T_z(1.0,0.0,3.0) = 10Nm$")

@@ -559,16 +559,16 @@ class Beam:
         return ang[2]
 
 
-    def SimpleShearLoad(self, LoadZ, LoadX, LoadY=0.0, LoadMagnitude = -10, AnalysisType = "1. Simple_Shear_Load"):
+    def SimpleShearLoad(self, LoadZ, LoadX, LoadY=0.0, LoadMagnitude = -10):
         # print(AnalysisType)
         # print(LoadX)
         assert LoadZ < self.length*20, "LoadZ is outside the length of beam"
         assert type(LoadZ) == int, "LoadZ is a position, beam is split into 0.05m segments"
 
-        folder_name = self._navigate([AnalysisType,"Beam_Repository", LoadZ, LoadX], chdir = True)
+        AnalysisType = "1. Simple_Shear_Load"
+        folder_name = self._navigate([AnalysisType, "Beam_Repository", LoadMagnitude, LoadZ, LoadX], chdir = True)
         # print(os.path.exists(folder_name + r"\displacement.csv"))
         if not os.path.exists(folder_name + r"\displacement.csv"):
-
             # if the analyis hasn't been run before - run it
             beam_data_frame = pd.DataFrame.copy(self.input_df)
             pd.options.mode.chained_assignment = None  # get rid of panda warnings
@@ -581,7 +581,7 @@ class Beam:
             beam_data_frame["LoadSection"][0] = LoadZ #No Mx allied to the section
             beam_data_frame["ResultSection"][0] = 0 #Not relevant to this type of analysis
             beam_data_frame.to_csv('beam.csv')
-            self._run_script()
+            # self._run_script()
         else:
             pass
         return Result_Data(folder_name) #+r'\beam.csv',folder_name + r"\displacement.csv", folder_name + r"\stress.csv")
@@ -611,13 +611,11 @@ class Beam:
             self._run_script()
         else:
             pass
-        return Result_Data(folder_name +r'\beam.csv',folder_name + r"\displacement.csv", folder_name + r"\stress.csv")
-
+        return Result_Data(folder_name)
 
     def TSC(self, LoadZ, tol = 1e-5):
         """ Newton-Raphson method to find the TSC
             a small load is used to make linear"""
-        AnalysisType = "2. Find_TSC"
 
         #load x means the x coordinate of the load
         LoadX= 0.0 #start point
@@ -628,10 +626,11 @@ class Beam:
         Rotationz_LB = -1
 
         while Rotationz_UB*Rotationz_LB > 0:
-            self.SimpleShearLoad(LoadZ, LoadX_UB, LoadMagnitude = -1, AnalysisType = AnalysisType)
-            self.SimpleShearLoad(LoadZ, LoadX_LB, LoadMagnitude = -1, AnalysisType = AnalysisType)
-            LoadX_UB_directory = self._navigate([AnalysisType,"Beam_Repository", LoadZ, LoadX_UB])
-            LoadX_LB_directory = self._navigate([AnalysisType,"Beam_Repository", LoadZ, LoadX_LB])
+            LoadMagnitude = -1
+            self.SimpleShearLoad(LoadZ, LoadX_UB, LoadMagnitude = LoadMagnitude)
+            self.SimpleShearLoad(LoadZ, LoadX_LB, LoadMagnitude = LoadMagnitude)
+            LoadX_UB_directory = self._navigate(["1. Simple_Shear_Load", LoadMagnitude, LoadZ, LoadX_UB])
+            LoadX_LB_directory = self._navigate(["1. Simple_Shear_Load", LoadMagnitude, LoadZ, LoadX_LB])
 
             Rotationz_UB = self.Rotationz_at_z(0, LoadX_UB_directory +r"\displacement.csv")
             Rotationz_LB = self.Rotationz_at_z(0,LoadX_LB_directory+ r"\displacement.csv")
@@ -649,14 +648,14 @@ class Beam:
             LoadX = LoadX - Rotation_at_LoadX/derivative_at_LoadX
             LoadX_UB = LoadX+tol
             LoadX_LB = LoadX-tol
-
+            print(Rotationz_UB, Rotationz_LB )
 
         return LoadX
 
     def LSC(self, LoadZ, tol = 1e-5):
         """ Newton-Raphson method to find the TSC
             a small load is used to make linear"""
-        AnalysisType = "3. Find_LSC"
+        # AnalysisType = "3. Find_LSC"
 
         #load x means the x coordinate of the load
         LoadX= 0.0 #start point
@@ -667,15 +666,16 @@ class Beam:
         Rotationz_LB = -1
 
         while Rotationz_UB*Rotationz_LB > 0:
-            self.SimpleShearLoad(LoadZ, LoadX_UB, LoadMagnitude = -1, AnalysisType = AnalysisType)
-            self.SimpleShearLoad(LoadZ, LoadX_LB, LoadMagnitude = -1, AnalysisType = AnalysisType)
-            LoadX_UB_directory = self._navigate([AnalysisType,"Beam_Repository", LoadZ, LoadX_UB])
-            LoadX_LB_directory = self._navigate([AnalysisType,"Beam_Repository", LoadZ, LoadX_LB])
+            LoadMagnitude = -1
+            self.SimpleShearLoad(LoadZ, LoadX_UB, LoadMagnitude = LoadMagnitude)
+            self.SimpleShearLoad(LoadZ, LoadX_LB, LoadMagnitude = LoadMagnitude)
+            LoadX_UB_directory = self._navigate(["1. Simple_Shear_Load", LoadMagnitude, LoadZ, LoadX_UB])
+            LoadX_LB_directory = self._navigate(["1. Simple_Shear_Load", LoadMagnitude, LoadZ, LoadX_LB])
 
-            Rotationz_UB = self.Rotationz_at_z(int(LoadZ),LoadX_UB_directory +r"\displacement.csv")
-            Rotationz_LB = self.Rotationz_at_z(int(LoadZ),LoadX_LB_directory+ r"\displacement.csv")
+            Rotationz_UB = self.Rotationz_at_z(int(LoadZ),LoadX_UB_directory + r"\displacement.csv")
+            Rotationz_LB = self.Rotationz_at_z(int(LoadZ),LoadX_LB_directory + r"\displacement.csv")
 
-            # print(Rotationz_UB, Rotationz_LB )
+            print(Rotationz_UB, Rotationz_LB )
             #newton -raphson method
             significant_digits = 10
             Rotationz_UB =  round(Rotationz_UB, significant_digits - int(math.floor(math.log10(abs(Rotationz_UB)))) - 1)
@@ -689,8 +689,6 @@ class Beam:
             LoadX_UB = LoadX+tol
             LoadX_LB = LoadX-tol
         return LoadX
-
-
     def TSC_every_n_m(self,n):
         """" calculates the TSC at regular intervals down the beam and sends results to a
         datafram in the results directory"""
@@ -699,8 +697,6 @@ class Beam:
         while LoadZ < self.length*20:
             self.TSC(LoadZ)
             LoadZ += int(20*n)
-
-
     def LSC_every_n_m(self,n):
         """" calculates the TSC at regular intervals down the beam and sends results to a
         datafram in the results directory"""
@@ -711,6 +707,41 @@ class Beam:
             self.LSC(LoadZ)
             LoadZ += int(20*n)
 
+    def end_rotation_x_sweep(self, start, stop, LoadZ, LoadMagnitude):
+        result_folder = self._navigate(["1. Simple_Shear_Load", "Processed_Results","sweep"])
+        sweep_csv = result_folder+ r"\end_rotation_x_sweep_{}_{}_{}_{}.csv".format(start,stop,LoadZ,LoadMagnitude)
+        if not os.path.exists(sweep_csv):
+            #create the csv
+            column_names =  ["Rotation", "Warping Magnitude"]
+            sweep_df = pd.DataFrame(columns=column_names)
+            sweep_df.index.name = "x"
+        else:
+            sweep_df = pd.read_csv(sweep_csv, header = 0, index_col = 0)
+        sweep_df = sweep_df.astype(np.float64)
+
+        folder = self._navigate(["1. Simple_Shear_Load", "Beam_Repository",LoadMagnitude, LoadZ])
+        # print(folder)
+        # os.chdir(folder)
+        # print(os.listdir(folder))
+
+        x_list = sorted([float(name) for name in os.listdir(folder)])
+
+        for i in range(len(x_list)):
+            if x_list[i] not in sweep_df.index:
+                result = self.SimpleShearLoad(LoadZ, x_list[i], LoadY=0.0, LoadMagnitude = LoadMagnitude)
+                rotation = result.section_rotationz(LoadZ)
+                warping  = result.section_warping_magnitude(LoadZ)
+                dfr = pd.DataFrame(data = {"Rotation":[rotation*180/np.pi],"Warping Magnitude":[warping]}, index = [x_list[i]])
+                dfr.index.name = "x"
+                sweep_df = sweep_df.append(dfr, ignore_index = False)
+                print(sweep_df)
+                sweep_df.to_csv(sweep_csv)
+            else:
+                pass
+        return sweep_df.index, sweep_df["Rotation"].values, sweep_df["Warping Magnitude"].values
+
+
+
 
 
 
@@ -720,7 +751,12 @@ class Beam:
 # input_csv = Beam_name + "input.csv"
 
 # Encastre = Beam(r"D:\shear_centre\1-Semi-Circle\0.4_0.02_5.0\210.0_81.0_0.3\encastre")
-# Warping = Beam(r"D:\shear_centre\1-Semi-Circle\0.4_0.02_5.0\210.0_81.0_0.3\Warping")
+Warping = Beam(r"D:\shear_centre\1-Semi-Circle\0.4_0.02_5.0\210.0_81.0_0.3\Warping")
+
+
+
+
+
 
 # fig, ax = plt.subplots()
 # print(Encatre.SimpleShearLoad(0,1.0).plot_z_rotation_along_beam())
@@ -737,7 +773,7 @@ class Beam:
 
 
 
-# Encastre.TSC_every_n_m(0.5)
+# Warping.TSC_every_n_m(0.5)
 # Encastre.LSC_every_n_m(0.5)
 # # print("hello")
 # # sc.LSC_every_n_m(0.5)

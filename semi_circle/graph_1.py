@@ -5,7 +5,7 @@ from beam_object import *
 
 
 Encatre = Beam(r"D:\shear_centre\1-Semi-Circle\0.4_0.02_5.0\210.0_81.0_0.3\encastre")
-Warping = Beam(r"D:\shear_centre\1-Semi-Circle\0.4_0.02_5.0\210.0_81.0_0.3\Warping")
+warping = Beam(r"D:\shear_centre\1-Semi-Circle\0.4_0.02_5.0\210.0_81.0_0.3\Warping")
 
 fig, ax = plt.subplots()
 
@@ -19,4 +19,10 @@ plt.xlabel(r'$z / m$ ', )
 plt.ylabel(r'$\theta_{z}$ / \textdegree ')
 plt.tight_layout()
 plt.grid()
-plt.show()
+
+folder_name = r"D:\plots"+r"\\"+ warping.ShapeName+ r"\graph_1"
+if not os.path.exists(folder_name ):
+    os.makedirs(folder_name)
+
+plt.savefig(folder_name+r"\graph_1.png")
+plt.savefig(folder_name+r"\graph_1.pgf")
