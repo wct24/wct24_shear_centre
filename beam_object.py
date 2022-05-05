@@ -430,11 +430,65 @@ class Beam:
     def __init__(self, beam_geomerty_name):
         # the beam geomtry is the location of the folder that tkinter created
         self.beam_name = beam_geomerty_name
-        self.input_csv = self.beam_name + r"\input.csv"
+        self.input_csv = self._make_input_csv()
         self.input_df  = pd.read_csv(self.input_csv, header = 0, index_col = 0)
         self.ShapeName = str(self.input_df['ShapeName'][0])
         self.ShapeId   = str(self.input_df["ShapeId"][0])
         self.length =   float(str(self.input_df["Dimensions"][0]).strip('][').split(', ')[-1])
+
+
+    def _make_beam_directory(self):
+        beam_directory =  self.beam_name
+
+        # if the file doesn't exist create it
+        if not os.path.exists(beam_directory):
+            os.makedirs(beam_directory)
+        return beam_directory
+
+
+
+    def _make_input_csv(self):
+        folder_name =  self.beam_name
+        # if the file doesn't exist create it
+        if not os.path.exists(folder_name):
+            os.makedirs(folder_name)
+
+        if not os.path.exists(folder_name + r"\input.csv"):
+            #make a data frame:
+
+            column_names =  ['ShapeName', 'ShapeId','Dimensions', "Material" , 'BoundaryCondition', 'LoadType', "AnalysisType", "LoadZ",  "LoadX",  "LoadY", "LoadMagnitude", "LoadSection", "ResultSection"]
+            beam_data_frame = pd.DataFrame(columns=column_names, index=[0])
+
+            pd.options.mode.chained_assignment = None  # get rid of panda warnings
+            input_string = self.beam_name
+            #there are 6 part to any beam name
+            x = input_string.split( r"\\"  )
+            assert len(x)==6, r"The name of the beam need to be a raw string and directory address is spaced with \\ "
+            beam_data_frame["ShapeName"][0] = str(x[2])
+            beam_data_frame["ShapeId"][0] = int(str(x[2])[0])
+            beam_data_frame["Dimensions"][0] = list(np.float_(x[3].split( r"_" )))
+            beam_data_frame["Material"][0] = list(np.float_(x[4].split( r"_" )))
+            if x[5] == "warping":
+                beam_data_frame["BoundaryCondition"][0] = 1
+            if x[5] == "encastre":
+                beam_data_frame["BoundaryCondition"][0] = 2
+            else:
+                print("name error -- BCs can only be warping or encastre - no capital")
+            #assign the rest of the dataframe to 0
+            beam_data_frame["LoadType"][0] = 0
+            beam_data_frame["AnalysisType"][0] = 0
+            beam_data_frame["LoadZ"][0] = 0
+            beam_data_frame["LoadX"][0] = 0.0
+            beam_data_frame["LoadY"][0] = 0.0
+            beam_data_frame["LoadMagnitude"][0] = 0.0
+            beam_data_frame["LoadSection"][0] = 0
+            beam_data_frame["ResultSection"][0] = 0
+            beam_data_frame.to_csv(folder_name + r"\input.csv")
+        else:
+            pass
+        return self.beam_name + r"\input.csv"
+
+
 
 
 
@@ -497,6 +551,7 @@ class Beam:
         if chdir==True:
             os.chdir(analysis_directory)
         return analysis_directory
+
     def Rotationz_at_z(self, ResultSection, abaqus_output_file_location):
         ''''takes a z position and an abaqus output file directory
                        and returns the axial rotation'''
@@ -554,7 +609,6 @@ class Beam:
         ang = mat2euler(R, axes='sxyz')
 
         return ang[2]
-
 
     def SimpleShearLoad(self, LoadZ, LoadX, LoadY=0.0, LoadMagnitude = -10):
         # print(AnalysisType)
@@ -752,7 +806,9 @@ class Beam:
 # input_csv = Beam_name + "input.csv"
 
 # Encastre = Beam(r"D:\shear_centre\1-Semi-Circle\0.4_0.02_5.0\210.0_81.0_0.3\encastre")
-# Warping = Beam(r"D:\shear_centre\1-Semi-Circle\0.4_0.02_5.0\210.0_81.0_0.3\Warping")
+
+warping = Beam(r"D:\\shear_centre\\5-NACA0025\\1.0\\210.0_81.0_0.3\\encastre")
+
 
 
 
