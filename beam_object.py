@@ -37,8 +37,8 @@ class Result_Data:
 
     def _stress_csv_to_data_frame(self, csv_filename):
         # be careful to make sure that the csv matches to the index
-        s = pd.read_csv(csv_filename, header = 0, usecols = [4,5,6,7,8])
-        s.columns=["Element", "Node","x", "y" ,"z"]
+        s = pd.read_csv(csv_filename, header = 0, usecols = [4,5,6,7,8,22])
+        s.columns=["Element", "Node","x", "y" ,"z","S33"]
         s = s.astype(np.float64)
         return s
 
@@ -195,7 +195,7 @@ class Result_Data:
         # ax.plot(z_list, rotation_z_list, label="$S_x({},{},{})$".format(self.beam_df["LoadX"][0],self.beam_df["LoadY"][0],z_list[int(self.beam_df["LoadZ"][0])]))
         return z_list, rotationz_list
 
-    def section_warping_magnitude(self, ResultSection):
+    def section_warping_magnitude(self, ResultSection, include_stress=False):
            # get the z coordinates of the sections
         # get the z coordinates of the sections
         section_warping_magnitude_csv = self.result_folder+ r"\section_warping_magnitude.csv"
@@ -211,6 +211,7 @@ class Result_Data:
         z = self.list_of_z_values[ResultSection]
 
         if z not in wm_df.index:
+
             df1 = self.U_df.loc[self.U_df["z"]==z]
             element_array = self._element_list(z)
 
@@ -274,9 +275,9 @@ class Result_Data:
                 (X0_0,Y0_0,X1_0,Y1_0, X2_0,Y2_0, X3_0,Y3_0) = element_array[i]
                 AFxy = 1
                 AFz  = 1
+
                 condition = (df1['x'] == X0_0) & (df1['y'] == Y0_0)
                 b = df1.index[condition].tolist()
-
                 X0_1 = x_2[b[0]]
                 Y0_1 = y_2[b[0]]
                 W0 = w[b[0]]
@@ -302,6 +303,31 @@ class Result_Data:
                 W3 = w[b[0]]
 
 
+
+                s_mean = 0.0 # if the stress is not asked for then it will by default be zero
+                stress_magnitude =0.0
+                if include_stress == True:
+                    df2 = self.S_df.loc[self.S_df["z"]==z]
+
+
+                    condition = (df2['x'] == X0_0) & (df2['y'] == Y0_0)
+                    b = df2.index[condition].tolist()
+                    S0 = self.S_df["S33"][b[0]]
+
+                    condition = (df2['x'] == X1_0) & (df2['y'] == Y1_0)
+                    b = df2.index[condition].tolist()
+                    S1 = self.S_df["S33"][b[0]]
+
+                    condition = (df2['x'] == X2_0) & (df2['y'] == Y2_0)
+                    b = df2.index[condition].tolist()
+                    S2 = self.S_df["S33"][b[0]]
+
+                    condition = (df2['x'] == X3_0) & (df2['y'] == Y3_0)
+                    b = df2.index[condition].tolist()
+                    S3 = self.S_df["S33"][b[0]]
+
+                    s_mean = (S0+S1+S2+S3)/4
+
                 #find the volume of an 8 point pryzm []
                 w_mean = (W0+W1+W2+W3)/4
                 #shoelace formula
@@ -310,23 +336,35 @@ class Result_Data:
                 x = [X0_1, X1_1, X2_1, X3_1]
                 y = [Y0_1, Y1_1, Y2_1, Y3_1]
                 dA = Polygon(zip(x, y)).area # Assuming the OP's x,y coordinates
-                warping_magnitude += w_mean**2*dA
+                warping_magnitude += abs(w_mean)*dA
+                stress_magnitude  +=  abs(s_mean)*dA
                 A += dA
-            dfr = pd.DataFrame(data = {"Warping Magnitude":[warping_magnitude]}, index = [z])
+
+            stress_magnitude = stress_magnitude/A
+            warping_magnitude = warping_magnitude/A
+            dfr = pd.DataFrame(data = {"Warping Magnitude":[warping_magnitude], "Stress Magnitude":[stress_magnitude] }, index = [z])
             dfr.index.name = "z"
             wm_df = wm_df.append(dfr, ignore_index = False)
             wm_df.to_csv(section_warping_magnitude_csv)
-        warping_magnitude = wm_df.loc[z,"Warping Magnitude"]
-        # print(A)
-        return warping_magnitude
 
-    def warping_magnitude_along_beam(self):
-        rotationz_list =[]
+
+
+        warping_magnitude = wm_df.loc[z,"Warping Magnitude"]
+        stress_magnitude = wm_df.loc[z,"Stress Magnitude"]
+        # print(A)
+        return warping_magnitude, stress_magnitude
+
+
+
+    def warping_magnitude_along_beam(self, include_stress=False):
+        warping_list =[]
+        stress_list = []
         for i in range(len(self.list_of_z_values)):
-            rotationz_list.append(self.section_warping_magnitude(i))
+            warping_list.append(self.section_warping_magnitude(i,include_stress=include_stress)[0])
+            stress_list.append(self.section_warping_magnitude(i,include_stress=include_stress)[1])
         z_list = self.list_of_z_values
         # ax.plot(z_list, rotation_z_list, label="$S_x({},{},{})$".format(self.beam_df["LoadX"][0],self.beam_df["LoadY"][0],z_list[int(self.beam_df["LoadZ"][0])]))
-        return z_list, rotationz_list
+        return z_list, warping_list, stress_list
 
     def plot_deformed_cross_section_3D(self,LoadZ):
         # get the z coordinates of the sections
@@ -480,15 +518,13 @@ class Beam:
             beam_data_frame["LoadZ"][0] = 0
             beam_data_frame["LoadX"][0] = 0.0
             beam_data_frame["LoadY"][0] = 0.0
-            beam_data_frame["LoadMagnitude"][0] = 0.0
+            beam_data_frame["LoadMagnitude"][0] = 2.5
             beam_data_frame["LoadSection"][0] = 0
             beam_data_frame["ResultSection"][0] = 0
             beam_data_frame.to_csv(folder_name + r"\input.csv")
         else:
             pass
         return self.beam_name + r"\input.csv"
-
-
 
 
 
@@ -632,7 +668,7 @@ class Beam:
             beam_data_frame["LoadSection"][0] = LoadZ #No Mx allied to the section
             beam_data_frame["ResultSection"][0] = 0 #Not relevant to this type of analysis
             beam_data_frame.to_csv('beam.csv')
-            # self._run_script()
+            self._run_script()
         else:
             pass
         return Result_Data(folder_name) #+r'\beam.csv',folder_name + r"\displacement.csv", folder_name + r"\stress.csv")
@@ -807,7 +843,7 @@ class Beam:
 
 # Encastre = Beam(r"D:\shear_centre\1-Semi-Circle\0.4_0.02_5.0\210.0_81.0_0.3\encastre")
 
-warping = Beam(r"D:\\shear_centre\\5-NACA0025\\1.0\\210.0_81.0_0.3\\encastre")
+
 
 
 
