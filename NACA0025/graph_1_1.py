@@ -59,8 +59,8 @@ applying a torque load at the end of the beam and at a position closer to the su
 length = 15.0
 
 
-encastre = Beam(r"D:\\shear_centre\\1-Semi-Circle\\0.4_0.02_{}\\210.0_81.0_0.3\\encastre".format(str(length)))
-warping = Beam(r"D:\\shear_centre\\1-Semi-Circle\\0.4_0.02_{}\\210.0_81.0_0.3\\warping".format(str(length)))
+encastre = Beam(r"D:\\shear_centre\\5-NACA0025\\{}\\210.0_81.0_0.3\\encastre".format(str(length)))
+warping = Beam(r"D:\\shear_centre\\5-NACA0025\\{}\\210.0_81.0_0.3\\warping".format(str(length)))
 
 fig, ax = plt.subplots(1,2)
 
@@ -171,14 +171,14 @@ ax[1].plot(xs, monoExp(xs, A, lamb), '--', label="Curve Fit", color="red")
 handles, labels = ax[1].get_legend_handles_labels()
 
 
-
+fig.set_figwidth(6.29921)
+fig.set_dpi(300)
 
 plt.tight_layout()
 fig.legend(handles, labels, loc="lower center", prop={'size': 9}, ncol=5 )
 fig.subplots_adjust(bottom=0.2)
 
-fig.set_figwidth(6.29921)
-fig.set_dpi(300)
+
 
 folder_name = r"D:\\report\\figs"+r"\\"+warping.ShapeName+ r"\graph_1"
 

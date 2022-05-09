@@ -171,14 +171,14 @@ ax[1].plot(xs, monoExp(xs, A, lamb), '--', label="Curve Fit", color="red")
 handles, labels = ax[1].get_legend_handles_labels()
 
 
-
+fig.set_figwidth(6.29921)
+fig.set_dpi(300)
 
 plt.tight_layout()
 fig.legend(handles, labels, loc="lower center", prop={'size': 9}, ncol=5 )
 fig.subplots_adjust(bottom=0.2)
 
-fig.set_figwidth(6.29921)
-fig.set_dpi(300)
+
 
 folder_name = r"D:\\report\\figs"+r"\\"+warping.ShapeName+ r"\graph_1"
 

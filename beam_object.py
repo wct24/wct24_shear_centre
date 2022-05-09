@@ -17,7 +17,9 @@ class Result_Data:
     def __init__(self, analysis_folder):
         self.analysis_folder = analysis_folder
         self.beam_csv = analysis_folder + r"\beam.csv"
+
         self.beam_df = pd.read_csv(self.beam_csv, header = 0,index_col=0)
+        self.ShapeName = str(self.beam_df['ShapeName'][0])
         self.output_csv_displacement = analysis_folder + r"\displacement.csv"
         self.output_csv_stress = analysis_folder + r"\stress.csv"
         self.U_df = self._displacement_csv_to_data_frame(self.output_csv_displacement)
@@ -354,8 +356,6 @@ class Result_Data:
         # print(A)
         return warping_magnitude, stress_magnitude
 
-
-
     def warping_magnitude_along_beam(self, include_stress=False):
         warping_list =[]
         stress_list = []
@@ -366,7 +366,7 @@ class Result_Data:
         # ax.plot(z_list, rotation_z_list, label="$S_x({},{},{})$".format(self.beam_df["LoadX"][0],self.beam_df["LoadY"][0],z_list[int(self.beam_df["LoadZ"][0])]))
         return z_list, warping_list, stress_list
 
-    def plot_deformed_cross_section_3D(self,LoadZ):
+    def plot_deformed_cross_section_3D_combind(self,LoadZ):
         # get the z coordinates of the sections
         fig = plt.figure()
         ax = fig.add_subplot(projection='3d')
@@ -377,15 +377,11 @@ class Result_Data:
         element_array = self._element_list(z)
         df1 = df1.reset_index()
 
-
-
-        maximum_warp = df1["U3"].max()
-        minimum_warp = df1["U3"].min()
         x_0 = df1["x"].values
         y_0 = df1["y"].values
         z_0 = df1["z"].values
         # plt.scatter(x_0[1:100], y_0[1:100], z_0[1:100])
-        warping_displacement = df1["U3"].values
+        # warping_displacement = df1["U3"].values
 
         # find the rotation:
         x_1 = x_0 + df1["U1"].values
@@ -424,10 +420,19 @@ class Result_Data:
         t = -R @ centroid_A + centroid_B
         XYZ_2  = R @ A + t
 
+        # the transformed coordinates
         x_2 = XYZ_2[0]
         y_2 = XYZ_2[1]
         w = XYZ_2[2]-z_0
 
+        maximum_warp = 1000*w.max()
+        minimum_warp = 1000*w.min()
+
+        maximum_x = x_2.max()
+        minimum_x = x_2.min()
+
+        maximum_y = y_2.max()
+        minimum_y = y_2.min()
 
         for i in range(np.shape(element_array)[0]):
             [X0_0,Y0_0,X1_0,Y1_0, X2_0,Y2_0, X3_0,Y3_0] = element_array[i]
@@ -437,29 +442,88 @@ class Result_Data:
             b = df1.index[condition].tolist()
             X0_1 = x_2[b[0]]
             Y0_1 = y_2[b[0]]
-            W0 = w[b[0]]
+            W0 = w[b[0]]*1000
             condition = (df1['x'] == X1_0) & (df1['y'] == Y1_0)
             b = df1.index[condition].tolist()
             X1_1 = x_2[b[0]]
             Y1_1 = y_2[b[0]]
-            W1 = w[b[0]]
+            W1 = w[b[0]]*1000
 
             condition = (df1['x'] == X2_0) & (df1['y'] == Y2_0)
             b = df1.index[condition].tolist()
             X2_1 = x_2[b[0]]
             Y2_1 = y_2[b[0]]
-            W2 = w[b[0]]
+            W2 = w[b[0]]*1000
 
             condition = (df1['x'] == X3_0) & (df1['y'] == Y3_0)
             b = df1.index[condition].tolist()
             X3_1 = x_2[b[0]]
             Y3_1 = y_2[b[0]]
-            W3 = w[b[0]]
+            W3 = w[b[0]]*1000
 
-            ax.plot_surface(np.array([[X0_0,X1_0],[X3_0,X2_0]]),np.array([[Y0_0,Y1_0],[Y3_0,Y2_0]]), np.array([[0.0,0.0],[0.0,0.0]]), color = (0.1,0.1,0.1, 0.5))
+
+            cf = ax.plot_surface(np.array([[X0_0,X1_0],[X3_0,X2_0]]),np.array([[Y0_0,Y1_0],[Y3_0,Y2_0]]), np.array([[0.0,0.0],[0.0,0.0]]), color = (0.1,0.1,0.1, 0.5))
             ax.plot_surface(np.array([[X0_1,X1_1],[X3_1,X2_1]]),np.array([[Y0_1,Y1_1],[Y3_1,Y2_1]]), np.array([[W0,W1],[W3,W2]]),vmin=minimum_warp, vmax=maximum_warp, rstride=1, cstride=1, cmap=cm.seismic,linewidth=0.3, antialiased=False, edgecolor=(0,0,0,1))
-        fig.suptitle("Deflection".format(z))
-        plt.show()
+
+            #need to get the colour for the contour plot
+
+            cmap = cf.get_cmap()
+            # print(len(cmap.colors)) is #256
+
+            seismic = cm.get_cmap('seismic', 256)
+            # avaerage warping as a number from 1 to 256
+
+
+            def get_colour():
+                mean_warp = (W0+W1+W2+W3)/4
+                range_w =  maximum_warp-minimum_warp
+                Float_between_0_and_1 = (mean_warp-minimum_warp)/range_w
+                return Float_between_0_and_1
+
+
+            z_offset = minimum_warp - 0.2*(maximum_warp-minimum_warp)
+
+            ax.plot_surface(np.array([[X0_1,X1_1],[X3_1,X2_1]]),np.array([[Y0_1,Y1_1],[Y3_1,Y2_1]]), np.array([[z_offset,z_offset],[z_offset,z_offset]]), color = seismic(get_colour()), shade=False)
+            y_offset = maximum_y + 0.2*(maximum_y-minimum_y)
+            ax.plot_surface(np.array([[X0_1,X1_1],[X3_1,X2_1]]),np.array([[y_offset,y_offset],[y_offset,y_offset]]), np.array([[W0,W1],[W3,W2]]), color = seismic(get_colour()),shade=False)
+            x_offset = minimum_x - 0.2*(maximum_x-minimum_x)
+
+            ax.plot_surface(np.array([[x_offset ,x_offset ],[x_offset , x_offset]]),np.array([[Y0_1,Y1_1],[Y3_1,Y2_1]]), np.array([[W0,W1],[W3,W2]]), color = seismic(get_colour()), shade=False)
+
+
+        ax.set_zlim(bottom= z_offset*0.97, top = -z_offset*0.97)
+        ax.set_xlim(left=x_offset *0.97)
+        ax.set_ylim(top=y_offset*0.97)
+
+        ax.locator_params(axis='z', nbins=5)
+        # ax.set_zticklabels([maximum_warp, minimum_warp])
+
+
+        print(minimum_warp*1.5, maximum_warp*1.5)
+        print(ax.get_zlim())
+
+
+
+
+
+        ax.set_box_aspect([1,(maximum_y-minimum_y)/(maximum_x-minimum_x),1])
+
+        ax.set_xlabel("$x / m$")
+        ax.set_ylabel("$z / m$")
+        ax.set_zlabel("$w / mm$")
+
+
+        fig.set_figwidth(6.29921)
+        fig.set_dpi(500)
+
+        plt.tight_layout()
+        folder_name = r"D:\\report\\figs"+r"\\"+self.ShapeName+ r"\graph_4"
+
+        if not os.path.exists(folder_name ):
+            os.makedirs(folder_name)
+
+        plt.savefig(folder_name+r"\graph_4_1.png")
+        plt.savefig(folder_name+r"\graph_4_1.pgf")
 
     def magnitude_of_w(self):
         return 0
@@ -508,7 +572,7 @@ class Beam:
             beam_data_frame["Material"][0] = list(np.float_(x[4].split( r"_" )))
             if x[5] == "warping":
                 beam_data_frame["BoundaryCondition"][0] = 1
-            if x[5] == "encastre":
+            elif x[5] == "encastre":
                 beam_data_frame["BoundaryCondition"][0] = 2
             else:
                 print("name error -- BCs can only be warping or encastre - no capital")
@@ -536,7 +600,7 @@ class Beam:
 
         #location of the script - different script for shape
         script = r"C:\Users\touze\project\wct24_shear_centre\abaqus_scripts\shape_{}.py".format(self.ShapeId)
-        script_command = "abaqus cae script={}".format(script)
+        script_command = "abaqus cae noGUI={}".format(script)
         script_info = run(script_command)
         errormessage = str(script_info.stderr)
         print("run")
@@ -654,7 +718,8 @@ class Beam:
 
         AnalysisType = "1. Simple_Shear_Load"
         folder_name = self._navigate([AnalysisType, "Beam_Repository", LoadMagnitude, LoadZ, LoadX], chdir = True)
-        # print(os.path.exists(folder_name + r"\displacement.csv"))
+        print(os.path.exists(folder_name + r"\displacement.csv"))
+        print(folder_name)
         if not os.path.exists(folder_name + r"\displacement.csv"):
             # if the analyis hasn't been run before - run it
             beam_data_frame = pd.DataFrame.copy(self.input_df)
@@ -669,6 +734,7 @@ class Beam:
             beam_data_frame["ResultSection"][0] = 0 #Not relevant to this type of analysis
             beam_data_frame.to_csv('beam.csv')
             self._run_script()
+            print("Hello")
         else:
             pass
         return Result_Data(folder_name) #+r'\beam.csv',folder_name + r"\displacement.csv", folder_name + r"\stress.csv")
@@ -716,8 +782,8 @@ class Beam:
             LoadMagnitude = -1
             self.SimpleShearLoad(LoadZ, LoadX_UB, LoadMagnitude = LoadMagnitude)
             self.SimpleShearLoad(LoadZ, LoadX_LB, LoadMagnitude = LoadMagnitude)
-            LoadX_UB_directory = self._navigate(["1. Simple_Shear_Load", LoadMagnitude, LoadZ, LoadX_UB])
-            LoadX_LB_directory = self._navigate(["1. Simple_Shear_Load", LoadMagnitude, LoadZ, LoadX_LB])
+            LoadX_UB_directory = self._navigate(["1. Simple_Shear_Load","Beam_Repository", LoadMagnitude, LoadZ, LoadX_UB])
+            LoadX_LB_directory = self._navigate(["1. Simple_Shear_Load","Beam_Repository", LoadMagnitude, LoadZ, LoadX_LB])
 
             Rotationz_UB = self.Rotationz_at_z(0, LoadX_UB_directory +r"\displacement.csv")
             Rotationz_LB = self.Rotationz_at_z(0,LoadX_LB_directory+ r"\displacement.csv")
@@ -756,8 +822,8 @@ class Beam:
             LoadMagnitude = -1
             self.SimpleShearLoad(LoadZ, LoadX_UB, LoadMagnitude = LoadMagnitude)
             self.SimpleShearLoad(LoadZ, LoadX_LB, LoadMagnitude = LoadMagnitude)
-            LoadX_UB_directory = self._navigate(["1. Simple_Shear_Load", LoadMagnitude, LoadZ, LoadX_UB])
-            LoadX_LB_directory = self._navigate(["1. Simple_Shear_Load", LoadMagnitude, LoadZ, LoadX_LB])
+            LoadX_UB_directory = self._navigate(["1. Simple_Shear_Load","Beam_Repository", LoadMagnitude, LoadZ, LoadX_UB])
+            LoadX_LB_directory = self._navigate(["1. Simple_Shear_Load","Beam_Repository", LoadMagnitude, LoadZ, LoadX_LB])
 
             Rotationz_UB = self.Rotationz_at_z(int(LoadZ),LoadX_UB_directory + r"\displacement.csv")
             Rotationz_LB = self.Rotationz_at_z(int(LoadZ),LoadX_LB_directory + r"\displacement.csv")
@@ -834,94 +900,22 @@ class Beam:
 
 
 
-
-
-
 #### what's important is the location of the input csv
 # beam_name = r"D:\shear_centre\1-Semi-Circle\0.4_0.02_5.0\210.0_81.0_0.3\warping"
 # input_csv = Beam_name + "input.csv"
 
-# Encastre = Beam(r"D:\shear_centre\1-Semi-Circle\0.4_0.02_5.0\210.0_81.0_0.3\encastre")
 
 
 
-
-
-
-
-
-
-# fig, ax = plt.subplots()
-# print(Encatre.SimpleShearLoad(0,1.0).plot_z_rotation_along_beam())
-# print(Warping.SimpleShearLoad(0,1.0).plot_z_rotation_along_beam())
-# plt.ylim(bottom=0)
-# plt.xlim(left=0)
-# ax.legend()
-# ax.xaxis.tick_bottom()
-# plt.xlabel(r'$z / m$ ', )
-# plt.ylabel(r'$\theta_{z}$ / \textdegree ')
-# plt.tight_layout()
-# plt.grid()
-# plt.show()
-
+# Warping  = Beam(r"D:\\shear_centre\\5-NACA0025\\5.0\\210.0_81.0_0.3\\warping")
+# Encastre = Beam(r"D:\\shear_centre\\5-NACA0025\\5.0\\210.0_81.0_0.3\\encastre")
 
 
 # Warping.TSC_every_n_m(0.5)
+# Warping.LSC_every_n_m(0.5)
+# Encastre.TSC_every_n_m(0.5)
 # Encastre.LSC_every_n_m(0.5)
-# # print("hello")
-# # sc.LSC_every_n_m(0.5)
-# #print(sc.SimpleShearLoad(89,1.0).plot_z_rotation_along_beam())
 
-
-
-
-
-
-# sc.TSC(0)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# df = pd.read_csv("input.csv", header = 0, index_col = 0)
-# print(df)
-
-
-
-
-
-
-
-
-# def ShearSweep(beam_number, Load_X_magnitude, LoadX_start, LoadX_end, step)
-#         if df["AnalysisType"][beam_number] == 1:
-#             for i in np.arange (9, 11, 1):
-#                 ShearLoad(beam_number, i)
-#         else:
-#             print("CANNOT DO A SHEAR SWEEP ON AN ANAYSIS 3 beam")
-
-# def get_LSC()
-
-
-
-
-
-
-# if __name__ == '__main__':
 
 
 

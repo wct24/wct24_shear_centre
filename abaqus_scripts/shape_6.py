@@ -107,37 +107,95 @@ def main():
     #     os.chdir(folder)
 
     model = mdb.models['Model-1']
-    s = model.ConstrainedSketch(name='__profile__', sheetSize=1.0)
-    g, v, d, c = s.geometry, s.vertices, s.dimensions, s.constraints
-
-    with open(r'C:\Users\touze\project\wct24_shear_centre\abaqus_scripts\point_files\NACA0025_points.csv') as f:
-        x = csv.reader(f)
-        data = list(x)
-    x_o = data[0]
-    y_o = data[1]
-    x_i = data[2]
-    y_i = data[3]
 
 
-    number_of_points = len(x_o)
-    for i in range(number_of_points):
-        if i == number_of_points-1:
-            s.Line(point1=(float(x_o[i]), float(y_o[i])), point2=(float(x_o[0]), float(y_o[0])))
-            s.Line(point1=(float(x_i[i]), float(y_i[i])), point2=(float(x_i[0]), float(y_i[0])))
-        else:
-            s.Line(point1=(float(x_o[i]), float(y_o[i])), point2=(float(x_o[i+1]), float(y_o[i+1])))
-            s.Line(point1=(float(x_i[i]), float(y_i[i])), point2=(float(x_i[i+1]), float(y_i[i+1])))
+    s1 = mdb.models['Model-1'].ConstrainedSketch(name='__profile__', sheetSize=1.0)
+    g, v, d, c = s1.geometry, s1.vertices, s1.dimensions, s1.constraints
+    s1.setPrimaryObject(option=STANDALONE)
+    s1.Line(point1=(0.0, 0.0), point2=(0.0, 0.1))
+    s1.VerticalConstraint(entity=g[2], addUndoState=False)
+    s1.delete(objectList=(g[2], c[4]))
+    s1.Line(point1=(-0.01, 0.0), point2=(-0.01, 0.1))
+    s1.VerticalConstraint(entity=g[3], addUndoState=False)
+    s1.Line(point1=(0.01, 0.0), point2=(0.01, 0.1))
+    s1.VerticalConstraint(entity=g[4], addUndoState=False)
+    s1.delete(objectList=(g[3], g[4], c[7], c[10]))
+    s1.Line(point1=(0.0, 0.0), point2=(0.0, 0.1))
+    s1.VerticalConstraint(entity=g[5], addUndoState=False)
+    s1.Line(point1=(0.0, 0.1), point2=(0.2, 0.1))
+    s1.HorizontalConstraint(entity=g[6], addUndoState=False)
+    s1.PerpendicularConstraint(entity1=g[5], entity2=g[6], addUndoState=False)
+    s1.Line(point1=(0.2, 0.1), point2=(0.2, -0.2))
+    s1.VerticalConstraint(entity=g[7], addUndoState=False)
+    s1.PerpendicularConstraint(entity1=g[6], entity2=g[7], addUndoState=False)
+    s1.Line(point1=(0.2, -0.2), point2=(-0.2, -0.2))
+    s1.HorizontalConstraint(entity=g[8], addUndoState=False)
+    s1.PerpendicularConstraint(entity1=g[7], entity2=g[8], addUndoState=False)
+    s1.Line(point1=(-0.2, -0.2), point2=(-0.2, 0.3))
+    s1.VerticalConstraint(entity=g[9], addUndoState=False)
+    s1.PerpendicularConstraint(entity1=g[8], entity2=g[9], addUndoState=False)
+    s1.Line(point1=(-0.2, 0.3), point2=(0.4, 0.3))
+    s1.HorizontalConstraint(entity=g[10], addUndoState=False)
+    s1.PerpendicularConstraint(entity1=g[9], entity2=g[10], addUndoState=False)
+    s1.Line(point1=(-0.01, 0.0), point2=(-0.01, 0.11))
+    s1.VerticalConstraint(entity=g[11], addUndoState=False)
+    s1.Line(point1=(-0.01, 0.11), point2=(0.21, 0.11))
+    s1.HorizontalConstraint(entity=g[12], addUndoState=False)
+    s1.PerpendicularConstraint(entity1=g[11], entity2=g[12], addUndoState=False)
+
+    s1.Line(point1=(0.21, 0.11), point2=(0.21, -0.2))
+    s1.VerticalConstraint(entity=g[13], addUndoState=False)
+    s1.PerpendicularConstraint(entity1=g[12], entity2=g[13], addUndoState=False)
+
+    s1.Line(point1=(0.21, -0.2), point2=(0.21, -0.21))
+    s1.VerticalConstraint(entity=g[14], addUndoState=False)
+    s1.ParallelConstraint(entity1=g[13], entity2=g[14], addUndoState=False)
+    s1.Line(point1=(0.21, -0.21), point2=(-0.21, -0.21))
+    s1.HorizontalConstraint(entity=g[15], addUndoState=False)
+    s1.PerpendicularConstraint(entity1=g[14], entity2=g[15], addUndoState=False)
+    s1.Line(point1=(-0.21, -0.21), point2=(-0.21, 0.31))
+    s1.VerticalConstraint(entity=g[16], addUndoState=False)
+    s1.PerpendicularConstraint(entity1=g[15], entity2=g[16], addUndoState=False)
+    s1.Line(point1=(-0.21, 0.31), point2=(0.4, 0.31))
+    s1.HorizontalConstraint(entity=g[17], addUndoState=False)
+    s1.PerpendicularConstraint(entity1=g[16], entity2=g[17], addUndoState=False)
+
+    s1.Line(point1=(0.4, 0.31), point2=(0.4, 0.29))
+    s1.VerticalConstraint(entity=g[18], addUndoState=False)
+    s1.PerpendicularConstraint(entity1=g[17], entity2=g[18], addUndoState=False)
+    s1.Line(point1=(0.4, 0.29), point2=(-0.18500000002794, 0.29))
+    s1.HorizontalConstraint(entity=g[19], addUndoState=False)
+    s1.PerpendicularConstraint(entity1=g[18], entity2=g[19], addUndoState=False)
+
+    s1.Line(point1=(-0.18500000002794, 0.29), point2=(-0.19, -0.19))
+
+    s1.Line(point1=(-0.19, -0.19), point2=(0.19, -0.19))
+    s1.HorizontalConstraint(entity=g[21], addUndoState=False)
+
+    s1.Line(point1=(0.19, -0.19), point2=(0.19, 0.09))
+    s1.VerticalConstraint(entity=g[22], addUndoState=False)
+    s1.PerpendicularConstraint(entity1=g[21], entity2=g[22], addUndoState=False)
+
+    s1.Line(point1=(0.19, 0.09), point2=(0.01, 0.09))
+    s1.HorizontalConstraint(entity=g[23], addUndoState=False)
+    s1.PerpendicularConstraint(entity1=g[22], entity2=g[23], addUndoState=False)
+    s1.Line(point1=(0.01, 0.09), point2=(0.01, 0.0))
+    s1.VerticalConstraint(entity=g[24], addUndoState=False)
+    s1.PerpendicularConstraint(entity1=g[23], entity2=g[24], addUndoState=False)
+    s1.Line(point1=(0.01, 0.0), point2=(-0.01, 0.0))
+    s1.HorizontalConstraint(entity=g[25], addUndoState=False)
+    s1.PerpendicularConstraint(entity1=g[24], entity2=g[25], addUndoState=False)
+
+    s1.delete(objectList=(g[6], g[5], g[7], g[8], g[9], g[10]))
 
     p = mdb.models['Model-1'].Part(name='part', dimensionality=THREE_D,
         type=DEFORMABLE_BODY)
-
-    part = mdb.models['Model-1'].parts['part']
-    part.BaseSolidExtrude(sketch=s, depth=length)
-    s.unsetPrimaryObject()
-
+    p = mdb.models['Model-1'].parts['part']
+    p.BaseSolidExtrude(sketch=s1, depth=length)
+    s1.unsetPrimaryObject()
+    p = mdb.models['Model-1'].parts['part']
 
     del mdb.models['Model-1'].sketches['__profile__']
-
     #------------------------------------------------------------------------------------
     #               MESH
     #------------------------------------------------------------------------------------
@@ -145,25 +203,58 @@ def main():
 
     p = mdb.models['Model-1'].parts['part']
     e = p.edges
-    pickedEdges = e.getSequenceFromMask(mask=(
-        '[#92492491 #24924924 #49249249 #92492292 #24924924 #49249249 #12492 ]',
-        ), )
+
+
+    p = mdb.models['Model-1'].parts['part']
+    f = p.faces
+    p.PartitionFaceByAuto(face=f[14])
+    p = mdb.models['Model-1'].parts['part']
+
+    p.seedPart(size=0.05, deviationFactor=0.1, minSizeFactor=0.001)
+    p = mdb.models['Model-1'].parts['part']
+    e = p.edges
+    pickedEdges = e.getSequenceFromMask(mask=('[#1c4 ]', ), )
     p.seedEdgeBySize(edges=pickedEdges, size=0.01, deviationFactor=0.1,
-        constraint=FINER)
+        minSizeFactor=0.001, constraint=FINER)
+    p = mdb.models['Model-1'].parts['part']
+    e = p.edges
+    pickedEdges = e.getSequenceFromMask(mask=('[#3b ]', ), )
+    p.seedEdgeBySize(edges=pickedEdges, size=0.02, deviationFactor=0.1,
+        minSizeFactor=0.001, constraint=FINER)
+    session.viewports['Viewport: 1'].view.setValues(nearPlane=9.23928,
+        farPlane=12.9643, width=1.14253, height=0.477486, viewOffsetX=-1.35241,
+        viewOffsetY=-0.660425)
+    p = mdb.models['Model-1'].parts['part']
+    e = p.edges
+    pickedEdges = e.getSequenceFromMask(mask=('[#3f ]', ), )
+    p.seedEdgeBySize(edges=pickedEdges, size=0.01, deviationFactor=0.1,
+        minSizeFactor=0.001, constraint=FINER)
+    session.viewports['Viewport: 1'].view.setValues(nearPlane=9.26298,
+        farPlane=12.9406, width=0.851018, height=0.355657,
+        viewOffsetX=-1.33573, viewOffsetY=-0.872709)
+    p = mdb.models['Model-1'].parts['part']
+    e = p.edges
+    pickedEdges = e.getSequenceFromMask(mask=('[#3a01 ]', ), )
+    p.seedEdgeBySize(edges=pickedEdges, size=0.01, deviationFactor=0.1,
+        minSizeFactor=0.001, constraint=FINER)
+    p = mdb.models['Model-1'].parts['part']
+    e = p.edges
+    pickedEdges = e.getSequenceFromMask(mask=('[#7fd000 #120000 ]', ), )
+    p.seedEdgeBySize(edges=pickedEdges, size=0.01, deviationFactor=0.1,
+        minSizeFactor=0.001, constraint=FINER)
     p = mdb.models['Model-1'].parts['part']
     p.generateMesh()
-    p = mdb.models['Model-1'].parts['part']
-    p.seedPart(size=0.05, deviationFactor=0.1, minSizeFactor=0.1)
-    p = mdb.models['Model-1'].parts['part']
-    p.generateMesh()
-    part.generateMesh()
+
+
+
+
     # #------------------------------------------------------------------------------------
     # #               SECTION
     # #------------------------------------------------------------------------------------
-    c = part.cells
+    c = p.cells
     print(c)
     cells = c.getSequenceFromMask(mask=('[#1 ]', ), )
-    SC_section_geometry = part.Set(cells=cells, name='SC_section_geometry')
+    SC_section_geometry = p.Set(cells=cells, name='SC_section_geometry')
 
     model.Material(name='SC-material')
     model.materials['SC-material'].Elastic(type=ENGINEERING_CONSTANTS,
@@ -172,12 +263,12 @@ def main():
                     G, G, G), ))
     model.HomogeneousSolidSection(name='SC-section', material='SC-material', thickness=None)
     ## asigning the section
-    part.SectionAssignment(region=SC_section_geometry, sectionName='SC-section', offset=0.0,
+    p.SectionAssignment(region=SC_section_geometry, sectionName='SC-section', offset=0.0,
             offsetType=MIDDLE_SURFACE, offsetField='',
             thicknessAssignment=FROM_SECTION)
     ##assigning the material orientaion
     orientation=None
-    part.MaterialOrientation(region=SC_section_geometry,
+    p.MaterialOrientation(region=SC_section_geometry,
         orientationType=GLOBAL, axis=AXIS_1,
         additionalRotationType=ROTATION_NONE, localCsys=None, fieldName='',
         stackDirection=STACK_3)
@@ -192,7 +283,7 @@ def main():
     # ------------------------------------------------------------------------------------
     a = model.rootAssembly
     a.DatumCsysByDefault(CARTESIAN)
-    a.Instance(name='SC_beam-1', part=part, dependent=ON)
+    a.Instance(name='SC_beam-1', part=p, dependent=ON)
     # ----------------------------------
     # Boundary Conditions ANd Load
     # ---------------------------------
