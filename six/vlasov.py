@@ -6,12 +6,11 @@ import numpy as np
 
 
 
-t= 0.1
 #define the sectors:
 d = {"x_0":[0, 0.4, 0.4],
-     "y_0":[0.4, 0.4, -0.4],
+     "y_0":[0.4, 0.4, -0.4 ],
      "x_1":[0.4,0.4,0],
-     "y_1":[0.4,-0.4,-0.4],
+     "y_1":[0.4,-0.4,-0.4]
 }
 
 df_xy = pd.DataFrame(data=d, dtype=np.float64)
@@ -31,15 +30,16 @@ def turn_into_principal(df):
         Ay += length*y
     NA_x = Ax/A
     NA_y = Ay/A
-    print(NA_x,NA_y)
+
     df_uv = df - [NA_x,NA_y,NA_x,NA_y]
     # rename the columns:
     df_uv.columns = ['u_0', 'v_0', 'u_1', 'v_1']
-    return df_uv
 
-df_uv = turn_into_principal(df_xy)
+    return df_uv,NA_x ,NA_y
 
-print(df_uv)
+df_uv,NA_x ,NA_y = turn_into_principal(df_xy)
+
+
 
 def I_uu(df):
     I_uu =0.0
@@ -85,10 +85,6 @@ def coefficient(x,y):
 
     return a,b,c
 
-# x = [1,2,3]
-# y = [4,7,12]
-
-# a,b,c = coefficient(x, y)
 
 
 def I_uw_vw(df, pole, display_w=False):
@@ -133,28 +129,22 @@ def I_uw_vw(df, pole, display_w=False):
         integral = length*(6*c+3*b+2*a)/6
 
 
-        # find the fraction along the segment where the com of the trapezium is located
-        # x_trapezium = 1/3 *(w_array[i+1]-2*w_array[i])/(w_array[i+1]-w_array[i]) # standard COM of the trapezium
-        # area_trapezium = (w_array[i+1] + w_array[i])*length/2
-        # print("area",area_trapezium)
-
-        # u_w_com = df["u_0"][i] + x_trapezium*(df["u_1"][i] - df["u_0"][i])
-        # v_w_com = df["v_0"][i] + x_trapezium*(df["v_1"][i] - df["v_0"][i])
-        # print("u_w" , u_w_com)
-        # print("v_w" , v_w_com)
-
         I_uw += integral
         I_vw += 0
     return I_uw, I_vw
 
 
 
-I_uw, I_vw =I_uw_vw(df_uv, [0.8,10], display_w=False)
+I_uw, I_vw =I_uw_vw(df_uv, [0.0,0.0], display_w=False)
 print(I_uu)
 print(I_uw)
 
+
+
+
+
 print("shear centre")
-print()
+print(NA_x)
 print(I_uw/I_uu)
 
 

@@ -766,7 +766,7 @@ class Beam:
             pass
         return Result_Data(folder_name)
 
-    def TSC(self, LoadZ, tol = 1e-5):
+    def TSC(self, LoadZ, tol = 1e-4):
         """ Newton-Raphson method to find the TSC
             a small load is used to make linear"""
 
@@ -805,7 +805,7 @@ class Beam:
 
         return LoadX
 
-    def LSC(self, LoadZ, tol = 1e-5):
+    def LSC(self, LoadZ, tol = 1e-4):
         """ Newton-Raphson method to find the TSC
             a small load is used to make linear"""
         # AnalysisType = "3. Find_LSC"
@@ -907,14 +907,14 @@ class Beam:
 
 
 
-# Warping  = Beam(r"D:\\shear_centre\\5-NACA0025\\5.0\\210.0_81.0_0.3\\warping")
-# Encastre = Beam(r"D:\\shear_centre\\5-NACA0025\\5.0\\210.0_81.0_0.3\\encastre")
+Warping  = Beam(r"D:\\shear_centre\\5-NACA0025\\5.0\\210.0_81.0_0.3\\warping")
+Encastre = Beam(r"D:\\shear_centre\\5-NACA0025\\5.0\\210.0_81.0_0.3\\encastre")
 
 
 # Warping.TSC_every_n_m(0.5)
 # Warping.LSC_every_n_m(0.5)
-# Encastre.TSC_every_n_m(0.5)
-# Encastre.LSC_every_n_m(0.5)
+Encastre.TSC_every_n_m(0.5)
+Encastre.LSC_every_n_m(0.5)
 
 
 
