@@ -10,9 +10,12 @@ applying a torque and seeing the resulting warping plot
 
  """
 
-warping = Beam(r"D:\\shear_centre\\5-NACA0025\\5.0\\210.0_81.0_0.3\\warping")
 
-warping.SimpleTorqueLoad(0,1.0, LoadMagnitude = -4.91).plot_deformed_cross_section_3D_combind(220)
+encastre = Beam(r"D:\\shear_centre\\5-NACA0025\\15.0\\300.0_40.0_0.3\\encastre")
+
+
+
+encastre.SimpleTorqueLoad(0,0.0, LoadMagnitude = -0.5).plot_deformed_cross_section_3D_combind(1)
 # print(warping.SimpleTorqueLoad(0,1.0, LoadMagnitude = -4.91)._connected_nodes(0.0398765,0.408056,5))
 
 

@@ -10,7 +10,7 @@ applying a torque load at the end of the beam and at a position closer to the su
 """
 
 
-warping = Beam(r"D:\shear_centre\1-Semi-Circle\0.4_0.02_5.0\210.0_81.0_0.3\Warping")
+warping = Beam(r"D:\\shear_centre\\5-NACA0025\\5.0\\210.0_81.0_0.3\\encastre")
 
 # x_array, rotation_array, warping_array = warping.end_rotation_x_sweep( 0, 0, 0, -10)
 
@@ -79,7 +79,7 @@ warping = Beam(r"D:\shear_centre\1-Semi-Circle\0.4_0.02_5.0\210.0_81.0_0.3\Warpi
 fig, ax = plt.subplots(2)
 
 
-x_array0, rotation_array0, warping_array0 = warping.end_rotation_x_sweep( 0, 0, 0, -1000)
+x_array0, rotation_array0, warping_array0 = warping.end_rotation_x_sweep( 0, 0, 0, -1)
 # x_array1, rotation_array1, warping_array1 = warping.end_rotation_x_sweep( 0, 0, 0, -1000)
 
 
