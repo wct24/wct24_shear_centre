@@ -73,6 +73,7 @@ class Result_Data:
         # bottom-right, and bottom-left order
         return np.array([tl, tr, br, bl], dtype="float64")
 
+
     def _element_list(self, z):
         """ returns a list of connected nodes
             1. find the element the node belongs to
@@ -197,26 +198,48 @@ class Result_Data:
         # ax.plot(z_list, rotation_z_list, label="$S_x({},{},{})$".format(self.beam_df["LoadX"][0],self.beam_df["LoadY"][0],z_list[int(self.beam_df["LoadZ"][0])]))
         return z_list, rotationz_list
 
-    def section_warping_magnitude(self, ResultSection, include_stress=False):
+
+
+    def GetAll(self, ResultSection):
            # get the z coordinates of the sections
         # get the z coordinates of the sections
-        section_warping_magnitude_csv = self.result_folder+ r"\section_warping_magnitude.csv"
-        if not os.path.exists(section_warping_magnitude_csv):
-            #create the csv
-            column_names =  ["Warping Magnitude"]
-            wm_df = pd.DataFrame(columns=column_names)
-            wm_df.index.name = "z"
-        else:
-            wm_df = pd.read_csv(section_warping_magnitude_csv, header = 0, index_col = 0)
-        wm_df = wm_df.astype(np.float64)
-
         z = self.list_of_z_values[ResultSection]
+        main_information_csv  = self.result_folder+ "\\main_information.csv"
+        extra_information_csv = self.result_folder+ "\\extra_information"+ "\\{}.csv".format(str(z))
 
-        if z not in wm_df.index:
+        if not os.path.exists(main_information_csv):
+            #create the csv
+            column_names =  ["GlobalDisplacementVector","GlobalRotationVector","WarpingMagnitude", "StressMagnitude", "MeanRC", "SpreadRC", "MeanWC", "SpreadWC","MeanSC","SpreadSC"]
+            main_df = pd.DataFrame(columns=column_names)
+            main_df.index.name = "z"
 
+
+
+
+        else:
+            main_df = pd.read_csv(main_information_csv, header = 0, index_col = 0)
+
+        main_df = main_df.astype(np.float64)
+
+        if not os.path.exists(self.result_folder+ "\\extra_information"):
+            os.mkdir(self.result_folder+ "\\extra_information")
+        else:
+            pass
+
+
+        if not os.path.exists(extra_information_csv):
+            #create the csv
+            column_names =  ["X0_0", "Y0_0", "X1_0", "Y1_0", "X2_0", "Y2_0", "X3_0", "Y3_0", "X0_1", "Y0_1", "X1_1", "Y1_1", "X2_1", "Y2_1", "X3_1", "Y3_1", "X0_2", "Y0_2", "X1_2", "Y1_2", "X2_2", "Y2_2", "X3_2", "Y3_2","W0", "W1", "W2", "W3", "S0", "S1", "S2", "S3","x_wc","y_wc","x_sc", "y_sc", "x_rc", "y_rc"]
+            extra_df = pd.DataFrame(columns=column_names)
+            extra_df.index.name = "e"
+        else:
+            extra_df = pd.read_csv(extra_information_csv, header = 0, index_col = 0)
+        extra_df = extra_df.astype(np.float64)
+
+        # only runs if it hasn't run before
+        if z not in main_df.index:
             df1 = self.U_df.loc[self.U_df["z"]==z]
             element_array = self._element_list(z)
-
             # the element will appear twice once downbeam and once up beam for a 3D element
             element_array = np.unique(element_array)
             df1 = df1.reset_index()
@@ -254,6 +277,8 @@ class Result_Data:
             centroid_A = centroid_A.reshape(-1, 1)
             centroid_B = centroid_B.reshape(-1, 1)
 
+            GlobalDisplacementVector = centroid_B - centroid_A
+
             # subtract mean
             Am = A - centroid_A
             Bm = B - centroid_B
@@ -261,6 +286,8 @@ class Result_Data:
             H = Am @ np.transpose(Bm)
             U, S, Vt = np.linalg.svd(H)
             R = Vt.T @ U.T
+            GlobalRotationVector = mat2euler(R, axes='sxyz')
+
 
             t = -R @ centroid_A + centroid_B
             XYZ_2  = R @ A + t
@@ -269,92 +296,368 @@ class Result_Data:
             y_2 = XYZ_2[1]
             w = XYZ_2[2]-z_0
 
+            #inatilise the overal variables
 
             warping_magnitude = 0.0
+            stress_magnitude =0.0
             A = 0.0
+            wc = np.zeros((np.shape(element_array)[0],2), dtype=np.float64)
+            rc = np.zeros((np.shape(element_array)[0],2), dtype=np.float64)
+            sc = np.zeros((np.shape(element_array)[0],2), dtype=np.float64)
 
             for i in range(np.shape(element_array)[0]):
+
+                ###############################################################################################
+                #warping
+                ###############################################################################################
                 (X0_0,Y0_0,X1_0,Y1_0, X2_0,Y2_0, X3_0,Y3_0) = element_array[i]
                 AFxy = 1
                 AFz  = 1
 
+
+
                 condition = (df1['x'] == X0_0) & (df1['y'] == Y0_0)
                 b = df1.index[condition].tolist()
-                X0_1 = x_2[b[0]]
-                Y0_1 = y_2[b[0]]
+                X0_2 = x_2[b[0]]
+                Y0_2 = y_2[b[0]]
+                X0_1 = x_1[b[0]]
+                Y0_1 = y_1[b[0]]
+
                 W0 = w[b[0]]
 
 
                 condition = (df1['x'] == X1_0) & (df1['y'] == Y1_0)
                 b = df1.index[condition].tolist()
-                X1_1 = x_2[b[0]]
-                Y1_1 = y_2[b[0]]
+                X1_2 = x_2[b[0]]
+                Y1_2 = y_2[b[0]]
+                X1_1 = x_1[b[0]]
+                Y1_1 = y_1[b[0]]
+
                 W1 = w[b[0]]
 
                 condition = (df1['x'] == X2_0) & (df1['y'] == Y2_0)
                 b = df1.index[condition].tolist()
-                X2_1 = x_2[b[0]]
-                Y2_1 = y_2[b[0]]
+                X2_2 = x_2[b[0]]
+                Y2_2 = y_2[b[0]]
+                X2_1 = x_1[b[0]]
+                Y2_1 = y_1[b[0]]
                 W2 = w[b[0]]
 
 
                 condition = (df1['x'] == X3_0) & (df1['y'] == Y3_0)
                 b = df1.index[condition].tolist()
-                X3_1 = x_2[b[0]]
-                Y3_1 = y_2[b[0]]
+                X3_2 = x_2[b[0]]
+                Y3_2 = y_2[b[0]]
+                X3_1 = x_1[b[0]]
+                Y3_1 = y_1[b[0]]
                 W3 = w[b[0]]
 
+                X2 = [X0_2, X1_2, X2_2, X3_2]
+                X1 = [X0_1, X1_1, X2_1, X3_1]
+                X0 = [X0_0, X1_0, X2_0, X3_0]
+
+                Y2 = [Y0_2, Y1_2, Y2_2, Y3_2]
+                Y1 = [Y0_1, Y1_1, Y2_1, Y3_1]
+                Y0 = [Y0_0, Y1_0, Y2_0, Y3_0]
+
+                W = [W0,W1,W2,W3]
+
+                # plt.scatter(X2,Y2)
+                # plt.show()
 
 
-                s_mean = 0.0 # if the stress is not asked for then it will by default be zero
-                stress_magnitude =0.0
-                if include_stress == True:
-                    df2 = self.S_df.loc[self.S_df["z"]==z]
 
 
-                    condition = (df2['x'] == X0_0) & (df2['y'] == Y0_0)
-                    b = df2.index[condition].tolist()
-                    S0 = self.S_df["S33"][b[0]]
-
-                    condition = (df2['x'] == X1_0) & (df2['y'] == Y1_0)
-                    b = df2.index[condition].tolist()
-                    S1 = self.S_df["S33"][b[0]]
-
-                    condition = (df2['x'] == X2_0) & (df2['y'] == Y2_0)
-                    b = df2.index[condition].tolist()
-                    S2 = self.S_df["S33"][b[0]]
-
-                    condition = (df2['x'] == X3_0) & (df2['y'] == Y3_0)
-                    b = df2.index[condition].tolist()
-                    S3 = self.S_df["S33"][b[0]]
-
-                    s_mean = (S0+S1+S2+S3)/4
-
-                #find the volume of an 8 point pryzm []
-                w_mean = (W0+W1+W2+W3)/4
-                #shoelace formula
 
 
-                x = [X0_1, X1_1, X2_1, X3_1]
-                y = [Y0_1, Y1_1, Y2_1, Y3_1]
-                dA = Polygon(zip(x, y)).area # Assuming the OP's x,y coordinates
-                warping_magnitude += abs(w_mean)*dA
-                stress_magnitude  +=  abs(s_mean)*dA
-                A += dA
+                # get the location of the warping shear centre for the element
 
-            stress_magnitude = stress_magnitude/A
-            warping_magnitude = warping_magnitude/A
-            dfr = pd.DataFrame(data = {"Warping Magnitude":[warping_magnitude], "Stress Magnitude":[stress_magnitude] }, index = [z])
+                # v1 = np.array([X2_2-X0_2, Y2_2-Y0_2])
+                # v2 = np.array([X3_2-X1_2, Y3_2-Y1_2])
+                # dw_1 = W2-W0
+                # dw_2 = W3-W1
+                # dS_1 = np.linalg.norm(v1)
+                # dS_2 = np.linalg.norm(v2)
+
+                # v1_perpendicular = dw_1/dS_1**2*np.matmul(np.array([[0,-1],[1,0]]),v1)
+                # v2_perpendicular = dw_2/dS_2**2*np.matmul(np.array([[0,-1],[1,0]]),v2)
+
+                # [xc,yc] = np.array([X2_2,Y2_2]) + np.transpose(v1_perpendicular)
+                # [xa,ya] = np.array([X0_2,Y0_2]) + np.transpose(v1_perpendicular)
+                # [xd,yd] = np.array([X3_2,Y3_2]) + np.transpose(v2_perpendicular)
+                # [xb,yb] = np.array([X1_2,Y1_2]) + np.transpose(v2_perpendicular)
+
+                # a0 = ya - yc
+                # b0 = xc - xa
+                # c0 = (ya - yc)*xc + (xa - xc)*yc
+
+                # a1 = yb - yd
+                # b1 = xd - xb
+                # c1 = (yb - yd)*xc + (xb - xd)*yc
+
+                # c_vector=np.array([c0,c1])
+
+                # ab = np.array([[a0,b0],[a1,b1]])
+                # x_wc, y_wc = np.matmul(np.linalg.inv(ab),c_vector)
+                # wc[i] = [x_wc, x_wc]
+
+                # w_mean = (W0+W1+W2+W3)/4
+
+                if ResultSection == 0:
+                    d_theta = self.section_rotationz(ResultSection) - self.section_rotationz(ResultSection+1)
+                    dz = self.list_of_z_values[ResultSection]-self.list_of_z_values[ResultSection+1]
+                    dtheta_dz = d_theta/dz
+                elif ResultSection == len(self.list_of_z_values)-1:
+                    d_theta = self.section_rotationz(ResultSection-1) - self.section_rotationz(ResultSection)
+                    dz = self.list_of_z_values[ResultSection-1]-self.list_of_z_values[ResultSection]
+                    dtheta_dz = d_theta/dz
+                else:
+                    d_theta = self.section_rotationz(ResultSection-1) - self.section_rotationz(ResultSection+1)
+                    dz = self.list_of_z_values[ResultSection-1]-self.list_of_z_values[ResultSection+1]
+                    dtheta_dz = d_theta/dz
+
+                significant_digits = 8
+                dtheta_dz = d_theta/dz
+
+                twist =  round(dtheta_dz, significant_digits - int(math.floor(math.log10(abs(dtheta_dz)))) - 1)
+                po = np.array([[0,1],[1,2],[2,3],[3,0], [0,2],[1,3]])
+                c_vector= np.zeros([len(po)])
+                ab = np.zeros(np.shape(po))
+
+                # print(dtheta_dz)
+                # m = []
+                # c = []
+                # for j in range(len(po)):
+                centroid_x = np.mean(X2)
+                centroid_y = np.mean(Y2)
+
+                #### left:
+                ds_left = np.array([(X2[1]-X2[3]),(Y2[1]-Y2[3])])
+                dw_left = W[1]/twist -W[3]/twist
+                a_left = (X2[1]+X2[3])/2 - centroid_x
+                b_left = (Y2[1]+Y2[3])/2 - centroid_y
+                #correct the dw term
+                dw_left= dw_left - (a_left*ds_left[1]-b_left*ds_left[0])
+
+                ### right:
+                ds_right = np.array([(X2[0]-X2[2]),(Y2[0]-Y2[2])])
+                dw_right = W[0]/twist-W[2]/twist
+                a_right = (X2[0]+X2[2])/2 - centroid_x
+                b_right = (Y2[0]+Y2[2])/2 - centroid_y
+                #correct the dw term
+                dw_right = dw_right  - (a_right*ds_right[1]-b_right*ds_right[0])
+
+
+                S =  np.array([[ds_left[1], -ds_left[0]],[ds_right[1], -ds_right[0]]])
+
+
+                r = np.linalg.inv(S) @ np.array([[dw_left],[dw_right]])
+
+
+
+                wc = np.array([centroid_x,centroid_y]) - r.T
+
+
+
+                radius = np.sqrt(centroid_x**2 + centroid_y**2)
+                if radius > 0.4:
+                    if centroid_y > 0:
+                        plt.scatter([wc[0][0]],[wc[0][1]], color="blue")
+                    else:
+                        plt.scatter([wc[0][0]],[wc[0][1]], color="green")
+
+                else:
+                    if centroid_y > 0:
+                        plt.scatter([wc[0][0]],[wc[0][1]], color="red")
+                    else:
+                        plt.scatter([wc[0][0]],[wc[0][1]], color="orange")
+
+
+
+
+
+
+                # def intersection(m1,c1,m2,c2):
+                #     x= (c1-c2)/(m2-m1)
+                #     y= m1*x+c1
+                #     return(x,y)
+
+                # x_tl,y_tl =  intersection(m[0],c[0],m[3],c[3])
+                # x_tr,y_tr =  intersection(m[0],c[0],m[1],c[1])
+                # x_br,y_br =  intersection(m[1],c[1],m[2],c[2])
+                # x_bl,y_bl =  intersection(m[2],c[2],m[3],c[3])
+
+                # plt.plot([x_tl,x_tr],[y_tl, y_tr], color="blue")
+                # plt.plot([x_tr,x_br],[y_tr,y_br], color="green")
+                # plt.plot([x_br,x_bl],[y_br, y_bl], color="yellow" )
+                # plt.plot([x_bl, x_tl],[y_bl, y_tl], color="orange")
+
+
+
+
+
+
+                # # x_wc, y_wc = np.matmul(np.linalg.inv(ab),c_vector)
+
+                # ###############################################################################################
+                # #Rotation
+                # ###############################################################################################
+
+                # m_array = np.zeros(4)
+                # c_array = np.zeros(4)
+
+                # X1 = [X0_1, X1_1, X2_1, X3_1]
+                # X0 = [X0_0, X1_0, X2_0, X3_0]
+
+                # Y1 = [Y0_1, Y1_1, Y2_1, Y3_1]
+                # Y0 = [Y0_0, Y1_0, Y2_0, Y3_0]
+
+                # for k in range(4):
+                #     v1 = np.array([X1[k]-X0[k], Y1[k]-Y0[k]])
+                #     v1_unit = v1/np.linalg.norm(v1)
+                #     v1_perpendicular = np.matmul(np.array([[0,-1],[1,0]]),v1)
+                #     m= v1_perpendicular[1]/v1_perpendicular[0]
+                #     c = -m*X0[k]+Y0[k]
+                #     m_array[k] = m
+                #     c_array[k] = c
+
+                # A = np.vstack([-m_array, np.ones(len(m_array))]).T
+                # x_rc, y_rc = (np.linalg.lstsq(A, c_array, rcond=None)[0])
+                # rc[i] = [x_rc, y_rc]
+                # ###############################################################################################
+                # #stress
+                # ###############################################################################################
+
+                # df2 = self.S_df.loc[self.S_df["z"]==z]
+
+                # condition = (df2['x'] == X0_0) & (df2['y'] == Y0_0)
+                # b = df2.index[condition].tolist()
+                # S0 = self.S_df["S33"][b[0]]
+
+                # condition = (df2['x'] == X1_0) & (df2['y'] == Y1_0)
+                # b = df2.index[condition].tolist()
+                # S1 = self.S_df["S33"][b[0]]
+
+                # condition = (df2['x'] == X2_0) & (df2['y'] == Y2_0)
+                # b = df2.index[condition].tolist()
+                # S2 = self.S_df["S33"][b[0]]
+
+                # condition = (df2['x'] == X3_0) & (df2['y'] == Y3_0)
+                # b = df2.index[condition].tolist()
+                # S3 = self.S_df["S33"][b[0]]
+
+                # s_mean = (S0+S1+S2+S3)/4
+
+
+                # # ds_1 = S2-S0
+                # # ds_2 = S3-S1
+                # # dS_1 = 1
+                # # dS_2 = 1
+                # # v2 = np.array([1,1])
+
+                # # v1_perpendicular = ds_1/dS_1**2*np.matmul(np.array([[0,-1],[1,0]]),v1)
+                # # v2_perpendicular = ds_2/dS_2**2*np.matmul(np.array([[0,-1],[1,0]]),v2)
+
+                # # [xc,yc] = np.array([X2_2,Y2_2]) + np.transpose(v1_perpendicular)
+                # # [xa,ya] = np.array([X0_2,Y0_2]) + np.transpose(v1_perpendicular)
+                # # [xd,yd] = np.array([X3_2,Y3_2]) + np.transpose(v2_perpendicular)
+                # # [xb,yb] = np.array([X1_2,Y1_2]) + np.transpose(v2_perpendicular)
+
+                # # a0 = ya - yc
+                # # b0 = xc - xa
+                # # c0 = (ya - yc)*xc + (xc - xa)*yc
+
+                # # a1 = yb - yd
+                # # b1 = xd - xb
+                # # c1 = (yb - yd)*xc + (xd - xb)*yc
+
+                # # c_vector=np.array([c0,c1])
+
+                # # ab = np.array([[a0,b0],[a1,b1]])
+                # # x_sc, y_sc = np.matmul(np.linalg.inv(ab),c_vector)
+                # # sc[i] = [x_sc, y_sc]
+                # x_sc = 0.05
+                # y_sc = 0.05
+                # data = {
+                #     "X0_0" : X0_0,
+                #     "Y0_0" : Y0_0,
+                #     "X1_0" : X1_0,
+                #     "Y1_0" : Y1_0,
+                #     "X2_0" : X2_0,
+                #     "Y2_0" : Y2_0,
+                #     "X3_0" : X3_0,
+                #     "Y3_0" : Y3_0,
+                #     "X0_1" : X0_1,
+                #     "Y0_1" : Y0_1,
+                #     "X1_1" : X1_1,
+                #     "Y1_1" : Y1_1,
+                #     "X2_1" : X2_1,
+                #     "Y2_1" : Y2_1,
+                #     "X3_1" : X3_1,
+                #     "Y3_1" : Y3_1,
+                #     "X0_2" : X0_2,
+                #     "Y0_2" : Y0_2,
+                #     "X1_2" : X1_2,
+                #     "Y1_2" : Y1_2,
+                #     "X2_2" : X2_2,
+                #     "Y2_2" : Y2_2,
+                #     "X3_2" : X3_2,
+                #     "Y3_2" : Y3_2,
+                #     "W0"   : W0,
+                #     "W1"   : W1,
+                #     "W2"   : W2,
+                #     "W3"   : W3,
+                #     "S0"   : S0,
+                #     "S1"   : S1,
+                #     "S2"   : S2,
+                #     "S3"   : S3,
+                #     "x_wc" : x_wc,
+                #     "y_wc" : y_wc,
+                #     "x_sc" : x_sc,
+                #     "y_sc" : y_sc,
+                #     "x_rc" : x_rc,
+                #     "y_rc" : y_rc,
+                #     }
+                # print(i)
+                # dfr = pd.DataFrame(data = data, index = [i] )
+                # dfr.index.name = "e"
+                # extra_df = extra_df.append(dfr, ignore_index = False)
+                # extra_df.to_csv(extra_information_csv)
+
+            plt.axis('equal')
+            plt.show()
+
+            StressMagnitude = stress_magnitude/A
+            WarpingMagnitude = warping_magnitude/A
+
+            MeanWC = np.mean(wc, axis=0)
+            MeanRC = np.mean(rc, axis=0)
+            MeanSC = np.mean(sc, axis=0)
+
+            SpreadWC = np.std(wc, axis=0)
+            SpreadRC = np.std(rc, axis=0)
+            SpreadSC = np.std(sc, axis=0)
+
+            data = {
+                "GlobalDisplacementVector": GlobalDisplacementVector,
+                "GlobalRotationVector": GlobalRotationVector,
+                "WarpingMagnitude": WarpingMagnitude,
+                "StressMagnitude": StressMagnitude,
+                "MeanRC": MeanRC,
+                "SpreadRC": SpreadRC,
+                "MeanWC": MeanWC,
+                "SpreadWC": SpreadWC,
+                "MeanSC": MeanSC,
+                "SpreadSC": SpreadSC,
+            }
+
+            dfr = pd.DataFrame(data = data, index = [z])
             dfr.index.name = "z"
-            wm_df = wm_df.append(dfr, ignore_index = False)
-            wm_df.to_csv(section_warping_magnitude_csv)
+            main_df = main_df.append(dfr, ignore_index = False)
+            main_df.to_csv(main_information_csv)
 
+        return main_df, extra_df
 
-
-        warping_magnitude = wm_df.loc[z,"Warping Magnitude"]
-        stress_magnitude = wm_df.loc[z,"Stress Magnitude"]
-        # print(A)
-        return warping_magnitude, stress_magnitude
 
     def warping_magnitude_along_beam(self, include_stress=False):
         warping_list =[]
@@ -548,7 +851,6 @@ class Beam:
         return beam_directory
 
 
-
     def _make_input_csv(self):
         folder_name =  self.beam_name
         # if the file doesn't exist create it
@@ -589,7 +891,6 @@ class Beam:
         else:
             pass
         return self.beam_name + r"\input.csv"
-
 
 
     def _run_script(self):

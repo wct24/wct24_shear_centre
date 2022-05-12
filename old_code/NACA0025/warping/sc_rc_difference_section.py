@@ -182,12 +182,6 @@ def angle(DF,z):
 
 
 
-
-
-
-
-
-
 def get_sc_from_w(DF,z,n):
     df1 = DF.loc[DF["z"]==z]
     x_0 = df1["x"].values
@@ -215,6 +209,7 @@ def get_sc_from_w(DF,z,n):
 
 
     list_of_z_values = get_z_values(u)
+    print(list_of_z_values)
     twist = (angle(DF,list_of_z_values[n]) - angle(DF,list_of_z_values[n+1]))/(list_of_z_values[n]-list_of_z_values[n+1])
     a_number = twist
     significant_digits = 6
@@ -343,6 +338,7 @@ def plot_sc_from_w(DF,z,n):
     # twist = twist
 
     list_of_z_values = get_z_values(u)
+    print(list_of_z_values)
     twist = (angle(DF,list_of_z_values[n]) - angle(DF,list_of_z_values[n+1]))/(list_of_z_values[n]-list_of_z_values[n+1])
     a_number = twist
     significant_digits = 6
@@ -388,6 +384,7 @@ def plot_sc_from_w(DF,z,n):
             element_df = element_df.append(df2, ignore_index = True)
             element_ids.append(element_id)
     sc_list = []
+
 
     for i in range(len(element_ids)):
 
