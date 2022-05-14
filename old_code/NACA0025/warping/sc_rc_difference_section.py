@@ -570,20 +570,20 @@ def plot_sc_from_w(DF,z,n):
 plot_sc_from_w(u,3.0,0)
 
 
-plot_sc_from_w(u,2.5,0)
+# plot_sc_from_w(u,2.5,0)
 
 
-plot_sc_from_w(u,2.0,0)
+# plot_sc_from_w(u,2.0,0)
 
 
 
-plot_sc_from_w(u,1.5,0)
+# plot_sc_from_w(u,1.5,0)
 
 
-plot_sc_from_w(u,1.0,0)
+# plot_sc_from_w(u,1.0,0)
 
 
-plot_sc_from_w(u,0.5,0)
+# plot_sc_from_w(u,0.5,0)
 
 
 
