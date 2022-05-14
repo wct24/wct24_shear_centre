@@ -716,6 +716,14 @@ class section(Result_Data):
         self.extra_df = extra_df
         self.z = z
 
+
+    def _make_string_linux_compatible(self, string1):
+        string1 = string1.replace(", ", "_")
+        string1 = string1.replace(".", "_")
+        string1 = string1.replace("[", "")
+        string1 = string1.replace("]", "")
+        return string1
+
     def plot_deformed_cross_section_3D(self, contours = True):
         # get the z coordinates of the sections
         fig = plt.figure()
@@ -797,8 +805,8 @@ class section(Result_Data):
         write_up_folder = self.result_folder.replace("shear_centre", "report\\figs")
         if not os.path.exists(write_up_folder ):
             os.makedirs(write_up_folder)
-        plt.savefig(write_up_folder+r"\plot_deformed_cross_section_3D_section_z_{}.png".format(str(self.z)))
-        plt.savefig(write_up_folder+r"\plot_deformed_cross_section_3D_section_z_{}.pgf".format(str(self.z)))
+        plt.savefig(write_up_folder+r"\plot_deformed_cross_section_3D_section_z_{}.png".format(str(int(self.z*100))))
+        plt.savefig(write_up_folder+r"\plot_deformed_cross_section_3D_section_z_{}.pgf".format(str(int(self.z*100))))
 
 
 
@@ -871,10 +879,11 @@ class section(Result_Data):
         plt.savefig(folder_name+r"\warping_centre_spread_z_{}.pgf".format(str(self.z)))
 
         write_up_folder = self.result_folder.replace("shear_centre", "report\\figs")
+
         if not os.path.exists(write_up_folder ):
             os.makedirs(write_up_folder)
-        plt.savefig(write_up_folder+r"\warping_centre_spread_z_{}.png".format(str(self.z)))
-        plt.savefig(write_up_folder+r"\warping_centre_spread_z_{}.pgf".format(str(self.z)))
+        plt.savefig(write_up_folder+r"\warping_centre_spread_z_{}.png".format(str(int(self.z*100))))
+        plt.savefig(write_up_folder+r"\warping_centre_spread_z_{}.pgf".format(str(int(self.z*100))))
 
 
 
