@@ -77,8 +77,8 @@ def main():
                 print(length)
                 Material = str(row[4])
                 Material = Material.strip('][').split(', ')
-                E = float(Material[0])*1000000
-                G = float(Material[1])*1000000
+                E = float(Material[0])*1000000000
+                G = float(Material[1])*1000000000
                 v_poisson = float(Material[2])
 
                 BoundaryCondition = int(row[5])
