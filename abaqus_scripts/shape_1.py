@@ -148,7 +148,39 @@ def main():
     p = mdb.models['Model-1'].parts['part']
     p.seedPart(size=0.05, deviationFactor=0.1, minSizeFactor=0.1)
     p = mdb.models['Model-1'].parts['part']
+
     p.generateMesh()
+
+
+
+    # p = mdb.models['Model-1'].parts['part']
+    # e = p.edges
+    # pickedEdges = e.getSequenceFromMask(mask=('[#410 ]', ), )
+    # p.seedEdgeBySize(edges=pickedEdges, size=0.002, deviationFactor=0.1,
+    #     minSizeFactor=0.1, constraint=FINER)
+    # e = p.edges
+    # pickedEdges = e.getSequenceFromMask(mask=('[#81 ]', ), )
+    # p.seedEdgeBySize(edges=pickedEdges, size=0.02, deviationFactor=0.1,
+    #     minSizeFactor=0.1, constraint=FINER)
+
+    # p.seedPart(size=0.05, deviationFactor=0.1, minSizeFactor=0.1)
+    # p = mdb.models['Model-1'].parts['part']
+    # p.generateMesh()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     # #------------------------------------------------------------------------------------
     # #               SECTION
     # #------------------------------------------------------------------------------------

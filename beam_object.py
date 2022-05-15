@@ -724,7 +724,7 @@ class section(Result_Data):
         string1 = string1.replace("]", "")
         return string1
 
-    def plot_deformed_cross_section_3D(self, contours = True):
+    def plot_deformed_cross_section_3D(self, contours = True, write_up=False):
         # get the z coordinates of the sections
         fig = plt.figure()
         ax = fig.add_subplot(projection='3d')
@@ -802,17 +802,18 @@ class section(Result_Data):
         plt.savefig(folder_name+r"\plot_deformed_cross_section_3D_section_z_{}.pgf".format(str(self.z)))
 
 
-        write_up_folder = self.result_folder.replace("shear_centre", "report\\figs")
-        if not os.path.exists(write_up_folder ):
-            os.makedirs(write_up_folder)
-        plt.savefig(write_up_folder+r"\plot_deformed_cross_section_3D_section_z_{}.png".format(str(int(self.z*100))))
-        plt.savefig(write_up_folder+r"\plot_deformed_cross_section_3D_section_z_{}.pgf".format(str(int(self.z*100))))
+
+        if write_up == True:
+            write_up_folder = self.result_folder.replace("shear_centre", "report\\figs")
+            if not os.path.exists(write_up_folder ):
+                os.makedirs(write_up_folder)
+            plt.savefig(write_up_folder+r"\plot_deformed_cross_section_3D_section_z_{}.png".format(str(int(self.z*100))))
+            plt.savefig(write_up_folder+r"\plot_deformed_cross_section_3D_section_z_{}.pgf".format(str(int(self.z*100))))
 
 
 
 
-
-    def warping_centre_spread(self):
+    def warping_centre_spread(self, write_up= False):
         fig,ax = plt.subplots(1,2)
 
         maximum_x = self.extra_df[["X0_2","X1_2","X2_2","X3_2"]].max().max()
@@ -843,11 +844,17 @@ class section(Result_Data):
             radius = np.sqrt(centroid_x**2 + centroid_y**2)
 
             if radius > 0.4:
-                #use seismi
                 points = [(row["X0_2"],row["Y0_2"]),(row["X1_2"],row["Y1_2"]),(row["X2_2"],row["Y2_2"]),(row["X3_2"],row["Y3_2"])]
                 element = patch.Polygon(points, linewidth=0.1, edgecolor='b', facecolor=seismic(get_colour(centroid_y)))
                 ax[0].add_patch(element )
                 ax[1].scatter(x_wc,y_wc, color= seismic(get_colour(centroid_y)))
+
+                # else:
+                #     ax[1].scatter(x_wc,y_wc, color = "green")
+
+
+
+
 
             if radius <0.4:
                 points = [(row["X0_2"],row["Y0_2"]),(row["X1_2"],row["Y1_2"]),(row["X2_2"],row["Y2_2"]),(row["X3_2"],row["Y3_2"])]
@@ -857,7 +864,13 @@ class section(Result_Data):
 
 
 
-        ax[0].set_ylim(maximum_y,minimum_y)
+
+
+
+
+
+
+        ax[0].set_ylim(minimum_y,maximum_y)
         ax[0].set_xlim(minimum_x,maximum_x)
 
         ax[0].set_xlabel("x")
@@ -878,12 +891,79 @@ class section(Result_Data):
         plt.savefig(folder_name+r"\warping_centre_spread_z_{}.png".format(str(self.z)))
         plt.savefig(folder_name+r"\warping_centre_spread_z_{}.pgf".format(str(self.z)))
 
-        write_up_folder = self.result_folder.replace("shear_centre", "report\\figs")
 
-        if not os.path.exists(write_up_folder ):
-            os.makedirs(write_up_folder)
-        plt.savefig(write_up_folder+r"\warping_centre_spread_z_{}.png".format(str(int(self.z*100))))
-        plt.savefig(write_up_folder+r"\warping_centre_spread_z_{}.pgf".format(str(int(self.z*100))))
+        if write_up == True:
+            write_up_folder = self.result_folder.replace("shear_centre", "report\\figs")
+            if not os.path.exists(write_up_folder ):
+                os.makedirs(write_up_folder)
+            plt.savefig(write_up_folder+r"\warping_centre_spread_z_{}.png".format(str(int(self.z*100))))
+            plt.savefig(write_up_folder+r"\warping_centre_spread_z_{}.pgf".format(str(int(self.z*100))))
+
+
+    def warping_centre_line(self, write_up= False):
+        print(len(self.extra_df["X0_0"]))
+        w_array = np.zeros([33,20])
+
+
+
+        # n=0
+        # for i in range(35):
+        #     k = 0
+        #     for index, row in self.extra_df.iterrows():
+        #         centroid_x = (row["X0_2"]+row["X1_2"]+row["X2_2"]+row["X3_2"])*0.25
+        #         centroid_y = (row["Y0_2"]+row["Y1_2"]+row["Y2_2"]+row["Y3_2"])*0.25
+
+        #         angle = np.arctan(centroid_y/centroid_x)
+        #         radius = np.sqrt(centroid_x**2 +  centroid_y**2)
+
+
+
+        #         if angle>0:
+
+        #             angle_bin = int(angle/(np.pi/66))
+        #             if angle_bin == i:
+        #                 k+=1
+        #                 n+=1
+
+
+        for index, row in self.extra_df.iterrows():
+            centroid_x = (row["X0_2"]+row["X1_2"]+row["X2_2"]+row["X3_2"])*0.25
+            centroid_y = (row["Y0_2"]+row["Y1_2"]+row["Y2_2"]+row["Y3_2"])*0.25
+
+            angle = np.arctan(centroid_y/centroid_x)
+            radius = np.sqrt(centroid_x**2 +  centroid_y**2)-0.38
+
+            W = (row["W0"] + row["W1"] + row["W2"] + row["W3"])/4
+
+
+            if angle>0:
+                angle_bin = int(angle/(np.pi/66))
+                radius_bin = int(radius/0.002)
+                assert w_array[angle_bin][radius_bin] == 0
+                w_array[angle_bin][radius_bin] = W
+
+
+
+        w_mean = np.mean(w_array, axis = 1).reshape(-1, 1)
+
+
+
+        print(w_mean)
+
+        w_noramlised = w_array - w_mean
+        x = np.arange(20)
+        y = w_noramlised[30]
+
+        print(w_noramlised)
+
+        plt.plot(x,y)
+
+        plt.show()
+
+        print(w_array)
+
+
+
 
 
 
@@ -958,7 +1038,7 @@ class Beam:
 
         #location of the script - different script for shape
         script = r"C:\Users\touze\project\wct24_shear_centre\abaqus_scripts\shape_{}.py".format(self.ShapeId)
-        script_command = "abaqus cae noGUI={}".format(script)
+        script_command = "abaqus cae script={}".format(script)
         script_info = run(script_command)
         errormessage = str(script_info.stderr)
         print("run")

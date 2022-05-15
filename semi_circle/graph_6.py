@@ -10,7 +10,7 @@ applying a torque load at the end of the beam and at a position closer to the su
 """
 
 
-warping = Beam(r"D:\\shear_centre\\1-Semi-Circle\\0.4_0.04_5.0\\210.0_81.0_0.3\\warping")
+warping = Beam(r"D:\\shear_centre\\1-Semi-Circle\\0.4_0.04_0.5\\210.0_81.0_0.3\\warping")
 
 
 # # first get the shear centre
@@ -22,10 +22,12 @@ warping = Beam(r"D:\\shear_centre\\1-Semi-Circle\\0.4_0.04_5.0\\210.0_81.0_0.3\\
 
 # warping = Beam(r"D:\\shear_centre\\1-Semi-Circle\\0.4_0.02_15.0\\210.0_81.0_0.3\\warping")
 
-warping.SimpleTorqueLoad(0, LoadMagnitude = -1).GetAll(0).plot_deformed_cross_section_3D()
+# warping.SimpleTorqueLoad(0, LoadMagnitude = -1).GetAll(0).plot_deformed_cross_section_3D()
 
 warping.SimpleTorqueLoad(0, LoadMagnitude = -1).GetAll(0).warping_centre_spread()
 
+
+# warping.SimpleTorqueLoad(0, LoadMagnitude = -1).GetAll(0).warping_centre_line()
 
 
 
