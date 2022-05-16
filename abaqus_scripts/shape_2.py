@@ -71,20 +71,20 @@ def main():
             if i == beam+1:
                 dimensions = str(row[3])
                 dimensions = dimensions.strip('][').split(', ')
-                radius = float(dimensions[0])
-                thickness = float(dimensions[1])
-                length = float(dimensions[2])
-
+                # radius = float(dimensions[0])
+                # thickness = float(dimensions[1])
+                length = float(dimensions[0])
+                print(length)
                 Material = str(row[4])
                 Material = Material.strip('][').split(', ')
-                E = float(Material[0])*1000000
-                G = float(Material[1])*1000000
+                E = float(Material[0])*1000000000
+                G = float(Material[1])*1000000000
                 v_poisson = float(Material[2])
 
                 BoundaryCondition = int(row[5])
 
                 LoadType = int(row[6])
-
+                print("loadType", LoadType)
                 LoadZ = int(float(row[8]))
                 LoadX = float(row[9])
                 LoadY =  float(row[10])
@@ -93,15 +93,6 @@ def main():
                 LoadSection = int(row[12])
 
                 break
-
-    #------------------------------------------
-    #Beam Parameters
-    #------------------------------------------
-
-
-    ri = radius-thickness/2
-    ro = radius+thickness/2
-
     #------------------------------------------------------------------------------------
     #                GEOMETRY
     #------------------------------------------------------------------------------------
@@ -115,79 +106,75 @@ def main():
     #     os.chdir(folder)
 
     model = mdb.models['Model-1']
-
     s = model.ConstrainedSketch(name='__profile__', sheetSize=1.0)
-
     g, v, d, c = s.geometry, s.vertices, s.dimensions, s.constraints
-    s.setPrimaryObject(option=STANDALONE)
-    s.ArcByCenterEnds(center=(0.0, 0.0), point1=(0.0, ri), point2=(0.0, -ri),
-        direction=CLOCKWISE)
-    s.ArcByCenterEnds(center=(0.0, 0.0), point1=(0.0, ro), point2=(0.0, -ro),
-        direction=CLOCKWISE)
-    s.Line(point1=(0.0, ri), point2=(0.0, ro))
-    s.VerticalConstraint(entity=g[4], addUndoState=False)
-    s.PerpendicularConstraint(entity1=g[2], entity2=g[4], addUndoState=False)
-    s.Line(point1=(0.0, -ro), point2=(0.0, -ri))
-    s.VerticalConstraint(entity=g[5], addUndoState=False)
-    s.PerpendicularConstraint(entity1=g[3], entity2=g[5], addUndoState=False)
-    p = mdb.models['Model-1'].Part(name='part', dimensionality=THREE_D,
-        type=DEFORMABLE_BODY)
 
-    part = mdb.models['Model-1'].parts['part']
-    part.BaseSolidExtrude(sketch=s, depth=length)
-    s.unsetPrimaryObject()
-    del mdb.models['Model-1'].sketches['__profile__']
+    acis = mdb.openAcis(
+        'C:/Users/touze/project/Shear_centre/reid_section/reid_sketch.sat',
+        scaleFromFile=OFF)
+    model.ConstrainedSketchFromGeometryFile(name='reid_sketch',
+        geometryFile=acis)
+    session.viewports['Viewport: 1'].setValues(displayedObject=None)
+    s1 = model.ConstrainedSketch(name='__profile__', sheetSize=1.0)
+    g, v, d, c = s1.geometry, s1.vertices, s1.dimensions, s1.constraints
+    s1.setPrimaryObject(option=STANDALONE)
+    s1.sketchOptions.setValues(gridOrigin=(0.0550505816936493, 0.0270000007003546))
+    s1.retrieveSketch(sketch=model.sketches['reid_sketch'])
+    session.viewports['Viewport: 1'].view.fitView()
+    p = model.Part(name='Part-1', dimensionality=THREE_D,
+        type=DEFORMABLE_BODY)
+    p = model.parts['Part-1']
+    p.BaseSolidExtrude(sketch=s1, depth=length)
+    s1.unsetPrimaryObject()
+    p = model.parts['Part-1']
+    session.viewports['Viewport: 1'].setValues(displayedObject=p)
+    del model.sketches['__profile__']
+
+
+
+
+
+
+
     #------------------------------------------------------------------------------------
     #               MESH
     #------------------------------------------------------------------------------------
-    # p = mdb.models['Model-1'].parts['part']
-    # e = p.edges
-    # pickedEdges = e.getSequenceFromMask(mask=('[#491 ]', ), )
-    # p.seedEdgeBySize(edges=pickedEdges, size=0.01, deviationFactor=0.1,
-    #     constraint=FINER)
-    # p = mdb.models['Model-1'].parts['part']
-    # p.seedPart(size=0.05, deviationFactor=0.1, minSizeFactor=0.1)
-    # p = mdb.models['Model-1'].parts['part']
-
-    # p.generateMesh()
 
 
-
-    p = mdb.models['Model-1'].parts['part']
+    p = mdb.models['Model-1'].parts['Part-1']
     e = p.edges
-    pickedEdges = e.getSequenceFromMask(mask=('[#410 ]', ), )
-    p.seedEdgeBySize(edges=pickedEdges, size=0.002, deviationFactor=0.1,
-        minSizeFactor=0.1, constraint=FINER)
+    pickedEdges = e.getSequenceFromMask(mask=('[#91492491 #92454914 #4 ]', ), )
+    p.deleteSeeds(regions=pickedEdges)
+    session.viewports['Viewport: 1'].view.setValues(nearPlane=1.84359,
+        farPlane=2.56374, width=0.333853, height=0.139524,
+        viewOffsetX=-0.295619, viewOffsetY=-0.128414)
+    p = mdb.models['Model-1'].parts['Part-1']
+    p.deleteSeeds()
+    session.viewports['Viewport: 1'].view.setValues(nearPlane=1.84822,
+        farPlane=2.55912, width=0.238559, height=0.0996986,
+        viewOffsetX=-0.276387, viewOffsetY=-0.145632)
+    p = mdb.models['Model-1'].parts['Part-1']
     e = p.edges
-    pickedEdges = e.getSequenceFromMask(mask=('[#81 ]', ), )
-    p.seedEdgeBySize(edges=pickedEdges, size=0.02, deviationFactor=0.1,
-        minSizeFactor=0.1, constraint=FINER)
-
+    pickedEdges = e.getSequenceFromMask(mask=('[#91492491 #92454914 #4 ]', ), )
+    p.seedEdgeBySize(edges=pickedEdges, size=0.01, deviationFactor=0.1,
+        constraint=FINER)
+    p = mdb.models['Model-1'].parts['Part-1']
+    e = p.edges
+    pickedEdges = e.getSequenceFromMask(mask=('[#91492491 #92454914 #4 ]', ), )
+    p.seedEdgeBySize(edges=pickedEdges, size=0.001, deviationFactor=0.1,
+        constraint=FINER)
+    p = mdb.models['Model-1'].parts['Part-1']
     p.seedPart(size=0.05, deviationFactor=0.1, minSizeFactor=0.1)
-    p = mdb.models['Model-1'].parts['part']
+    p = mdb.models['Model-1'].parts['Part-1']
     p.generateMesh()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     # #------------------------------------------------------------------------------------
     # #               SECTION
     # #------------------------------------------------------------------------------------
-    c = part.cells
+    c = p.cells
     print(c)
     cells = c.getSequenceFromMask(mask=('[#1 ]', ), )
-    SC_section_geometry = part.Set(cells=cells, name='SC_section_geometry')
+    SC_section_geometry = p.Set(cells=cells, name='SC_section_geometry')
 
     model.Material(name='SC-material')
     model.materials['SC-material'].Elastic(type=ENGINEERING_CONSTANTS,
@@ -196,12 +183,12 @@ def main():
                     G, G, G), ))
     model.HomogeneousSolidSection(name='SC-section', material='SC-material', thickness=None)
     ## asigning the section
-    part.SectionAssignment(region=SC_section_geometry, sectionName='SC-section', offset=0.0,
+    p.SectionAssignment(region=SC_section_geometry, sectionName='SC-section', offset=0.0,
             offsetType=MIDDLE_SURFACE, offsetField='',
             thicknessAssignment=FROM_SECTION)
     ##assigning the material orientaion
     orientation=None
-    part.MaterialOrientation(region=SC_section_geometry,
+    p.MaterialOrientation(region=SC_section_geometry,
         orientationType=GLOBAL, axis=AXIS_1,
         additionalRotationType=ROTATION_NONE, localCsys=None, fieldName='',
         stackDirection=STACK_3)
@@ -216,7 +203,7 @@ def main():
     # ------------------------------------------------------------------------------------
     a = model.rootAssembly
     a.DatumCsysByDefault(CARTESIAN)
-    a.Instance(name='SC_beam-1', part=part, dependent=ON)
+    a.Instance(name='SC_beam-1', part=p, dependent=ON)
     # ----------------------------------
     # Boundary Conditions ANd Load
     # ---------------------------------

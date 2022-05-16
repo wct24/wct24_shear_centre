@@ -224,3 +224,50 @@ def Macro1():
     p.generateMesh()
 
 
+def Macro2():
+    import section
+    import regionToolset
+    import displayGroupMdbToolset as dgm
+    import part
+    import material
+    import assembly
+    import step
+    import interaction
+    import load
+    import mesh
+    import optimization
+    import job
+    import sketch
+    import visualization
+    import xyPlot
+    import displayGroupOdbToolset as dgo
+    import connectorBehavior
+    session.viewports['Viewport: 1'].view.setValues(nearPlane=1.85199, 
+        farPlane=2.55535, width=0.192167, height=0.0803106, 
+        viewOffsetX=-0.300861, viewOffsetY=-0.131459)
+    p = mdb.models['Model-1'].parts['Part-1']
+    e = p.edges
+    pickedEdges = e.getSequenceFromMask(mask=('[#91492491 #92454914 #4 ]', ), )
+    p.deleteSeeds(regions=pickedEdges)
+    session.viewports['Viewport: 1'].view.setValues(nearPlane=1.84359, 
+        farPlane=2.56374, width=0.333853, height=0.139524, 
+        viewOffsetX=-0.295619, viewOffsetY=-0.128414)
+    p = mdb.models['Model-1'].parts['Part-1']
+    p.deleteSeeds()
+    session.viewports['Viewport: 1'].view.setValues(nearPlane=1.84822, 
+        farPlane=2.55912, width=0.238559, height=0.0996986, 
+        viewOffsetX=-0.276387, viewOffsetY=-0.145632)
+    p = mdb.models['Model-1'].parts['Part-1']
+    e = p.edges
+    pickedEdges = e.getSequenceFromMask(mask=('[#91492491 #92454914 #4 ]', ), )
+    p.seedEdgeBySize(edges=pickedEdges, size=0.01, deviationFactor=0.1, 
+        constraint=FINER)
+    p = mdb.models['Model-1'].parts['Part-1']
+    e = p.edges
+    pickedEdges = e.getSequenceFromMask(mask=('[#91492491 #92454914 #4 ]', ), )
+    p.seedEdgeBySize(edges=pickedEdges, size=0.001, deviationFactor=0.1, 
+        constraint=FINER)
+    p = mdb.models['Model-1'].parts['Part-1']
+    p.seedPart(size=0.05, deviationFactor=0.1, minSizeFactor=0.1)
+    p = mdb.models['Model-1'].parts['Part-1']
+    p.generateMesh()
