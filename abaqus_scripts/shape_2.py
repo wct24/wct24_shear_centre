@@ -77,8 +77,8 @@ def main():
                 print(length)
                 Material = str(row[4])
                 Material = Material.strip('][').split(', ')
-                E = float(Material[0])*1000000000
-                G = float(Material[1])*1000000000
+                E = float(Material[0])*1000000
+                G = float(Material[1])*1000000
                 v_poisson = float(Material[2])
 
                 BoundaryCondition = int(row[5])
@@ -129,10 +129,6 @@ def main():
     p = model.parts['Part-1']
     session.viewports['Viewport: 1'].setValues(displayedObject=p)
     del model.sketches['__profile__']
-
-
-
-
 
 
 
@@ -287,7 +283,7 @@ def main():
     r1 = a.referencePoints.values()[0]
 
 
-    model.ConnectorSection(name='warping', translationalType=SLOT)
+    model.ConnectorSection(name='warping', translationalType=JOIN)
     for i in range(0,number_of_loading_nodes):
         wire = a.WirePolyLine(points=((r1, loading_nodes[i]), ), mergeType=IMPRINT, meshable=OFF)
     e1 = a.edges

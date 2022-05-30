@@ -1,8 +1,7 @@
-
 import sys
 # # adding Folder_2 to the system path
 sys.path.insert(0, r'C:\Users\touze\project\wct24_shear_centre')
-from beam_object import *
+from Load_object import *
 import scipy.optimize
 
 """
@@ -10,58 +9,56 @@ applying a torque load at the end of the beam and at a position closer to the su
 
 """
 
-encastre_long = Beam(r"D:\\shear_centre\\1-Semi-Circle\\0.4_0.02_15.0\\210.0_81.0_0.3\\encastre")
+encastre_long = Load(r"D:\\shear_centre\\1-Semi-Circle\\0.4_0.02_15.0\\210.0_81.0_0.3\\encastre")
 
-encastre_short = Beam(r"D:\\shear_centre\\1-Semi-Circle\\0.4_0.02_5.0\\210.0_81.0_0.3\\encastre")
+encastre_short = Load(r"D:\\shear_centre\\1-Semi-Circle\\0.4_0.02_3.0\\210.0_81.0_0.3\\encastre")
 
-fig, ax = plt.subplots()
-
-
-line1 = encastre_long.SimpleTorqueLoad(0,0.0, LoadMagnitude = -0.5).warping_magnitude_along_beam(include_stress=True)
-line2  = encastre_short.SimpleTorqueLoad(0,0.0, LoadMagnitude = -0.5).warping_magnitude_along_beam(include_stress=True)
-
-ax.plot(np.array(line1[0])/15.0,np.array(line1[2])/0.7399896433500958 , label="Warping Stress", color = "darkblue")
-ax.plot(np.array(line2[0])/5.0,np.array(line2[2])/0.7399896433500958 , label="Warping Stress", color = "darkblue")
+fig, ax = plt.subplots(1,2)
 
 
+line1 = encastre_long.SimpleTorqueLoad(0, LoadMagnitude = -0.5).GetAllWholeBeam().stress_magnitude_along_beam()
+line2 = encastre_short.SimpleTorqueLoad(0, LoadMagnitude = -0.5000001).GetAllWholeBeam().stress_magnitude_along_beam()
+
+max_stress = np.amax(line1[1])
+
+ax[0].plot(np.array(line1[0])/15.0,np.array(line1[1])/max_stress , label="Dimensionless Axial Stress", color = "deepskyblue")
+ax[1].plot(np.append(np.array(line2[0]),0)/3.0,np.append(np.array(line2[1]),0.86*max_stress)/max_stress  , label="Dimensionless Axial Stress", color = "deepskyblue")
 
 
+# print(np.array(line1[0])/15.0)
+# ax.set_ylim(bottom=0)
+# ax.set_xlim(0,1)
+# ax.set_ylabel(r'Dimensionless Warping')
 
-
-print(np.array(line1[0])/15.0)
-ax.set_ylim(bottom=0)
-ax.set_xlim(0,1)
-ax.set_ylabel(r'Dimensionless Warping')
-
-ax.set_xlabel(r'$z / m$ ', )
-ax.grid()
+# ax.set_xlabel(r'$z / m$ ', )
+# ax.grid()
 
 
 
-#get the warping equation:
+# #get the warping equation:
 
-xs = line1[0]
-ys = line1[2]
-
-
-def monoExp( z, A, lamb):
-    return A*(np.exp(-z/lamb))
-# perform the fit
-p0 = (0.7, 2.6) # start with values near those we expect
-params, cv = scipy.optimize.curve_fit(monoExp, xs, ys, p0)
-A, lamb = params
-
-squaredDiffs = np.square(ys - monoExp(xs, A, lamb))
-squaredDiffsFromMean = np.square(ys - np.mean(ys))
-rSquared = 1 - np.sum(squaredDiffs) / np.sum(squaredDiffsFromMean)
-print(f"R² = {rSquared}")
-print(lamb)
-print(A)
-# plot the results
+# xs = line1[0]
+# ys = line1[1]
 
 
+# def monoExp( z, A, lamb):
+#     return A*(np.exp(-z/lamb))
+# # perform the fit
+# p0 = (max_stress, 2.6) # start with values near those we expect
+# params, cv = scipy.optimize.curve_fit(monoExp, xs, ys, p0)
+# A, lamb = params
 
-ax.plot(line1[0]/15.0, monoExp(xs, A, lamb)/0.7399896433500958 , '--', color="red")
+# squaredDiffs = np.square(ys - monoExp(xs, A, lamb))
+# squaredDiffsFromMean = np.square(ys - np.mean(ys))
+# rSquared = 1 - np.sum(squaredDiffs) / np.sum(squaredDiffsFromMean)
+# print(f"R² = {rSquared}")
+# print(lamb)
+# print(A)
+# # plot the results
+
+
+
+# ax.plot(line1[0]/15.0, monoExp(xs, A, lamb)/max_stress, '--', color="red")
 
 
 
@@ -70,55 +67,68 @@ ax.plot(line1[0]/15.0, monoExp(xs, A, lamb)/0.7399896433500958 , '--', color="re
 # line1 = encastre_long.SimpleTorqueLoad(0,0.0, LoadMagnitude = -0.5).warping_magnitude_along_beam(include_stress=True)
 # line2 = encastre_short.SimpleTorqueLoad(0,0.0, LoadMagnitude = -0.5).warping_magnitude_along_beam(include_stress=True)
 
-ax.plot(np.array(line1[0])/15.0,np.array(line1[1])/3.28386130119e-05 , color = "darkblue")
-ax.plot(np.array(line2[0])/5.0,np.array(line2[1])/3.28386130119e-05 , color = "darkblue")
+line1 = encastre_long.SimpleTorqueLoad(0, LoadMagnitude = -0.5).GetAllWholeBeam().warping_magnitude_along_beam()
+line2 = encastre_short.SimpleTorqueLoad(0, LoadMagnitude = -0.5000001).GetAllWholeBeam().warping_magnitude_along_beam()
+
+max_warping = np.amax(line1[1])
+
+ax[0].plot(np.array(line1[0])/15.0,np.array(line1[1])/max_warping , color = "darkviolet")
+ax[1].plot(np.array(line2[0])/3.0,np.array(line2[1])/max_warping , color = "darkviolet", label= "Dimensionless Warping")
 
 # ax.plot(line2[0],line2[1] , label="Encastre BC - 5m", color = "palegreen")
 # ax.plot(line3[0][200:-1],line3[1][200:-1] , label="Encastre BC - 15m", color = "darkgreen")
 
 
-ax.set_ylim(bottom=0)
-ax.set_xlim(0,1)
-ax.set_ylabel(r'Dimensionless Warping')
+ax[0].set_ylim(0,1)
+ax[0].set_xlim(0,1)
+ax[0].set_ylabel(r'')
 
-ax.set_xlabel(r'$z / L$ ', )
-ax.grid()
+ax[0].set_xlabel(r'$Z / 15$ ', )
+ax[0].grid()
 
+
+ax[1].set_ylim(bottom=0)
+ax[1].set_xlim(0,1)
+ax[1].set_ylim(0,1)
+ax[1].set_ylabel(r'')
+
+ax[1].set_xlabel(r'$Z / 3$ ', )
+ax[1].grid()
 
 
 #get the warping equation:
 
-xs = line1[0]
-ys = line1[1]
+# xs = line1[0]
+# ys = line1[1]
 
 
-def monoExp( z, A, lamb):
-    return A*(1-np.exp(-z/lamb))
-# perform the fit
-p0 = (3.28386130119e-05, 2.6) # start with values near those we expect
-params, cv = scipy.optimize.curve_fit(monoExp, xs, ys, p0)
-A, lamb = params
+# def monoExp( z, A, lamb):
+#     return A*(1-np.exp(-z/lamb))
+# # perform the fit
+# p0 = (3.28386130119e-05, 2.6) # start with values near those we expect
+# params, cv = scipy.optimize.curve_fit(monoExp, xs, ys, p0)
+# A, lamb = params
 
-squaredDiffs = np.square(ys - monoExp(xs, A, lamb))
-squaredDiffsFromMean = np.square(ys - np.mean(ys))
-rSquared = 1 - np.sum(squaredDiffs) / np.sum(squaredDiffsFromMean)
-print(f"R² = {rSquared}")
-print(lamb)
-print(A)
-# plot the results
-
-
-
-ax.plot(np.array(line1[0])/15.0, monoExp(xs, A, lamb)/3.28386130119e-05 , '--', label="Curve Fit", color="red")
+# squaredDiffs = np.square(ys - monoExp(xs, A, lamb))
+# squaredDiffsFromMean = np.square(ys - np.mean(ys))
+# rSquared = 1 - np.sum(squaredDiffs) / np.sum(squaredDiffsFromMean)
+# print(f"R² = {rSquared}")
+# print(lamb)
+# print(A)
+# # plot the results
 
 
 
+# ax.plot(np.array(line1[0])/15.0, monoExp(xs, A, lamb)/3.28386130119e-05 , '--', label="Curve Fit", color="red")
 
 
 
 
 
-handles, labels = ax.get_legend_handles_labels()
+
+
+
+handles, labels = ax[1].get_legend_handles_labels()
 
 
 fig.set_figwidth(6.29921)

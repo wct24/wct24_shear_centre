@@ -87,7 +87,7 @@ class Load:
 
         #location of the script - different script for shape
         script = r"C:\Users\touze\project\wct24_shear_centre\abaqus_scripts\shape_{}.py".format(self.ShapeId)
-        script_command = "abaqus cae noGUI={}".format(script)
+        script_command = "abaqus cae script={}".format(script)
         script_info = run(script_command)
         errormessage = str(script_info.stderr)
         print("run")
@@ -258,7 +258,7 @@ class Load:
             pass
         return Result_Data(folder_name)
 
-    def TSC(self, LoadZ, LoadMagnitude=-1,tol = 0.5e-3):
+    def TSC(self, LoadZ, tol = 0.5e-3):
         """ Newton-Raphson method to find the TSC
             a small load is used to make linear"""
 
@@ -269,7 +269,7 @@ class Load:
         LoadX_LB = LoadX-tol
         Rotationz_UB = -1
         Rotationz_LB = -1
-        LoadMagnitude = -0.1
+        LoadMagnitude = -1
 
         while Rotationz_UB*Rotationz_LB > 0:
             self.SimpleShearLoad(LoadZ, LoadX_UB, LoadMagnitude = LoadMagnitude)
@@ -286,32 +286,32 @@ class Load:
             Rotationz_UB =  round(Rotationz_UB, significant_digits - int(math.floor(math.log10(abs(Rotationz_UB)))) - 1)
             Rotationz_LB =  round(Rotationz_LB, significant_digits - int(math.floor(math.log10(abs(Rotationz_LB)))) - 1)
 
-
-            derivative_at_LoadX = (Rotationz_UB-Rotationz_LB)*50000
+            print(Rotationz_UB, Rotationz_LB )
+            derivative_at_LoadX = (Rotationz_UB-Rotationz_LB)/(2*tol)
             Rotation_at_LoadX = (Rotationz_UB+Rotationz_LB)*0.5
 
             LoadX = LoadX - Rotation_at_LoadX/derivative_at_LoadX
             LoadX_UB = LoadX+tol
             LoadX_LB = LoadX-tol
 
-        return LoadX
+        return self.SimpleShearLoad(LoadZ, LoadX, LoadMagnitude = LoadMagnitude)
 
-    def LSC(self, LoadZ, tol = 0.5e-3):
-        """ Newton-Raphson method to find the TSC
+
+    def LSC(self, LoadZ, tol = 1e-3):
+        """ Newton-Raphson method to find the LSC
             a small load is used to make linear"""
         # AnalysisType = "3. Find_LSC"
 
         #load x means the x coordinate of the load
-        LoadX= 0.0 #start point
+        LoadX= -0.18 #start point
 
         LoadX_UB = LoadX+tol
         LoadX_LB = LoadX-tol
         Rotationz_UB = -1
         Rotationz_LB = -1
-        LoadMagnitude = -0.1
+        LoadMagnitude = -1000
         while Rotationz_UB*Rotationz_LB > 0:
-
-
+            self.SimpleShearLoad(LoadZ, LoadX_UB, LoadMagnitude = LoadMagnitude)
             self.SimpleShearLoad(LoadZ, LoadX_LB, LoadMagnitude = LoadMagnitude)
             LoadX_UB_directory = self._navigate(["1. Simple_Shear_Load","Beam_Repository", LoadMagnitude, LoadZ, LoadX_UB])
             LoadX_LB_directory = self._navigate(["1. Simple_Shear_Load","Beam_Repository", LoadMagnitude, LoadZ, LoadX_LB])
@@ -326,13 +326,15 @@ class Load:
             Rotationz_LB =  round(Rotationz_LB, significant_digits - int(math.floor(math.log10(abs(Rotationz_LB)))) - 1)
 
 
-            derivative_at_LoadX = (Rotationz_UB-Rotationz_LB)*50000
+            derivative_at_LoadX = (Rotationz_UB-Rotationz_LB)/(2*tol)
             Rotation_at_LoadX = (Rotationz_UB+Rotationz_LB)*0.5
 
             LoadX = LoadX - Rotation_at_LoadX/derivative_at_LoadX
             LoadX_UB = LoadX+tol
             LoadX_LB = LoadX-tol
-        return self.SimpleShearLoad(LoadZ, LoadX, LoadMagnitude = LoadMagnitude)
+        # record the LSC
+
+        return self.SimpleShearLoad(LoadZ, LoadX, LoadMagnitude = LoadMagnitude),LoadX
 
     def TSC_every_n_m(self,n):
         """" calculates the TSC at regular intervals down the beam and sends results to a
@@ -340,18 +342,39 @@ class Load:
         assert (n/0.05)%1 == 0.0 , "n must be a multiple of 0.05 as this is the smallest devision"
         LoadZ = 0
         while LoadZ < self.length*20:
-            self.TSC(LoadZ)
+            self.TSC(LoadZ).GetAllWholeBeam()
             LoadZ += int(20*n)
 
     def LSC_every_n_m(self,n):
         """" calculates the TSC at regular intervals down the beam and sends results to a
         datafram in the results directory"""
-        assert (n/0.05)%1 == 0.0 , "n must be a multiple of 0.05 as this is the smallest devision"
-        list_of_LoadZ =  []
-        LoadZ = 0
-        while LoadZ < self.length*20:
-            self.LSC(LoadZ)
-            LoadZ += int(20*n)
+        folder_name = self._navigate(["1. Simple_Shear_Load","Beam_Repository", -1000, "LSC"], chdir = True)
+        LSC_csv =r"\LSC_every_{}m.csv".format(str(n))
+        if not os.path.exists(folder_name + LSC_csv):
+
+            assert (n/0.05)%1 == 0.0 , "n must be a multiple of 0.05 as this is the smallest devision"
+            list_of_LoadZ =  []
+            LoadZ = 0
+            list_of_LoadX = []
+            while LoadZ < self.length*20:
+                LoadX = self.LSC(LoadZ)[1]
+
+                Z = self.length -  LoadZ*0.05
+                list_of_LoadX.append(LoadX)
+                list_of_LoadZ.append(Z)
+
+                LoadZ += int(20*n)
+
+            #create the csv
+            d = {"LoadX":list_of_LoadX, "LoadZ":list_of_LoadZ}
+            column_names =  ["LSC"]
+            LSC_df = pd.DataFrame(d)
+
+            LSC_df.to_csv(folder_name + LSC_csv)
+        else:
+            LSC_df = pd.read_csv(folder_name + LSC_csv, header = 0, index_col = 0)
+        LSC_df = LSC_df.astype(np.float64)
+        return LSC_df
 
     def end_rotation_x_sweep(self,LoadZ, LoadMagnitude):
         # result_folder = self._navigate(["1. Simple_Shear_Load", "Processed_Results","sweep"])
@@ -601,6 +624,43 @@ class Result_Data:
         # ax.plot(z_list, rotation_z_list, label="$S_x({},{},{})$".format(self.beam_df["LoadX"][0],self.beam_df["LoadY"][0],z_list[int(self.beam_df["LoadZ"][0])]))
         return z_list, rotationz_list
 
+    def _get_twist(self, ResultSection):
+        if ResultSection == 0:
+            d_theta = self.section_rotationz(ResultSection) - self.section_rotationz(ResultSection+1)
+            dz = self.list_of_z_values[ResultSection]-self.list_of_z_values[ResultSection+1]
+            dtheta_dz = d_theta/dz
+        elif ResultSection == len(self.list_of_z_values)-1:
+            d_theta = self.section_rotationz(ResultSection-1) - self.section_rotationz(ResultSection)
+            dz = self.list_of_z_values[ResultSection-1]-self.list_of_z_values[ResultSection]
+            dtheta_dz = d_theta/dz
+        else:
+            d_theta = self.section_rotationz(ResultSection-1) - self.section_rotationz(ResultSection+1)
+            dz = self.list_of_z_values[ResultSection-1]-self.list_of_z_values[ResultSection+1]
+            dtheta_dz = d_theta/dz
+        # remove floating point error
+        significant_digits = 10
+        Twist =  round(dtheta_dz, significant_digits - int(math.floor(math.log10(abs(dtheta_dz)))) - 1)
+        return Twist
+
+    def _get_twist_derivative(self, ResultSection):
+        if ResultSection == 0:
+            d_theta = self._get_twist(ResultSection) - self._get_twist(ResultSection+1)
+            dz = self.list_of_z_values[ResultSection]-self.list_of_z_values[ResultSection+1]
+            dtheta_dz = d_theta/dz
+        elif ResultSection == len(self.list_of_z_values)-1:
+            d_theta = self._get_twist(ResultSection-1) - self._get_twist(ResultSection)
+            dz = self.list_of_z_values[ResultSection-1]-self.list_of_z_values[ResultSection]
+            dtheta_dz = d_theta/dz
+        else:
+            d_theta = self._get_twist(ResultSection-1) - self._get_twist(ResultSection+1)
+            dz = self.list_of_z_values[ResultSection-1]-self.list_of_z_values[ResultSection+1]
+            dtheta_dz = d_theta/dz
+        # remove floating point error
+        significant_digits = 10
+
+        Twist =  round(dtheta_dz, significant_digits - int(math.floor(math.log10(abs(dtheta_dz)))) - 1)
+        return Twist
+
     def GetAllSingleSection(self, ResultSection):
            # get the z coordinates of the sections
         # get the z coordinates of the sections
@@ -714,12 +774,12 @@ class Result_Data:
             wc = np.zeros((np.shape(element_array)[0],2), dtype=np.float64)
             rc = np.zeros((np.shape(element_array)[0],2), dtype=np.float64)
             sc = np.zeros((np.shape(element_array)[0],2), dtype=np.float64)
+            J = 0.0
 
 
             df2 = self.S_df.loc[self.S_df["z"]==z]
             MaxStress = df2["S33"].max()
             MinStress = df2["S33"].min()
-
 
             for i in range(np.shape(element_array)[0]):
                 ###############################################################################################
@@ -781,8 +841,6 @@ class Result_Data:
 
                 W = [W0, W1, W2, W3]
 
-
-
                 dArea = Polygon(zip(X2, Y2)).area # Assuming the OP's x,y coordinates
 
                 Area += dArea
@@ -790,46 +848,29 @@ class Result_Data:
                 #########################################################################
                 #Warping
                 #########################################################################
+                Twist = self._get_twist(ResultSection)
 
-                if ResultSection == 0:
-                    d_theta = self.section_rotationz(ResultSection) - self.section_rotationz(ResultSection+1)
-                    dz = self.list_of_z_values[ResultSection]-self.list_of_z_values[ResultSection+1]
-                    dtheta_dz = d_theta/dz
-                elif ResultSection == len(self.list_of_z_values)-1:
-                    d_theta = self.section_rotationz(ResultSection-1) - self.section_rotationz(ResultSection)
-                    dz = self.list_of_z_values[ResultSection-1]-self.list_of_z_values[ResultSection]
-                    dtheta_dz = d_theta/dz
-                else:
-                    d_theta = self.section_rotationz(ResultSection-1) - self.section_rotationz(ResultSection+1)
-                    dz = self.list_of_z_values[ResultSection-1]-self.list_of_z_values[ResultSection+1]
-                    dtheta_dz = d_theta/dz
-
-                # remove floating point error
-                significant_digits = 10
-                dtheta_dz = d_theta/dz
-                Twist =  round(dtheta_dz, significant_digits - int(math.floor(math.log10(abs(dtheta_dz)))) - 1)
                 points = np.array([[0,2],[1,3]])
-                w = np.zeros(len(points))
+                dw_array = np.zeros(len(points))
                 S = np.zeros(np.shape(points))
                 n=0
                 for point in points:
                     ds = np.array([(X0[point[1]]-X0[point[0]]),(Y0[point[1]]-Y0[point[0]]), 0])
                     dw = (W[point[1]] -W[point[0]])/Twist
-
                     #vector from centroid of the element to centre of the segment
                     a = (X0[point[1]]+X0[point[0]])/2 - centroid_x
                     b = (Y0[point[1]]+Y0[point[0]])/2 - centroid_y
                     # plt.plot([a+centroid_x,centroid_x],[b+centroid_y,centroid_y] )
                     r = np.array([centroid_x+a-0.4*4/np.pi, centroid_y+b, 0])
-                    w[n] = dw-np.cross([a,b,0], ds)[-1]
+                    dw_array[n] = dw-np.cross([a,b,0], ds)[-1]
                     S[n] = [ds[1], -ds[0]]
                     n+=1
 
 
-                x_wc_, y_wc_ = (np.linalg.lstsq(S, w, rcond=None)[0])
+                x_wc_, y_wc_ = (np.linalg.lstsq(S, dw_array, rcond=None)[0])
                 x_wc, y_wc = [centroid_x-x_wc_,centroid_y-y_wc_]
                 wc[i] = [x_wc,y_wc]
-                warping_magnitude += abs(np.mean(W))*dArea
+                warping_magnitude += np.mean(W)**2*dArea
                 # ###############################################################################################
                 # #Rotation
                 # ###############################################################################################
@@ -859,6 +900,7 @@ class Result_Data:
                 # ###############################################################################################
                 # #stress
                 # ###############################################################################################
+                TwistDerivative = self._get_twist_derivative(ResultSection)
 
                 condition = (df2['x'] == X0_0) & (df2['y'] == Y0_0)
                 b = df2.index[condition].tolist()
@@ -878,13 +920,53 @@ class Result_Data:
 
                 s_mean = (S0+S1+S2+S3)/4
                 stress_magnitude += abs(s_mean)*dArea
+
+                Stress = [S0, S1, S2, S3]
+
                 ###############
                 #Inset stress code here
                 ###############
 
-                x_sc = 0.05
-                y_sc = 0.05
+                points = np.array([[0,2],[1,3]])
+                dstress_array = np.zeros(len(points))
+                S = np.zeros(np.shape(points))
+                n=0
+                for point in points:
+                    ds = np.array([(X0[point[1]]-X0[point[0]]),(Y0[point[1]]-Y0[point[0]]), 0])
+                    dstress = (Stress[point[1]] -Stress[point[0]])/(TwistDerivative*210*10**6)
+                    #vector from centroid of the element to centre of the segment
+                    a = (X0[point[1]]+X0[point[0]])/2 - centroid_x
+                    b = (Y0[point[1]]+Y0[point[0]])/2 - centroid_y
+                    # plt.plot([a+centroid_x,centroid_x],[b+centroid_y,centroid_y] )
+                    r = np.array([centroid_x+a-0.4*4/np.pi, centroid_y+b, 0])
+                    dstress_array[n] = dstress-np.cross([a,b,0], ds)[-1]
+                    S[n] = [ds[1], -ds[0]]
+                    n+=1
+                x_sc_, y_sc_ = (np.linalg.lstsq(S, dstress_array, rcond=None)[0])
+                x_sc, y_sc = [centroid_x-x_sc_,centroid_y-y_sc_]
                 sc[i] = [x_sc, y_sc]
+                #################################################################
+                #saint-venant constant
+                ##################################################################
+                J1 = 0.0
+                J2 = 0.0
+                J3 = 0.0
+                J4 = 0.0
+
+
+                X2_centroid = centroid_x
+                Y2_centroid = centroid_y
+                integral1 = (X2_centroid-x_rc)**2
+                integral2 = (Y2_centroid-y_rc)**2
+                integral3 = (X2_centroid-x_rc)*(X2_centroid-x_wc)
+                integral4 = (Y2_centroid-y_rc)*(Y2_centroid-y_wc)
+
+                J1 += integral1*dArea
+                J2 += integral2*dArea
+                J3 += integral3*dArea
+                J4 += integral4*dArea
+                j = J1-J3+J2-J4
+                J += j
                 data = {
                     "X0_0" : X0_0,
                     "Y0_0" : Y0_0,
@@ -932,7 +1014,7 @@ class Result_Data:
 
 
             StressMagnitude = stress_magnitude/Area
-            WarpingMagnitude = warping_magnitude/Area
+            WarpingMagnitude = np.sqrt(warping_magnitude/Area)
 
             MeanWC = np.mean(wc, axis=0)
             MeanRC = np.mean(rc, axis=0)
@@ -949,12 +1031,14 @@ class Result_Data:
                 "GlobalRotationVectorX": GlobalRotationVector[0],
                 "GlobalRotationVectorY": GlobalRotationVector[1],
                 "GlobalRotationVectorZ": GlobalRotationVector[2],
+                "Area": Area,
                 "Twist": Twist,
+                "TwistDerivative": TwistDerivative,
                 "WarpingMagnitude": WarpingMagnitude,
                 "MaxWarp": MaxWarp,
                 "MinWarp": MinWarp,
                 "StressMagnitude": StressMagnitude,
-                "MaxStress": MaxWarp,
+                "MaxStress": MaxStress,
                 "MinStress": MinStress,
                 "MeanRCX": MeanRC[0],
                 "MeanRCY": MeanRC[1],
@@ -965,25 +1049,27 @@ class Result_Data:
                 "MeanSCX": MeanSC[0],
                 "MeanSCY": MeanSC[1],
                 "SpreadSC": SpreadSC,
+                "J": J,
             }
             dfr = pd.DataFrame(data = data, index = [z])
             dfr.index.name = "z"
             main_df = main_df.append(dfr, ignore_index = False)
             main_df.to_csv(main_information_csv)
 
-
-
-
-
-
-
         return Section(main_df, extra_df, z,self.analysis_folder)
 
     def GetAllWholeBeam(self):
-        for i in range(len(self.list_of_z_values)-1):
-            self.GetAllSingleSection(i)
+        z = self.list_of_z_values
+        main_information_csv  = self.result_folder+ "\\main_information.csv"
+        if not os.path.exists(main_information_csv):
+            #create the csv
+            for i in range(len(self.list_of_z_values)-2):
+                print(i)
+                self.GetAllSingleSection(i)
 
-        return Beam(self.GetAllSingleSection(len(self.list_of_z_values)-1))
+        main_df = pd.read_csv(main_information_csv, header = 0, index_col = 0)
+        main_df = main_df.astype(np.float64)
+        return Beam(main_df,z,self.analysis_folder)
 
     def warping_magnitude_along_beam(self, include_stress=False):
         warping_list =[]
@@ -1120,7 +1206,6 @@ class Section(Result_Data):
         self.extra_df = extra_df
         self.z = z
 
-
     def _make_string_linux_compatible(self, string1):
         string1 = string1.replace(", ", "_")
         string1 = string1.replace(".", "_")
@@ -1194,7 +1279,7 @@ class Section(Result_Data):
 
 
         fig.set_figwidth(6.29921)
-        fig.set_dpi(500)
+        fig.set_dpi(1000)
 
         plt.tight_layout()
         folder_name = self.result_folder + "\\graphs" + "\\{}".format(str(self.z))
@@ -1278,12 +1363,12 @@ class Section(Result_Data):
         ax.set_box_aspect([1,(maximum_y-minimum_y)/(maximum_x-minimum_x),1])
 
         ax.set_xlabel("$x / m$")
-        ax.set_ylabel("$z / m$")
+        ax.set_ylabel("$y / m$")
         ax.set_zlabel("$w / m^2$")
 
 
         fig.set_figwidth(6.29921)
-        fig.set_dpi(600)
+        fig.set_dpi(1000)
 
         plt.tight_layout()
         folder_name = self.result_folder + "\\graphs" + "\\{}".format(str(self.z))
@@ -1346,7 +1431,7 @@ class Section(Result_Data):
 
             if radius <0.4:
                 points = [(row["X0_2"],row["Y0_2"]),(row["X1_2"],row["Y1_2"]),(row["X2_2"],row["Y2_2"]),(row["X3_2"],row["Y3_2"])]
-                element = patch.Polygon(points, linewidth=0.1, edgecolor='b', facecolor=PiYG(get_colour(centroid_y)))
+                element = patch.Polygon(points, linewidth=0.001, edgecolor='b', facecolor=PiYG(get_colour(centroid_y)))
                 ax[0].add_patch(element )
                 ax[1].scatter(x_wc,y_wc, color = PiYG(get_colour(centroid_y)))
 
@@ -1442,11 +1527,188 @@ class Section(Result_Data):
 
         print(w_array)
 
+    def get_J(self):
+        # maximum_warp = 1000*self.main_df["MaxWarp"][self.z]
+        # minimum_warp = 1000*self.main_df["MinWarp"][self.z]
+
+        # maximum_x = self.extra_df["X0_0"].max()
+        # minimum_x = self.extra_df["X0_0"].min()
+
+        # maximum_y = self.extra_df["Y0_0"].max()
+        # minimum_y = self.extra_df["Y0_0"].min()
+        J1 = 0.0
+        J2 = 0.0
+        J3 = 0.0
+        J4 = 0.0
+        for index, row in self.extra_df.iterrows():
+            X2 = [row["X0_2"],row["X1_2"],row["X2_2"],row["X3_2"]]
+            Y2 = [row["Y0_2"],row["Y1_2"],row["Y2_2"],row["Y3_2"]]
+            dArea = Polygon(zip(X2, Y2)).area
+            X2_centroid = np.mean(X2)
+            Y2_centroid = np.mean(Y2)
+            integral1 = (X2_centroid-row["x_rc"])**2
+            integral2 = (Y2_centroid-row["y_rc"])**2
+            integral3 = (X2_centroid-row["x_rc"])*(X2_centroid-row["x_wc"])
+            integral4 = (Y2_centroid-row["y_rc"])*(Y2_centroid-row["y_wc"])
+            # integral1 = (row["x_rc"]-row["x_wc"])**2
+            # integral2 = (row["y_rc"]-row["y_wc"])**2
+
+
+            #+(Y2_centroid-row["y_rc"])**2+(X2_centroid-row["x_rc"])*(X2_centroid-row["x_wc"])-(Y2_centroid-row["y_rc"])*(Y2_centroid-row["y_wc"])
+            J1 += integral1*dArea
+            J2 += integral2*dArea
+            J3 += integral3*dArea
+            J4 += integral4*dArea
+        return J1-J3+J2-J4
+
+    def plot_deflected_section(self,name=" "):
+        fig,ax = plt.subplots(2,1)
+        for index, row in self.extra_df.iterrows():
+            ax[0].plot(np.array([row["X0_0"],row["X1_0"],row["X2_0"],row["X3_0"],row["X0_0"]]),np.array([row["Y0_0"],row["Y1_0"],row["Y2_0"],row["Y3_0"],row["Y0_0"]]), c = (0.1,0.1,0.1, 0.5))
+            Af = 2000
+            dX0 = (row["X0_1"]-row["X0_0"])*Af
+            dX1 = (row["X1_1"]-row["X1_0"])*Af
+            dX2 = (row["X2_1"]-row["X2_0"])*Af
+            dX3 = (row["X3_1"]-row["X3_0"])*Af
+
+            dY0 = (row["Y0_1"]-row["Y0_0"])*Af
+            dY1 = (row["Y1_1"]-row["Y1_0"])*Af
+            dY2 = (row["Y2_1"]-row["Y2_0"])*Af
+            dY3 = (row["Y3_1"]-row["Y3_0"])*Af
+
+
+            points = [(row["X0_0"],row["Y0_0"]),(row["X1_0"],row["Y1_0"]),(row["X2_0"],row["Y2_0"]),(row["X3_0"],row["Y3_0"])]
+            element = patch.Polygon(points, facecolor="lightgrey", zorder=1)
+            ax[0].add_patch(element)
+            points = [(row["X0_0"],row["Y0_0"]),(row["X1_0"],row["Y1_0"]),(row["X2_0"],row["Y2_0"]),(row["X3_0"],row["Y3_0"])]
+            element = patch.Polygon(points, facecolor="lightslategrey")
+
+            ax[1].add_patch(element)
+
+
+
+
+            points = [(row["X0_0"]+dX0,row["Y0_0"]+dY0),(row["X1_0"]+dX1,row["Y1_0"]+dY1),(row["X2_0"]+dX2,row["Y2_0"]+dY2),(row["X3_0"]+dX3,row["Y3_0"]+dY3)]
+            element = patch.Polygon(points, facecolor="red", zorder=2)
+            ax[0].add_patch(element)
+
+            #ax[0].plot(np.array([row["X0_0"]+dX0,row["X1_0"]+dX1,row["X2_0"]+dX2,row["X3_0"]+dX3,row["X0_0"]+dX0]),np.array([row["Y0_0"]+dY0,row["Y1_0"]+dY1,row["Y2_0"]+dY2,row["Y3_0"]+dY3,row["Y0_0"]+dY0]), c = (0.5,0.1,0.1, 0.5))
+
+            # ax[1].plot(np.array([row["X0_0"],row["X1_0"],row["X2_0"],row["X3_0"],row["X0_0"]]),np.array([row["Y0_0"],row["Y1_0"],row["Y2_0"],row["Y3_0"],row["Y0_0"]]), c = (0.1,0.1,0.1, 0.5))
+
+            x_centroid = (row["X0_0"]+row["X1_0"]+row["X2_0"]+row["X3_0"])/4
+            y_centroid = (row["Y0_0"]+row["Y1_0"]+row["Y2_0"]+row["Y3_0"])/4
+
+            x_rc = row["x_rc"]
+            y_rc = row["y_rc"]
+
+            def get_colour(x_centroid,y_centroid ):
+                sin = np.sin(y_centroid/(x_centroid**2+y_centroid**2)**0.5)
+                sin = (sin+1)/2
+                return sin
+
+            seismic = cm.get_cmap('Set1', 256)
+
+            ax[1].plot([x_rc, x_centroid],[y_rc, y_centroid], color= seismic(get_colour(x_centroid,y_centroid)))
+
+
+            # avaerage warping as a number from 1 to 256
+
+
+
+
+
+
+
+
+            #ax.plot_surface(np.array([[row["X0_2"],row["X1_2"]],[row["X3_2"],row["X2_2"]]]),np.array([[row["Y0_2"],row["Y1_2"]],[row["Y3_2"],row["Y2_2"]]]), 1000*np.array([[row["W0"],row["W1"]],[row["W3"],row["W2"]]]),vmin=minimum_warp, vmax=maximum_warp, rstride=1, cstride=1, cmap=cm.plasma,linewidth=0.1, antialiased=False, edgecolor=(0.1,0.1,0.1,0.5))
+
+            #need to get the colour for the contour plot
+
+            # cmap = cf.get_cmap()
+
+
+            # seismic = cm.get_cmap('seismic', 256)
+            # # avaerage warping as a number from 1 to 256
+
+
+            # def get_colour():
+            #     mean_warp = 1000*(row["W0"]+row["W1"]+row["W2"]+row["W2"])/4
+            #     range_w =  maximum_warp-minimum_warp
+            #     Float_between_0_and_1 = (mean_warp-minimum_warp)/range_w
+            #     return Float_between_0_and_1
+
+
+            # z_offset = minimum_warp - 0.2*(maximum_warp-minimum_warp)
+
+            # ax.plot_surface(np.array([[row["X0_2"],row["X1_2"]],[row["X3_2"],row["X2_2"]]]),np.array([[row["Y0_2"],row["Y1_2"]],[row["Y3_2"],row["Y2_2"]]]), np.array([[z_offset,z_offset],[z_offset,z_offset]]), color = seismic(get_colour()), shade=False)
+            # y_offset = maximum_y + 0.2*(maximum_y-minimum_y)
+            # ax.plot_surface(np.array([[row["X0_2"],row["X1_2"]],[row["X3_2"],row["X2_2"]]]),np.array([[y_offset,y_offset],[y_offset,y_offset]]), 1000*np.array([[row["W0"],row["W1"]],[row["W3"],row["W2"]]]), color = seismic(get_colour()),shade=False)
+            # x_offset = minimum_x - 0.2*(maximum_x-minimum_x)
+
+            # ax.plot_surface(np.array([[x_offset ,x_offset ],[x_offset , x_offset]]),np.array([[row["Y0_2"],row["Y1_2"]],[row["Y3_2"],row["Y2_2"]]]), 1000*np.array([[row["W0"],row["W1"]],[row["W3"],row["W2"]]]), color = seismic(get_colour()), shade=False)
+        ax[0].set_aspect('equal', adjustable='box')
+        # ax[1].set_aspect('equal', adjustable='box')
+        plt.tight_layout()
+        fig.set_figwidth(6.29921/2)
+        fig.set_figheight(5.0)
+        fig.set_dpi(300)
+        plt.tight_layout()
+
+        folder_name = r"D:\\report\\figs"+r"\\"+"NACA"+ r"\graph_hodograph"
+
+        if not os.path.exists(folder_name ):
+            os.makedirs(folder_name)
+
+
+        plt.savefig(folder_name+r"\graph_{}.png".format(name))
+        plt.savefig(folder_name+r"\graph_{}.pgf".format(name))
+
+
+
+
 class Beam(Result_Data):
-    def __init__(self, main_df,extra_df,z, analyis_folder):
+    def __init__(self,main_df,z, analyis_folder):
         self.analyis_folder = analyis_folder
         Result_Data.__init__(self, self.analyis_folder)
         self.main_df = main_df
+
+        self.z = z
+    def z_rotation_along_beam(self):
+        z = self.main_df.index.values.tolist()
+        theta_z = self.main_df["GlobalRotationVectorZ"].values*180/np.pi
+
+
+        return z, theta_z
+
+    def warping_magnitude_along_beam(self):
+        z = self.main_df.index.values.tolist()
+        w = self.main_df["WarpingMagnitude"].values
+        return z, w
+
+    def twist_along_beam(self):
+        z = self.main_df.index.values.tolist()
+
+        twist =  self.main_df["Twist"].values
+        return z, twist
+
+    def gamma_along_beam(self):
+        z = self.main_df.index.values.tolist()
+        w = self.main_df["WarpingMagnitude"].values**2
+        w = w*self.main_df["Area"].values
+        twist =  self.main_df["Twist"].values**2
+        return z, w/twist
+    def stress_magnitude_along_beam(self):
+        z = self.main_df.index.values.tolist()
+        w = self.main_df["StressMagnitude"].values
+        return z, w
+    def MeanRCX_along_beam(self):
+        z = self.main_df.index.values.tolist()
+        w = self.main_df["MeanRCX"].values
+        return z, w
+
+
+
 
 
 

@@ -20,71 +20,7 @@ import displayGroupOdbToolset as dgo
 import connectorBehavior
 import os
 import random
-#-------------------------------------------
-# FUNCTIONS
-#-------------------------------------------
-def get_nodes(DAB, all_nodes):
-    model = mdb.models['Model-1']
-    a = model.rootAssembly
-    """A function that will make a set of loading nodes at a given Distance Along Beam
-    all_nodes = a.instances['name'].nodes"""
-    number_of_nodes=0
-    node_list = []
-    for i in range(len(all_nodes)):
-        node = all_nodes[i]
-        if node.coordinates[2] == DAB:
-            number_of_nodes+=1
-            node_list.append(node)
-        else:
-            pass
-    set_name = "nodes_at_z_%smm"%(int(DAB*1000))
-    a.Set(nodes=mesh.MeshNodeArray(node_list), name =set_name)
-    nodes = a.allSets[set_name].nodes
-    return nodes, number_of_nodes
 
-#------------------------------------------
-#Script
-#------------------------------------------
-def main():
-    os.chdir(r"E:\temp\box")
-    #------------------------------------------------------------------------------------
-    #                GEOMETRY
-    #------------------------------------------------------------------------------------
-    model = mdb.models['Model-1']
-
-    s = model.ConstrainedSketch(name='__profile__', sheetSize=1.0)
-    g, v, d, c = s.geometry, s.vertices, s.dimensions, s.constraints
-    s.setPrimaryObject(option=STANDALONE)
-    d_value = 1.0
-
-    s.rectangle(point1=(-0.5, (-d_value/2 - 0.125)), point2=(0.5, (d_value/2 + 0.125)))
-    s.rectangle(point1=(-0.375, -d_value/2), point2=(0.375, d_value/2 ))
-    p = model.Part(name='box_beam', dimensionality=THREE_D, type=DEFORMABLE_BODY)
-    part = model.parts['box_beam']
-    part.BaseSolidExtrude(sketch=s, depth=3.0)
-    s.unsetPrimaryObject()
-    del model.sketches['__profile__']
-    #------------------------------------------------------------------------------------
-    #               MESH
-    #------------------------------------------------------------------------------------
-    # part.seedPart(size=0.05, deviationFactor=0.001, minSizeFactor=0.001)
-
-    # part.generateMesh()
-    f = part.faces
-    print(f)
-
-
-    e = part.edges
-    pickedEdges = e.getSequenceFromMask(mask=('[#12a ]', ), )
-    part.seedEdgeBySize(edges=pickedEdges, size=0.05, deviationFactor=0.1,
-        minSizeFactor=0.001, constraint=FINER)
-    e = part.edges
-    pickedEdges = e.getSequenceFromMask(mask=('[#491491 ]', ), )
-    part.seedEdgeBySize(edges=pickedEdges, size=0.015625, deviationFactor=0.1,
-        minSizeFactor=0.1, constraint=FINER)
-    part.PartitionFaceByAuto(face=f[8])
-
-    part.generateMesh()
 
     #------------------------------------------------------------------------------------
      #             SECTION

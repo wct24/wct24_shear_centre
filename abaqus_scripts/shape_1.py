@@ -137,48 +137,35 @@ def main():
     part.BaseSolidExtrude(sketch=s, depth=length)
     s.unsetPrimaryObject()
     del mdb.models['Model-1'].sketches['__profile__']
-    #------------------------------------------------------------------------------------
-    #               MESH
-    #------------------------------------------------------------------------------------
-    # p = mdb.models['Model-1'].parts['part']
-    # e = p.edges
-    # pickedEdges = e.getSequenceFromMask(mask=('[#491 ]', ), )
-    # p.seedEdgeBySize(edges=pickedEdges, size=0.01, deviationFactor=0.1,
-    #     constraint=FINER)
-    # p = mdb.models['Model-1'].parts['part']
-    # p.seedPart(size=0.05, deviationFactor=0.1, minSizeFactor=0.1)
-    # p = mdb.models['Model-1'].parts['part']
-
-    # p.generateMesh()
-
-
-
+    # #------------------------------------------------------------------------------------
+    # #               MESH
+    # #------------------------------------------------------------------------------------
     p = mdb.models['Model-1'].parts['part']
     e = p.edges
-    pickedEdges = e.getSequenceFromMask(mask=('[#410 ]', ), )
-    p.seedEdgeBySize(edges=pickedEdges, size=0.002, deviationFactor=0.1,
-        minSizeFactor=0.1, constraint=FINER)
-    e = p.edges
-    pickedEdges = e.getSequenceFromMask(mask=('[#81 ]', ), )
-    p.seedEdgeBySize(edges=pickedEdges, size=0.02, deviationFactor=0.1,
-        minSizeFactor=0.1, constraint=FINER)
-
+    pickedEdges = e.getSequenceFromMask(mask=('[#491 ]', ), )
+    p.seedEdgeBySize(edges=pickedEdges, size=0.01, deviationFactor=0.1,
+        constraint=FINER)
+    p = mdb.models['Model-1'].parts['part']
     p.seedPart(size=0.05, deviationFactor=0.1, minSizeFactor=0.1)
     p = mdb.models['Model-1'].parts['part']
+
     p.generateMesh()
 
 
+    #very fine
+    # p = mdb.models['Model-1'].parts['part']
+    # e = p.edges
+    # pickedEdges = e.getSequenceFromMask(mask=('[#410 ]', ), )
+    # p.seedEdgeBySize(edges=pickedEdges, size=0.002, deviationFactor=0.1,
+    #     minSizeFactor=0.1, constraint=FINER)
+    # e = p.edges
+    # pickedEdges = e.getSequenceFromMask(mask=('[#81 ]', ), )
+    # p.seedEdgeBySize(edges=pickedEdges, size=0.02, deviationFactor=0.1,
+    #     minSizeFactor=0.1, constraint=FINER)
 
-
-
-
-
-
-
-
-
-
-
+    # p.seedPart(size=0.05, deviationFactor=0.1, minSizeFactor=0.1)
+    # p = mdb.models['Model-1'].parts['part']
+    # p.generateMesh()
 
 
     # #------------------------------------------------------------------------------------
@@ -292,17 +279,95 @@ def main():
     v1 = a.instances['SC_beam-1'].vertices
     e1 = a.instances['SC_beam-1'].edges
     Csys = a.DatumCsysByThreePoints(origin=v1[4], point1=v1[5], name='end',
-        coordSysType=CARTESIAN,
-        point2=a.instances['SC_beam-1'].InterestingPoint(edge=e1[8],
-        rule=MIDDLE))
+    coordSysType=CARTESIAN,
+    point2=a.instances['SC_beam-1'].InterestingPoint(edge=e1[8],
+    rule=MIDDLE))
 
-    a.ReferencePoint(point=(LoadX, LoadY, list_of_z[LoadZ]))
-    r1 = a.referencePoints.values()[0]
+    # a.ReferencePoint(point=(LoadX, LoadY, list_of_z[LoadZ]))
+    # r1 = a.referencePoints.values()[0]
 
 
-    model.ConnectorSection(name='warping', translationalType=SLOT)
-    for i in range(0,number_of_loading_nodes):
-        wire = a.WirePolyLine(points=((r1, loading_nodes[i]), ), mergeType=IMPRINT, meshable=OFF)
+    # model.ConnectorSection(name='warping', translationalType=SLOT)
+    # for i in range(0,number_of_loading_nodes):
+    #     wire = a.WirePolyLine(points=((r1, loading_nodes[i]), ), mergeType=IMPRINT, meshable=OFF)
+    # e1 = a.edges
+    # a.Set(edges=e1, name='Wire-Set-loading')
+    # region=a.sets['Wire-Set-loading']
+    # csa = a.SectionAssignment(sectionName='warping', region=region)
+    # datums = a.datums.values() # make sure right one is used
+    # a.ConnectorOrientation(region=csa.getSet(), localCsys1=datums[1])
+
+    # #-------------------------------------------------
+    # #       LOADING
+    # #-----------------------------------------------
+
+    # refPoints1=(r1, )
+    # region = a.Set(referencePoints=refPoints1, name='loading')
+
+    # if LoadType == 1:
+    #     # #force
+    #     mdb.models['Model-1'].ConcentratedForce(name='Load-1',
+    #         createStepName='loading', region=region, cf2=LoadMagnitude,
+    #         distributionType=UNIFORM, field='', localCsys=None)
+    # if LoadType == 2:
+    #     mdb.models['Model-1'].Moment(name='Load-2', createStepName='loading',
+    #         region=region, cm3=LoadMagnitude, distributionType=UNIFORM, field='',
+    #         localCsys=None)
+
+
+
+
+    n=0
+    for loading_z in list_of_z:
+        if loading_z == list_of_z[-1]:
+            pass
+        elif loading_z == list_of_z[LoadZ]:
+            loading_nodes, number_of_loading_nodes = get_nodes(loading_z,n1)
+            a.ReferencePoint(point=(LoadX, LoadY, loading_z))
+            r1 = a.referencePoints.values()[0]
+
+            model.ConnectorSection(name='warping', translationalType=SLOT)
+            for i in range(0,number_of_loading_nodes):
+                wire = a.WirePolyLine(points=((r1, loading_nodes[i]), ), mergeType=IMPRINT, meshable=OFF)
+            e1 = a.edges
+
+
+            #-------------------------------------------------
+            #       LOADING
+            #-----------------------------------------------
+
+            refPoints1=(r1, )
+            region = a.Set(referencePoints=refPoints1, name='loading-%s'%(n))
+
+            mdb.models['Model-1'].Moment(name='Load-%s'%(n), createStepName='loading',
+                region=region, cm3=LoadMagnitude, distributionType=UNIFORM, field='',
+                localCsys=None)
+        elif n%2 == 0:
+            loading_nodes, number_of_loading_nodes = get_nodes(loading_z,n1)
+            a.ReferencePoint(point=(LoadX, LoadY, loading_z))
+            r1 = a.referencePoints.values()[0]
+            e1 = a.edges
+
+            model.ConnectorSection(name='warping', translationalType=SLOT)
+            for i in range(0,number_of_loading_nodes):
+                wire = a.WirePolyLine(points=((r1, loading_nodes[i]), ), mergeType=IMPRINT, meshable=OFF)
+
+            #-------------------------------------------------
+            #       LOADING
+            #-----------------------------------------------
+
+            refPoints1=(r1, )
+            region = a.Set(referencePoinrftts=refPoints1, name='loading-%s'%(n))
+
+            mdb.models['Model-1'].Moment(name='Load-%s'%(n), createStepName='loading',
+                region=region, cm3=-0.0001, distributionType=UNIFORM, field='',
+                localCsys=None)
+
+        else:
+            pass
+        n +=1
+
+
     e1 = a.edges
     a.Set(edges=e1, name='Wire-Set-loading')
     region=a.sets['Wire-Set-loading']
@@ -310,22 +375,8 @@ def main():
     datums = a.datums.values() # make sure right one is used
     a.ConnectorOrientation(region=csa.getSet(), localCsys1=datums[1])
 
-    #-------------------------------------------------
-    #       LOADING
-    #-----------------------------------------------
 
-    refPoints1=(r1, )
-    region = a.Set(referencePoints=refPoints1, name='loading')
 
-    if LoadType == 1:
-        # #force
-        mdb.models['Model-1'].ConcentratedForce(name='Load-1',
-            createStepName='loading', region=region, cf2=LoadMagnitude,
-            distributionType=UNIFORM, field='', localCsys=None)
-    if LoadType == 2:
-        mdb.models['Model-1'].Moment(name='Load-2', createStepName='loading',
-            region=region, cm3=LoadMagnitude, distributionType=UNIFORM, field='',
-            localCsys=None)
 
 
     #-------------------------------------------------

@@ -15,8 +15,10 @@ u = u.astype(np.float64)
 
 E_G = u["lambda"].values**2
 E_G = E_G*47
-shed_length = u["length"].values
 
+E_G = np.sqrt(E_G)
+shed_length = u["length"].values
+shed_length = u["length"].values/10
 fig,ax = plt.subplots()
 
 ax.plot(E_G,shed_length)
@@ -26,11 +28,11 @@ ax.plot(E_G,shed_length)
 
 
 ax.set_ylim(bottom=0)
-ax.set_ylabel('shed rate / m')
-ax.set_xscale('log')
-ax.set_xlabel(r'$\frac{E}{G}$  ', )
-ax.grid()
+ax.set_ylabel('shed rate  $z_{0.01}/L$')
 
+ax.set_xlabel(r'$\sqrt{\frac{E}{G}}$ ', )
+ax.grid()
+plt.tight_layout()
 
 
 print(E_G)
