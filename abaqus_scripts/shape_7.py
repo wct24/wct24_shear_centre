@@ -79,8 +79,8 @@ def main():
                 print(length)
                 Material = str(row[4])
                 Material = Material.strip('][').split(', ')
-                E = float(Material[0])*1000000
-                G = float(Material[1])*1000000
+                E = float(Material[0])*1000000000
+                G = float(Material[1])*1000000000
                 v_poisson = float(Material[2])
 
                 BoundaryCondition = int(row[5])
@@ -109,78 +109,155 @@ def main():
 
     model = mdb.models['Model-1']
 
-
-    session.viewports['Viewport: 1'].setValues(displayedObject=None)
-    s = mdb.models['Model-1'].ConstrainedSketch(name='__profile__', sheetSize=1.0)
-    g, v, d, c = s.geometry, s.vertices, s.dimensions, s.constraints
-    s.setPrimaryObject(option=STANDALONE)
-    session.viewports['Viewport: 1'].view.setValues(nearPlane=0.797034,
-        farPlane=1.08858, width=2.17075, height=1.01856, cameraPosition=(
-        -0.0231676, 0.132199, 0.942809), cameraTarget=(-0.0231676, 0.132199,
+    session.viewports['Viewport: 1'].partDisplay.setValues(sectionAssignments=OFF,
+        engineeringFeatures=OFF)
+    session.viewports['Viewport: 1'].partDisplay.geometryOptions.setValues(
+        referenceRepresentation=ON)
+    s1 = mdb.models['Model-1'].ConstrainedSketch(name='__profile__', sheetSize=1.0)
+    g, v, d, c = s1.geometry, s1.vertices, s1.dimensions, s1.constraints
+    s1.setPrimaryObject(option=STANDALONE)
+    s1.CircleByCenterPerimeter(center=(0.0, 0.0), point1=(0.0, 0.39))
+    session.viewports['Viewport: 1'].view.setValues(nearPlane=0.828168,
+        farPlane=1.05745, width=1.59816, height=0.69412, cameraPosition=(
+        0.00172994, 0.0318447, 0.942809), cameraTarget=(0.00172994, 0.0318447,
         0))
-    s.ArcByCenterEnds(center=(0.0, 0.0), point1=(0.0, 0.4), point2=(0.0, -0.4),
-        direction=CLOCKWISE)
-    session.viewports['Viewport: 1'].view.setValues(nearPlane=0.914143,
-        farPlane=0.971475, width=0.353102, height=0.165683, cameraPosition=(
-        0.340686, -0.0152572, 0.942809), cameraTarget=(0.340686, -0.0152572,
+    s1.CircleByCenterPerimeter(center=(0.0, 0.0), point1=(0.0, 0.42))
+    session.viewports['Viewport: 1'].view.setValues(nearPlane=0.775952,
+        farPlane=1.10967, width=2.05533, height=0.892682, cameraPosition=(
+        0.153979, -0.18111, 0.942809), cameraTarget=(0.153979, -0.18111, 0))
+    s1.delete(objectList=(g[2], ))
+    s1.CircleByCenterPerimeter(center=(0.0, 0.0), point1=(0.0, 0.38))
+    session.viewports['Viewport: 1'].view.setValues(nearPlane=0.847201,
+        farPlane=1.03842, width=1.17769, height=0.511502, cameraPosition=(
+        0.0933151, -0.331871, 0.942809), cameraTarget=(0.0933151, -0.331871,
         0))
-    s.Arc3Points(point1=(0.0, 0.41), point2=(0.0, -0.41), point3=(
-        0.412606418132782, 0.0193976201117039))
-    session.viewports['Viewport: 1'].view.setValues(nearPlane=0.908058,
-        farPlane=0.977561, width=0.428066, height=0.200857, cameraPosition=(
-        0.25893, -0.00494628, 0.942809), cameraTarget=(0.25893, -0.00494628,
-        0))
-    s.Arc3Points(point1=(0.0, 0.39), point2=(0.0, -0.39), point3=(0.39, 0.02))
-    session.viewports['Viewport: 1'].view.setValues(nearPlane=0.803878,
-        farPlane=1.08174, width=1.93678, height=0.908778, cameraPosition=(
-        -0.157778, -0.0127311, 0.942809), cameraTarget=(-0.157778, -0.0127311,
-        0))
-    s.delete(objectList=(g[2], ))
-    session.viewports['Viewport: 1'].view.setValues(nearPlane=0.833002,
-        farPlane=1.05262, width=1.35259, height=0.634665, cameraPosition=(
-        -0.121323, 0.234666, 0.942809), cameraTarget=(-0.121323, 0.234666, 0))
-    s.rectangle(point1=(0.0, -0.41), point2=(-0.02, 0.41))
-    s.autoTrimCurve(curve1=g[5], point1=(0.00229237228631973, 0.400285542011261))
-    session.viewports['Viewport: 1'].view.setValues(nearPlane=0.882199,
-        farPlane=1.00342, width=0.746594, height=0.350317, cameraPosition=(
-        -0.0508321, -0.357238, 0.942809), cameraTarget=(-0.0508321, -0.357238,
-        0))
-    s.autoTrimCurve(curve1=g[9], point1=(-0.00122997164726257, -0.402132749557495))
-    session.viewports['Viewport: 1'].view.setValues(nearPlane=0.648681,
-        farPlane=1.23694, width=4.10031, height=1.92395, cameraPosition=(
-        -0.30632, -0.0456021, 0.942809), cameraTarget=(-0.30632, -0.0456021,
-        0))
+    s1.rectangle(point1=(-0.04, -0.42), point2=(0.0, 0.42))
+    session.viewports['Viewport: 1'].view.setValues(nearPlane=0.901607,
+        farPlane=0.984012, width=0.507529, height=0.220433, cameraPosition=(
+        0.0523625, 0.367115, 0.942809), cameraTarget=(0.0523625, 0.367115, 0))
+    s1.autoTrimCurve(curve1=g[3], point1=(-0.0592432878911495, 0.414711952209473))
+    s1.autoTrimCurve(curve1=g[9], point1=(-0.0316980294883251, 0.417242050170898))
+    s1.autoTrimCurve(curve1=g[4], point1=(-0.0215664468705654, 0.379923462867737))
+    s1.autoTrimCurve(curve1=g[11], point1=(-0.0586100779473782, 0.375179588794708))
+    s1.autoTrimCurve(curve1=g[7], point1=(0.00154623761773109, 0.392890095710754))
+    session.viewports['Viewport: 1'].view.setValues(nearPlane=0.85907,
+        farPlane=1.02655, width=1.03149, height=0.448003, cameraPosition=(
+        0.11421, -0.30877, 0.942809), cameraTarget=(0.11421, -0.30877, 0))
+    s1.autoTrimCurve(curve1=g[13], point1=(-0.00129442662000656,
+        -0.402290999889374))
+    s1.autoTrimCurve(curve1=g[12], point1=(-0.0167378708720207,
+        -0.381079912185669))
+    session.viewports['Viewport: 1'].view.setValues(nearPlane=0.909572,
+        farPlane=0.976046, width=0.409409, height=0.177816, cameraPosition=(
+        0.0328638, -0.3868, 0.942809), cameraTarget=(0.0328638, -0.3868, 0))
+    s1.autoTrimCurve(curve1=g[10], point1=(-0.0295818783342838,
+        -0.417797148227692))
+    session.viewports['Viewport: 1'].view.setValues(nearPlane=0.746227,
+        farPlane=1.13939, width=2.42148, height=1.05171, cameraPosition=(
+        0.172411, 0.0859817, 0.942809), cameraTarget=(0.172411, 0.0859817, 0))
     p = mdb.models['Model-1'].Part(name='Part-1', dimensionality=THREE_D,
         type=DEFORMABLE_BODY)
     p = mdb.models['Model-1'].parts['Part-1']
-    p.BaseSolidExtrude(sketch=s, depth=3.0)
-    s.unsetPrimaryObject()
+    p.BaseSolidExtrude(sketch=s1, depth=1.0)
+    s1.unsetPrimaryObject()
     p = mdb.models['Model-1'].parts['Part-1']
     session.viewports['Viewport: 1'].setValues(displayedObject=p)
     del mdb.models['Model-1'].sketches['__profile__']
-    session.viewports['Viewport: 1'].view.setValues(nearPlane=5.51035,
-        farPlane=8.2819, width=1.94982, height=0.880874, viewOffsetX=-0.589305,
-        viewOffsetY=-0.140395)
+    session.viewports['Viewport: 1'].view.setValues(nearPlane=2.10653,
+        farPlane=3.75682, width=2.23751, height=0.971806,
+        viewOffsetX=0.000473559, viewOffsetY=0.000415348)
+    session.viewports['Viewport: 1'].view.setValues(nearPlane=2.28334,
+        farPlane=3.64121, width=2.42532, height=1.05338, cameraPosition=(
+        0.225595, 0.0143203, 3.46216), cameraUpVector=(-0.576739, 0.744839,
+        -0.33554), cameraTarget=(0.184134, -0.0262091, 0.531057),
+        viewOffsetX=0.000513308, viewOffsetY=0.000450211)
     session.viewports['Viewport: 1'].partDisplay.setValues(mesh=ON)
     session.viewports['Viewport: 1'].partDisplay.meshOptions.setValues(
         meshTechnique=ON)
     session.viewports['Viewport: 1'].partDisplay.geometryOptions.setValues(
         referenceRepresentation=OFF)
-    session.viewports['Viewport: 1'].view.setValues(nearPlane=5.46631,
-        farPlane=8.32594, width=2.80376, height=1.26983, viewOffsetX=-0.296069,
-        viewOffsetY=-0.0733024)
+    session.viewports['Viewport: 1'].view.setValues(nearPlane=2.40332,
+        farPlane=3.52124, width=0.615108, height=0.267825,
+        viewOffsetX=-0.262468, viewOffsetY=-0.146112)
+    p = mdb.models['Model-1'].parts['Part-1']
+    f = p.faces
+    pickedFaces = f.getSequenceFromMask(mask=('[#40 ]', ), )
+    v1, e, d1 = p.vertices, p.edges, p.datums
+    p.PartitionFaceByShortestPath(point1=v1[9], point2=v1[6], faces=pickedFaces)
+    session.viewports['Viewport: 1'].view.setValues(nearPlane=2.40531,
+        farPlane=3.51925, width=0.590614, height=0.25716, viewOffsetX=0.109459,
+        viewOffsetY=0.349129)
+    p = mdb.models['Model-1'].parts['Part-1']
+    f = p.faces
+    pickedFaces = f.getSequenceFromMask(mask=('[#40 ]', ), )
+    v2, e1, d2 = p.vertices, p.edges, p.datums
+    p.PartitionFaceByShortestPath(point1=v2[8], point2=v2[4], faces=pickedFaces)
+    session.viewports['Viewport: 1'].view.setValues(nearPlane=2.27181,
+        farPlane=3.65275, width=2.51363, height=1.09446, viewOffsetX=0.198654,
+        viewOffsetY=0.0871294)
+    session.viewports['Viewport: 1'].view.setValues(nearPlane=2.1403,
+        farPlane=3.68101, width=2.36812, height=1.03111, cameraPosition=(
+        -0.164915, -0.422719, 3.35958), cameraUpVector=(-0.223828, 0.9526,
+        -0.206044), cameraTarget=(0.100127, 0.0419429, 0.477118),
+        viewOffsetX=0.187154, viewOffsetY=0.0820857)
+    session.viewports['Viewport: 1'].view.setValues(nearPlane=2.08471,
+        farPlane=3.73661, width=3.41252, height=1.48585, viewOffsetX=0.222558,
+        viewOffsetY=-0.533339)
+    session.viewports['Viewport: 1'].view.setValues(nearPlane=1.58455,
+        farPlane=3.43886, width=2.59378, height=1.12936, cameraPosition=(
+        -0.400004, 1.25037, 2.61663), cameraUpVector=(0.226368, 0.733256,
+        -0.641166), cameraTarget=(0.413076, 0.0884691, 0.0507734),
+        viewOffsetX=0.169162, viewOffsetY=-0.40538)
     p = mdb.models['Model-1'].parts['Part-1']
     e = p.edges
-    pickedEdges = e.getSequenceFromMask(mask=('[#11491 ]', ), )
-    p.seedEdgeBySize(edges=pickedEdges, size=0.01, deviationFactor=0.1,
+    pickedEdges = e.getSequenceFromMask(mask=('[#1b ]', ), )
+    p.seedEdgeByNumber(edges=pickedEdges, number=10, constraint=FINER)
+    session.viewports['Viewport: 1'].view.setValues(nearPlane=1.78797,
+        farPlane=3.23543, width=0.775596, height=0.337704,
+        viewOffsetX=-0.0370046, viewOffsetY=-0.163101)
+    p = mdb.models['Model-1'].parts['Part-1']
+    e = p.edges
+    pickedEdges = e.getSequenceFromMask(mask=('[#40824 ]', ), )
+    p.seedEdgeBySize(edges=pickedEdges, size=0.04, deviationFactor=0.1,
         constraint=FINER)
-    session.viewports['Viewport: 1'].view.setValues(nearPlane=5.45483,
-        farPlane=8.33742, width=2.63, height=1.19114, viewOffsetX=-0.333459,
-        viewOffsetY=-0.070095)
+    p = mdb.models['Model-1'].parts['Part-1']
+    e = p.edges
+    pickedEdges = e.getSequenceFromMask(mask=('[#40824 ]', ), )
+    p.seedEdgeBySize(edges=pickedEdges, size=0.004, deviationFactor=0.1,
+        constraint=FINER)
+    session.viewports['Viewport: 1'].view.setValues(nearPlane=1.78284,
+        farPlane=3.24056, width=0.751107, height=0.327041,
+        viewOffsetX=-0.0148392, viewOffsetY=-0.636563)
+    session.viewports['Viewport: 1'].view.setValues(nearPlane=1.56501,
+        farPlane=3.05838, width=0.659333, height=0.287081, cameraPosition=(
+        0.0137785, 1.72512, 2.09981), cameraUpVector=(0.62962, 0.425242,
+        -0.65019), cameraTarget=(0.791748, -0.238049, 0.066226),
+        viewOffsetX=-0.0130261, viewOffsetY=-0.558785)
+    session.viewports['Viewport: 1'].view.setValues(nearPlane=1.53022,
+        farPlane=3.09317, width=1.13897, height=0.495919,
+        viewOffsetX=0.0234848, viewOffsetY=-0.539364)
     p = mdb.models['Model-1'].parts['Part-1']
     p.seedPart(size=0.05, deviationFactor=0.1, minSizeFactor=0.1)
     p = mdb.models['Model-1'].parts['Part-1']
     p.generateMesh()
+    session.viewports['Viewport: 1'].view.setValues(nearPlane=2.03523,
+        farPlane=3.30658, width=1.51485, height=0.659582, cameraPosition=(
+        -0.686342, 0.414171, 3.02195), cameraUpVector=(-0.0356415, 0.929963,
+        -0.365922), cameraTarget=(0.226219, 0.403721, 0.235941),
+        viewOffsetX=0.0312353, viewOffsetY=-0.717365)
+    session.viewports['Viewport: 1'].view.setValues(nearPlane=1.93215,
+        farPlane=3.32387, width=1.43812, height=0.626176, cameraPosition=(
+        -0.0756435, 0.715219, 3.06344), cameraUpVector=(0.260515, 0.882226,
+        -0.392186), cameraTarget=(0.528761, 0.378003, 0.214629),
+        viewOffsetX=0.0296532, viewOffsetY=-0.681031)
+    session.viewports['Viewport: 1'].view.setValues(nearPlane=1.95783,
+        farPlane=3.2982, width=1.09153, height=0.475264,
+        viewOffsetX=-0.0384157, viewOffsetY=-0.343856)
+    session.viewports['Viewport: 1'].view.setValues(nearPlane=2.00735,
+        farPlane=3.2656, width=1.11914, height=0.487284, cameraPosition=(
+        -0.0484302, 0.526132, 3.11551), cameraUpVector=(0.0659447, 0.930328,
+        -0.36075), cameraTarget=(0.428938, 0.421791, 0.22484),
+        viewOffsetX=-0.0393874, viewOffsetY=-0.352553)
 
 
 
@@ -292,12 +369,19 @@ def main():
 
 
 
-    v1 = a.instances['SC_beam-1'].vertices
-    e1 = a.instances['SC_beam-1'].edges
-    Csys = a.DatumCsysByThreePoints(origin=v1[4], point1=v1[5], name='end',
-        coordSysType=CARTESIAN,
-        point2=a.instances['SC_beam-1'].InterestingPoint(edge=e1[8],
-        rule=MIDDLE))
+    # v1 = a.instances['SC_beam-1'].vertices
+    # e1 = a.instances['SC_beam-1'].edges
+    # Csys = a.DatumCsysByThreePoints(origin=v1[4], point1=v1[5], name='end',
+    #     coordSysType=CARTESIAN,
+    #     point2=a.instances['SC_beam-1'].InterestingPoint(edge=e1[8],
+    #     rule=MIDDLE))
+
+    Csys = a.DatumCsysByThreePoints(name='end', coordSysType=CARTESIAN, origin=(
+        0.0, 0.0, 3.0), point1=(0.0, 0.0, 0.0), line2=(0.0, 9.0, 0.0),
+        isDependent=False)
+
+
+
 
     a.ReferencePoint(point=(LoadX, LoadY, list_of_z[LoadZ]))
     r1 = a.referencePoints.values()[0]
@@ -312,6 +396,10 @@ def main():
     csa = a.SectionAssignment(sectionName='warping', region=region)
     datums = a.datums.values() # make sure right one is used
     a.ConnectorOrientation(region=csa.getSet(), localCsys1=datums[1])
+
+
+
+
 
     #-------------------------------------------------
     #       LOADING

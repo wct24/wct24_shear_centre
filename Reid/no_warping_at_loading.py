@@ -24,12 +24,8 @@ ax.plot(line1[0], line1[1])
 ax.set_ylim(top=0)
 ax.set_xlim(0,1)
 ax.set_ylabel(r'$\theta_{z}$ / \textdegree ')
-
 ax.set_xlabel(r'$Z / m$ ' )
 ax.grid()
-
-
-
 
 
 

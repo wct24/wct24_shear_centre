@@ -296,7 +296,6 @@ class Load:
 
         return self.SimpleShearLoad(LoadZ, LoadX, LoadMagnitude = LoadMagnitude)
 
-
     def LSC(self, LoadZ, tol = 1e-3):
         """ Newton-Raphson method to find the LSC
             a small load is used to make linear"""
@@ -350,6 +349,8 @@ class Load:
         datafram in the results directory"""
         folder_name = self._navigate(["1. Simple_Shear_Load","Beam_Repository", -1000, "LSC"], chdir = True)
         LSC_csv =r"\LSC_every_{}m.csv".format(str(n))
+
+
         if not os.path.exists(folder_name + LSC_csv):
 
             assert (n/0.05)%1 == 0.0 , "n must be a multiple of 0.05 as this is the smallest devision"
@@ -1344,9 +1345,9 @@ class Section(Result_Data):
             z_offset = minimum_omega - 0.2*(maximum_omega-minimum_omega)
 
             ax.plot_surface(np.array([[row["X0_2"],row["X1_2"]],[row["X3_2"],row["X2_2"]]]),np.array([[row["Y0_2"],row["Y1_2"]],[row["Y3_2"],row["Y2_2"]]]), np.array([[z_offset,z_offset],[z_offset,z_offset]]), color = seismic(get_colour()), shade=False)
-            y_offset = maximum_y + 0.2*(maximum_y-minimum_y)
+            y_offset = maximum_y + 0.3*(maximum_y-minimum_y)
             ax.plot_surface(np.array([[row["X0_2"],row["X1_2"]],[row["X3_2"],row["X2_2"]]]),np.array([[y_offset,y_offset],[y_offset,y_offset]]), (1/Twist)*np.array([[row["W0"],row["W1"]],[row["W3"],row["W2"]]]), color = seismic(get_colour()),shade=False)
-            x_offset = minimum_x - 0.2*(maximum_x-minimum_x)
+            x_offset = minimum_x - 0.5*(maximum_x-minimum_x)
 
             ax.plot_surface(np.array([[x_offset ,x_offset ],[x_offset , x_offset]]),np.array([[row["Y0_2"],row["Y1_2"]],[row["Y3_2"],row["Y2_2"]]]), (1/Twist)*np.array([[row["W0"],row["W1"]],[row["W3"],row["W2"]]]), color = seismic(get_colour()), shade=False)
 
@@ -1356,6 +1357,8 @@ class Section(Result_Data):
         ax.set_ylim(top=y_offset*0.97)
 
         ax.locator_params(axis='z', nbins=5)
+        ax.locator_params(axis='x', nbins=5)
+
         # ax.set_zticklabels([maximum_warp, minimum_warp])
 
 
@@ -1419,21 +1422,53 @@ class Section(Result_Data):
 
             radius = np.sqrt(centroid_x**2 + centroid_y**2)
 
-            if radius > 0.4:
+
+
+            # if centroid_x < 0.05 and abs(centroid_y)>0.36:
+            #     points = [(row["X0_2"],row["Y0_2"]),(row["X1_2"],row["Y1_2"]),(row["X2_2"],row["Y2_2"]),(row["X3_2"],row["Y3_2"])]
+            #     element = patch.Polygon(points, linewidth=1, edgecolor='black', facecolor="black")
+            #     ax[0].add_patch(element)
+
+            if centroid_x < -0.02:
                 points = [(row["X0_2"],row["Y0_2"]),(row["X1_2"],row["Y1_2"]),(row["X2_2"],row["Y2_2"]),(row["X3_2"],row["Y3_2"])]
-                element = patch.Polygon(points, linewidth=0.1, edgecolor='b', facecolor=seismic(get_colour(centroid_y)))
+                element = patch.Polygon(points, linewidth=0.01, edgecolor='black', facecolor=seismic(get_colour(centroid_y)))
                 ax[0].add_patch(element )
-                ax[1].scatter(x_wc,y_wc, color= seismic(get_colour(centroid_y)))
+                ax[1].scatter(x_wc,y_wc, color= seismic(get_colour(centroid_y)),s = 4)
+
+
+
+            elif centroid_x > -0.02 and centroid_x<0:
+                points = [(row["X0_2"],row["Y0_2"]),(row["X1_2"],row["Y1_2"]),(row["X2_2"],row["Y2_2"]),(row["X3_2"],row["Y3_2"])]
+                element = patch.Polygon(points, linewidth=0.01, edgecolor='black', facecolor=PiYG(get_colour(centroid_y)))
+                ax[0].add_patch(element )
+                ax[1].scatter(x_wc,y_wc, color = PiYG(get_colour(centroid_y)), s = 4)
+
+
+            elif radius > 0.4:
+                points = [(row["X0_2"],row["Y0_2"]),(row["X1_2"],row["Y1_2"]),(row["X2_2"],row["Y2_2"]),(row["X3_2"],row["Y3_2"])]
+                element = patch.Polygon(points, linewidth=0.01, edgecolor='black', facecolor=seismic(get_colour(centroid_y)))
+                ax[0].add_patch(element )
+                ax[1].scatter(x_wc,y_wc, color= seismic(get_colour(centroid_y)),s = 4)
 
                 # else:
                 #     ax[1].scatter(x_wc,y_wc, color = "green")
 
 
-            if radius <0.4:
+            elif radius <0.4:
                 points = [(row["X0_2"],row["Y0_2"]),(row["X1_2"],row["Y1_2"]),(row["X2_2"],row["Y2_2"]),(row["X3_2"],row["Y3_2"])]
-                element = patch.Polygon(points, linewidth=0.001, edgecolor='b', facecolor=PiYG(get_colour(centroid_y)))
+                element = patch.Polygon(points, linewidth=0.01, edgecolor='black', facecolor=PiYG(get_colour(centroid_y)))
                 ax[0].add_patch(element )
-                ax[1].scatter(x_wc,y_wc, color = PiYG(get_colour(centroid_y)))
+                ax[1].scatter(x_wc,y_wc, color = PiYG(get_colour(centroid_y)),s = 4)
+
+        # Plot the mean warping centre
+
+        MeanRCX = self.main_df["MeanRCX"][self.z]
+        MeanRCY = self.main_df["MeanRCY"][self.z]
+        MeanWCX = self.main_df["MeanWCX"][self.z]
+        MeanWCY = self.main_df["MeanWCY"][self.z]
+
+        ax[1].scatter(MeanRCX ,MeanRCY, marker = "x",s = 150, c="c" )
+        ax[1].scatter(MeanWCX ,MeanWCY, marker = "+",s = 150, c="m")
 
 
         ax[0].set_ylim(minimum_y,maximum_y)
@@ -1441,6 +1476,11 @@ class Section(Result_Data):
 
         ax[0].set_xlabel("x")
         ax[0].set_ylabel("y")
+
+
+        ax[1].scatter(x_wc,y_wc, color = PiYG(get_colour(centroid_y)))
+        ax[1].scatter(x_wc,y_wc, color = PiYG(get_colour(centroid_y)))
+
 
         ax[1].locator_params(axis='y', nbins=5)
 
@@ -1465,6 +1505,124 @@ class Section(Result_Data):
                 os.makedirs(write_up_folder)
             plt.savefig(write_up_folder+r"\warping_centre_spread_z_{}.png".format(str(int(self.z*100))))
             plt.savefig(write_up_folder+r"\warping_centre_spread_z_{}.pgf".format(str(int(self.z*100))))
+
+
+    def warping_centre_spread2(self, write_up= False):
+        fig,ax = plt.subplots(1,2)
+
+        print("entre")
+        maximum_x = self.extra_df[["X0_2","X1_2","X2_2","X3_2"]].max().max()
+        minimum_x = self.extra_df[["X0_2","X1_2","X2_2","X3_2"]].min().min()
+
+        maximum_y = self.extra_df[["Y0_2","Y1_2","Y2_2","Y3_2"]].max().max()
+        minimum_y = self.extra_df[["Y0_2","Y1_2","Y2_2","Y3_2"]].min().min()
+
+
+        seismic = cm.get_cmap('seismic', 256)
+        PiYG = cm.get_cmap('PiYG', 256)
+
+        for index, row in self.extra_df.iterrows():
+            x_wc = row["x_wc"]
+            y_wc = row["y_wc"]
+
+            centroid_x = (row["X0_2"]+row["X1_2"]+row["X2_2"]+row["X3_2"])*0.25
+            centroid_y = (row["Y0_2"]+row["Y1_2"]+row["Y2_2"]+row["Y3_2"])*0.25
+
+
+            def get_colour(centroid_y):
+                centroid_y = centroid_y
+                range_w =  maximum_y-minimum_y
+
+                Float_between_0_and_1 = (centroid_y-minimum_y)/range_w
+                return Float_between_0_and_1
+
+            radius = np.sqrt(centroid_x**2 + centroid_y**2)
+
+
+
+            if centroid_x < 0.05 and abs(centroid_y)>0.36:
+                points = [(row["X0_2"],row["Y0_2"]),(row["X1_2"],row["Y1_2"]),(row["X2_2"],row["Y2_2"]),(row["X3_2"],row["Y3_2"])]
+                element = patch.Polygon(points, linewidth=1, edgecolor='black', facecolor="black")
+                ax[0].add_patch(element)
+
+            elif centroid_x < -0.02:
+                points = [(row["X0_2"],row["Y0_2"]),(row["X1_2"],row["Y1_2"]),(row["X2_2"],row["Y2_2"]),(row["X3_2"],row["Y3_2"])]
+                element = patch.Polygon(points, linewidth=0.01, edgecolor='black', facecolor=seismic(get_colour(centroid_y)))
+                ax[0].add_patch(element )
+                ax[1].scatter(x_wc,y_wc, color= seismic(get_colour(centroid_y)),s = 4)
+
+
+
+            elif centroid_x > -0.02 and centroid_x<0:
+                points = [(row["X0_2"],row["Y0_2"]),(row["X1_2"],row["Y1_2"]),(row["X2_2"],row["Y2_2"]),(row["X3_2"],row["Y3_2"])]
+                element = patch.Polygon(points, linewidth=0.01, edgecolor='black', facecolor=PiYG(get_colour(centroid_y)))
+                ax[0].add_patch(element )
+                ax[1].scatter(x_wc,y_wc, color = PiYG(get_colour(centroid_y)), s = 4)
+
+
+            elif radius > 0.4:
+                points = [(row["X0_2"],row["Y0_2"]),(row["X1_2"],row["Y1_2"]),(row["X2_2"],row["Y2_2"]),(row["X3_2"],row["Y3_2"])]
+                element = patch.Polygon(points, linewidth=0.01, edgecolor='black', facecolor=seismic(get_colour(centroid_y)))
+                ax[0].add_patch(element )
+                ax[1].scatter(x_wc,y_wc, color= seismic(get_colour(centroid_y)),s = 4)
+
+                # else:
+                #     ax[1].scatter(x_wc,y_wc, color = "green")
+
+
+            elif radius <0.4:
+                points = [(row["X0_2"],row["Y0_2"]),(row["X1_2"],row["Y1_2"]),(row["X2_2"],row["Y2_2"]),(row["X3_2"],row["Y3_2"])]
+                element = patch.Polygon(points, linewidth=0.01, edgecolor='black', facecolor=PiYG(get_colour(centroid_y)))
+                ax[0].add_patch(element )
+                ax[1].scatter(x_wc,y_wc, color = PiYG(get_colour(centroid_y)),s = 4)
+
+        # Plot the mean warping centre
+
+        MeanRCX = self.main_df["MeanRCX"][self.z]
+        MeanRCY = self.main_df["MeanRCY"][self.z]
+        MeanWCX = self.main_df["MeanWCX"][self.z]
+        MeanWCY = self.main_df["MeanWCY"][self.z]
+
+        ax[1].scatter(MeanRCX ,MeanRCY, marker = "x",s = 150, c="c" )
+        ax[1].scatter(MeanWCX ,MeanWCY, marker = "+",s = 150, c="m")
+
+
+        ax[0].set_ylim(minimum_y,maximum_y)
+        ax[0].set_xlim(minimum_x,maximum_x)
+
+        ax[0].set_xlabel("x")
+        ax[0].set_ylabel("y")
+
+
+        ax[1].scatter(x_wc,y_wc, color = PiYG(get_colour(centroid_y)))
+        ax[1].scatter(x_wc,y_wc, color = PiYG(get_colour(centroid_y)))
+
+
+        ax[1].locator_params(axis='y', nbins=5)
+
+        ax[1].set_box_aspect(1.0)
+
+        fig.set_figwidth(6.29921)
+        fig.set_dpi(500)
+
+        plt.tight_layout()
+        folder_name = self.result_folder + "\\graphs" + "\\{}".format(str(self.z))
+
+
+        if not os.path.exists(folder_name ):
+            os.makedirs(folder_name)
+        plt.savefig(folder_name+r"\warping_centre_spread_z_{}.png".format(str(self.z)))
+        plt.savefig(folder_name+r"\warping_centre_spread_z_{}.pgf".format(str(self.z)))
+
+
+        if write_up == True:
+            write_up_folder = self.result_folder.replace("shear_centre", "report\\figs")
+            if not os.path.exists(write_up_folder ):
+                os.makedirs(write_up_folder)
+            plt.savefig(write_up_folder+r"\warping_centre_spread_z_{}.png".format(str(int(self.z*100))))
+            plt.savefig(write_up_folder+r"\warping_centre_spread_z_{}.pgf".format(str(int(self.z*100))))
+
+
 
     def warping_centre_line(self, write_up= False):
         print(len(self.extra_df["X0_0"]))
@@ -1526,7 +1684,6 @@ class Section(Result_Data):
         plt.show()
 
         print(w_array)
-
     def get_J(self):
         # maximum_warp = 1000*self.main_df["MaxWarp"][self.z]
         # minimum_warp = 1000*self.main_df["MinWarp"][self.z]
@@ -1672,13 +1829,37 @@ class Beam(Result_Data):
         self.analyis_folder = analyis_folder
         Result_Data.__init__(self, self.analyis_folder)
         self.main_df = main_df
-
         self.z = z
+
+    def _navigate(self, analysis_arguments, chdir = False ):
+        root = self.analyis_folder
+        analysis_directory = root
+        assert(type(analysis_arguments) == list)
+
+        for arg in analysis_arguments:
+            arg = self._make_string_windows_compatible(str(arg))
+            analysis_directory = analysis_directory + r'\{}'.format(str(arg))
+
+        # if the file doesn't exist create it
+        if not os.path.exists(analysis_directory):
+            os.makedirs(analysis_directory)
+
+        if chdir==True:
+            os.chdir(analysis_directory)
+        return analysis_directory
+
+
+    def _make_string_windows_compatible(self, string1):
+        string1 = string1.replace(", ", "_")
+        string1 = string1.replace("[", "")
+        string1 = string1.replace("]", "")
+        return string1
+
+
+
     def z_rotation_along_beam(self):
         z = self.main_df.index.values.tolist()
         theta_z = self.main_df["GlobalRotationVectorZ"].values*180/np.pi
-
-
         return z, theta_z
 
     def warping_magnitude_along_beam(self):
@@ -1706,6 +1887,87 @@ class Beam(Result_Data):
         z = self.main_df.index.values.tolist()
         w = self.main_df["MeanRCX"].values
         return z, w
+
+    # def _get_rate_of_distortion(self, z):
+    #     z_list = self.main_df.index.values.tolist()
+    #     ResultSection=z_list.index(z)
+    #     if ResultSection==0:
+    #         d_theta = abs(self.main_df["SpreadRC"][z_list[ResultSection]] - self.main_df["SpreadRC"][z_list[ResultSection+1]])
+    #         dz = 0.05
+    #         dtheta_dz = d_theta/dz
+    #     elif ResultSection == len(self.list_of_z_values)-3:
+    #         d_theta = abs(self.main_df["SpreadRC"][z_list[ResultSection-1]] - self.main_df["SpreadRC"][z_list[ResultSection]])
+    #         dz = 0.05
+    #         dtheta_dz = d_theta/dz
+    #     elif ResultSection > len(self.list_of_z_values)-3:
+    #         pass
+    #     else:
+    #         print(ResultSection)
+    #         d_theta = abs(self.main_df["SpreadRC"][z_list[ResultSection-1]] - self.main_df["SpreadRC"][z_list[ResultSection+1]])
+    #         dz = 0.1
+    #         dtheta_dz = d_theta/dz
+    #     # remove floating point error
+    #     significant_digits = 10
+    #     Twist =  round(dtheta_dz, significant_digits - int(math.floor(math.log10(abs(dtheta_dz)))) - 1)
+    #     return Twist
+
+
+
+
+
+
+
+    def distorsion_along_beam(self, LoadSection):
+        loading_z = self.main_df.index.values.tolist()[LoadSection]
+        z_list = self.main_df.index.values.tolist()
+
+        folder_name =  self._navigate(["..","..", "LSC_torque"], chdir = True)
+        LSC_csv =r"\LSC.csv"
+
+        # if not os.path.exists(extra_information_csv):
+        #     #create the csv
+        #     column_names =  []
+        #     extra_df = pd.DataFrame(columns=column_names)
+        #     extra_df.index.name = "e"
+        # else:
+        #     extra_df = pd.read_csv(extra_information_csv, header = 0, index_col = 0)
+        # extra_df = extra_df.astype(np.float64)
+
+        if not os.path.exists(folder_name + LSC_csv):
+            column_names =  []
+            LSC_df = pd.DataFrame(columns=column_names)
+            LSC_df.index.name = "z"
+        else:
+            LSC_df = pd.read_csv(folder_name + LSC_csv, header = 0, index_col = 0)
+        LSC_df = LSC_df.astype(np.float64)
+
+        above = 0.0
+        bellow = 0.0
+        # above_counter = 0
+        # bellow_counter = 0
+
+
+
+
+        if loading_z not in LSC_df.index:
+            for z in z_list:
+                if z >= loading_z:
+                    # above += self._get_rate_of_distortion(z)
+                    above += self.main_df["SpreadRC"][z]
+                elif z < loading_z:
+                    bellow += self.main_df["SpreadRC"][z]
+                # else:
+                #     print("z = ", z )
+            data = {"above":above, "bellow":bellow, "MeanRCX":self.main_df["MeanRCX"][loading_z]}
+            dfr = pd.DataFrame(data = data, index = [loading_z])
+            dfr.index.name = "z"
+            LSC_df =  LSC_df.append(dfr, ignore_index = False)
+            LSC_df.to_csv(folder_name + LSC_csv)
+
+
+
+
+
 
 
 

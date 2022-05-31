@@ -15,31 +15,40 @@ applying a torque load at the end of the beam and at a position closer to the su
 # warping.LSC_every_n_m(0.5)
 
 
-length = 5.0
-encastre = Load(r"D:\\shear_centre\\5-NACA0025\\{}\\210.0_81.0_0.3\\encastre".format(str(length)))
-line1 = encastre.LSC_every_n_m(0.2)
-print(line1)
-plt.plot(line1["LoadZ"].values, line1["LoadX"].values)
+# length = 10.0
+# encastre = Load(r"D:\\shear_centre\\5-NACA0025\\{}\\210.0_81.0_0.3\\encastre".format(str(length)))
+# line1 = encastre.LSC_every_n_m(0.2)
+# print(line1)
+# plt.plot(line1["LoadZ"].values, line1["LoadX"].values)
 
 
 
 
+
+
+
+# length = 10.0
+# warping = Load(r"D:\\shear_centre\\5-NACA0025\\{}\\210.0_81.0_0.3\\warping".format(str(length)))
+# line2 = warping.LSC_every_n_m(0.2)
+
+# plt.plot(line2["LoadZ"].values, line2["LoadX"].values)
 
 
 
 length = 5.0
 warping = Load(r"D:\\shear_centre\\5-NACA0025\\{}\\210.0_81.0_0.3\\warping".format(str(length)))
-line2 = warping.LSC_every_n_m(0.2)
 
-plt.plot(line2["LoadZ"].values, line2["LoadX"].values)
+for i in range(0,100,4):
+    print(i)
+    warping.SimpleTorqueLoad(i,LoadMagnitude=-1000).GetAllWholeBeam().distorsion_along_beam(i)
 
 
 
-length = 5.0
-warping = Load(r"D:\\shear_centre\\5-NACA0025\\{}\\210.0_81.0_0.3\\warping".format(str(length)))
-line3 = warping.SimpleTorqueLoad(0,LoadMagnitude=-1000).GetAllWholeBeam().MeanRCX_along_beam()
 
-plt.plot(line3[0], line3[1])
+
+
+
+
 
 
 
@@ -54,7 +63,7 @@ plt.plot(line3[0], line3[1])
 # encastre.LSC_every_n_m(0.2)
 
 
-plt.show()
+
 
 
 
