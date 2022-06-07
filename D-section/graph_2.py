@@ -21,6 +21,6 @@ warping = Load(r"D:\\shear_centre\\1-Semi-Circle\\0.4_0.02_5.0\\210.0_81.0_0.3\\
 
 # warping = Beam(r"D:\\shear_centre\\1-Semi-Circle\\0.4_0.02_15.0\\210.0_81.0_0.3\\warping")
 
-warping.SimpleTorqueLoad(0, LoadMagnitude = -5).GetAllSingleSection(0).plot_warping_function()
+warping.SimpleTorqueLoad(0, LoadMagnitude = -100).GetAllSingleSection(0).plot_warping_function()
 
 

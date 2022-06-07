@@ -1,4 +1,4 @@
-import sys
+juitgfimport sys
 # # adding Folder_2 to the system path
 sys.path.insert(0, r'C:\Users\touze\project\wct24_shear_centre')
 from beam_object import *

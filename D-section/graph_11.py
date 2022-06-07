@@ -13,7 +13,7 @@ applying a torque load at the end of the beam and at a position closer to the su
 
 warping = Load(r"D:\\shear_centre\\7-D\\3.0\\210.0_81.0_0.3\\warping")
 
-# warping.SimpleTorqueLoad(0, LoadMagnitude = -50000).GetAllSingleSection(0).warping_centre_spread2(write_up = True)
+warping.SimpleTorqueLoad(0, LoadMagnitude = -50000).GetAllSingleSection(0).warping_centre_spread2(write_up = True)
 warping.SimpleTorqueLoad(0, LoadMagnitude = -50000).GetAllSingleSection(0).plot_warping_function(write_up=True)
 
 

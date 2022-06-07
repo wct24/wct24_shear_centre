@@ -158,7 +158,7 @@ def main():
     p = mdb.models['Model-1'].Part(name='Part-1', dimensionality=THREE_D,
         type=DEFORMABLE_BODY)
     p = mdb.models['Model-1'].parts['Part-1']
-    p.BaseSolidExtrude(sketch=s1, depth=1.0)
+    p.BaseSolidExtrude(sketch=s1, depth=length)
     s1.unsetPrimaryObject()
     p = mdb.models['Model-1'].parts['Part-1']
     session.viewports['Viewport: 1'].setValues(displayedObject=p)
@@ -211,7 +211,7 @@ def main():
     p = mdb.models['Model-1'].parts['Part-1']
     e = p.edges
     pickedEdges = e.getSequenceFromMask(mask=('[#1b ]', ), )
-    p.seedEdgeByNumber(edges=pickedEdges, number=10, constraint=FINER)
+    p.seedEdgeByNumber(edges=pickedEdges, number=1, constraint=FINER)
     session.viewports['Viewport: 1'].view.setValues(nearPlane=1.78797,
         farPlane=3.23543, width=0.775596, height=0.337704,
         viewOffsetX=-0.0370046, viewOffsetY=-0.163101)
@@ -223,7 +223,7 @@ def main():
     p = mdb.models['Model-1'].parts['Part-1']
     e = p.edges
     pickedEdges = e.getSequenceFromMask(mask=('[#40824 ]', ), )
-    p.seedEdgeBySize(edges=pickedEdges, size=0.004, deviationFactor=0.1,
+    p.seedEdgeBySize(edges=pickedEdges, size=0.04, deviationFactor=0.1,
         constraint=FINER)
     session.viewports['Viewport: 1'].view.setValues(nearPlane=1.78284,
         farPlane=3.24056, width=0.751107, height=0.327041,

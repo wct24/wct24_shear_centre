@@ -13,7 +13,7 @@ from decimal import Decimal
 from shapely.geometry import Polygon
 import sys
 import scipy.optimize
-
+plt.rcParams['figure.dpi'] = 1600
 # sys.path.insert(0, r'C:\Users\touze\project\wct24_shear_centre')
 # from Result_Data_object import *
 # from Beam_object import *
@@ -86,7 +86,10 @@ class Load:
             return completed
 
         #location of the script - different script for shape
+
+        print(self.ShapeId)
         script = r"C:\Users\touze\project\wct24_shear_centre\abaqus_scripts\shape_{}.py".format(self.ShapeId)
+        # script = r"C:\Users\touze\project\wct24_shear_centre\abaqus_scripts\shape_7.py"
         script_command = "abaqus cae script={}".format(script)
         script_info = run(script_command)
         errormessage = str(script_info.stderr)
@@ -1306,6 +1309,7 @@ class Section(Result_Data):
         fig = plt.figure()
         ax = fig.add_subplot(projection='3d')
         # get the z coordinates of the sections
+        fig.set_dpi(1200)
 
         Twist = self.main_df["Twist"][self.z]
 
@@ -1369,9 +1373,9 @@ class Section(Result_Data):
         ax.set_ylabel("$y / m$")
         ax.set_zlabel("$w / m^2$")
 
-
         fig.set_figwidth(6.29921)
-        fig.set_dpi(1000)
+        fig.set_figheight(5)
+        fig.set_dpi(1200)
 
         plt.tight_layout()
         folder_name = self.result_folder + "\\graphs" + "\\{}".format(str(self.z))
@@ -1380,7 +1384,7 @@ class Section(Result_Data):
             os.makedirs(folder_name)
 
         plt.savefig(folder_name+r"\plot_warping_function_z_{}.png".format(str(self.z)))
-        plt.savefig(folder_name+r"\plot_warping_function_z_{}.pgf".format(str(self.z)))
+        # plt.savefig(folder_name+r"\plot_warping_function_z_{}.pgf".format(str(self.z)))
 
 
 
@@ -1389,7 +1393,7 @@ class Section(Result_Data):
             if not os.path.exists(write_up_folder ):
                 os.makedirs(write_up_folder)
             plt.savefig(write_up_folder+r"\plot_warping_function_z_{}.png".format(str(int(self.z*100))))
-            plt.savefig(write_up_folder+r"\plot_warping_function_z_{}.pgf".format(str(int(self.z*100))))
+            # plt.savefig(write_up_folder+r"\plot_warping_function_z_{}.pgf".format(str(int(self.z*100))))
 
     def warping_centre_spread(self, write_up= False):
         fig,ax = plt.subplots(1,2)
@@ -1509,7 +1513,7 @@ class Section(Result_Data):
 
     def warping_centre_spread2(self, write_up= False):
         fig,ax = plt.subplots(1,2)
-
+        fig.set_dpi(1200)
         print("entre")
         maximum_x = self.extra_df[["X0_2","X1_2","X2_2","X3_2"]].max().max()
         minimum_x = self.extra_df[["X0_2","X1_2","X2_2","X3_2"]].min().min()
@@ -1603,7 +1607,8 @@ class Section(Result_Data):
         ax[1].set_box_aspect(1.0)
 
         fig.set_figwidth(6.29921)
-        fig.set_dpi(500)
+        fig.set_figheight(5)
+        fig.set_dpi(1200)
 
         plt.tight_layout()
         folder_name = self.result_folder + "\\graphs" + "\\{}".format(str(self.z))
@@ -1612,7 +1617,7 @@ class Section(Result_Data):
         if not os.path.exists(folder_name ):
             os.makedirs(folder_name)
         plt.savefig(folder_name+r"\warping_centre_spread_z_{}.png".format(str(self.z)))
-        plt.savefig(folder_name+r"\warping_centre_spread_z_{}.pgf".format(str(self.z)))
+        # plt.savefig(folder_name+r"\warping_centre_spread_z_{}.pgf".format(str(self.z)))
 
 
         if write_up == True:
@@ -1620,8 +1625,7 @@ class Section(Result_Data):
             if not os.path.exists(write_up_folder ):
                 os.makedirs(write_up_folder)
             plt.savefig(write_up_folder+r"\warping_centre_spread_z_{}.png".format(str(int(self.z*100))))
-            plt.savefig(write_up_folder+r"\warping_centre_spread_z_{}.pgf".format(str(int(self.z*100))))
-
+            # plt.savefig(write_up_folder+r"\warping_centre_spread_z_{}.pgf".format(str(int(self.z*100))))
 
 
     def warping_centre_line(self, write_up= False):
@@ -1684,6 +1688,7 @@ class Section(Result_Data):
         plt.show()
 
         print(w_array)
+
     def get_J(self):
         # maximum_warp = 1000*self.main_df["MaxWarp"][self.z]
         # minimum_warp = 1000*self.main_df["MinWarp"][self.z]
@@ -1822,6 +1827,79 @@ class Section(Result_Data):
         plt.savefig(folder_name+r"\graph_{}.pgf".format(name))
 
 
+    def plot_deflected_section2(self,name=" "):
+        fig,ax = plt.subplots()
+        n=0
+        for index, row in self.extra_df.iterrows():
+            # ax.plot(np.array([row["X0_0"],row["X1_0"],row["X2_0"],row["X3_0"],row["X0_0"]]),np.array([row["Y0_0"],row["Y1_0"],row["Y2_0"],row["Y3_0"],row["Y0_0"]]), c = (1,0.1,0.1, 1))
+            ax.plot(np.array([row["X0_0"],row["X1_0"],row["X2_0"],row["X3_0"],row["X0_0"]]),np.array([row["Y0_0"],row["Y1_0"],row["Y2_0"],row["Y3_0"],row["Y0_0"]]), c = (0.1,0.1,0.1, 0.5), zorder=0)
+
+
+            # Af = 2000
+            # dX0 = (row["X0_1"]-row["X0_0"])*Af
+            # dX1 = (row["X1_1"]-row["X1_0"])*Af
+            # dX2 = (row["X2_1"]-row["X2_0"])*Af
+            # dX3 = (row["X3_1"]-row["X3_0"])*Af
+
+            # dY0 = (row["Y0_1"]-row["Y0_0"])*Af
+            # dY1 = (row["Y1_1"]-row["Y1_0"])*Af
+            # dY2 = (row["Y2_1"]-row["Y2_0"])*Af
+            # dY3 = (row["Y3_1"]-row["Y3_0"])*Af
+
+
+            # points = [(row["X0_0"],row["Y0_0"]),(row["X1_0"],row["Y1_0"]),(row["X2_0"],row["Y2_0"]),(row["X3_0"],row["Y3_0"])]
+            # element = patch.Polygon(points, facecolor="lightgrey", zorder=1)
+            # ax[0].add_patch(element)
+            # points = [(row["X0_0"],row["Y0_0"]),(row["X1_0"],row["Y1_0"]),(row["X2_0"],row["Y2_0"]),(row["X3_0"],row["Y3_0"])]
+            # element = patch.Polygon(points, facecolor="lightslategrey")
+
+            # ax[1].add_patch(element)
+
+            # points = [(row["X0_0"]+dX0,row["Y0_0"]+dY0),(row["X1_0"]+dX1,row["Y1_0"]+dY1),(row["X2_0"]+dX2,row["Y2_0"]+dY2),(row["X3_0"]+dX3,row["Y3_0"]+dY3)]
+            # element = patch.Polygon(points, facecolor="red", zorder=2)
+            # ax[0].add_patch(element)
+
+            x_centroid = (row["X0_0"]+row["X1_0"]+row["X2_0"]+row["X3_0"])/4
+            y_centroid = (row["Y0_0"]+row["Y1_0"]+row["Y2_0"]+row["Y3_0"])/4
+
+            x_rc = row["x_rc"]
+            y_rc = row["y_rc"]
+            # ax.plot([x_rc, x_centroid],[y_rc, y_centroid], color= "tab:purple")
+
+
+            def get_colour(x_centroid,y_centroid ):
+                sin = np.sin(y_centroid/(x_centroid**2+y_centroid**2)**0.5)
+                sin = (sin+1)/2
+                return sin
+
+            seismic = cm.get_cmap('Set1', 256)
+
+            # ax.plot([x_rc, x_centroid],[y_rc, y_centroid], color= "tab:purple", zorder=0)
+            ax.scatter([x_rc,y_rc], color= "tab:purple", zorder=1)
+
+            n+=1
+
+        MeanRCX = self.main_df["MeanRCX"][self.z]
+        MeanRCY = self.main_df["MeanRCY"][self.z]
+        ax.scatter(MeanRCX,MeanRCY,color= "tab:green", marker="X",s=150, zorder=2)
+        ax.set_aspect('equal', adjustable='box')
+        plt.tight_layout()
+        fig.set_figwidth(6.29921/2)
+        fig.set_figheight(5.0)
+        plt.tight_layout()
+
+        folder_name = r"D:\\report\\figs"+r"\\"+"D"+ r"\graph_hodograph"
+
+        if not os.path.exists(folder_name ):
+            os.makedirs(folder_name)
+
+
+        plt.savefig(folder_name+r"\graph_{}.png".format(name))
+        plt.savefig(folder_name+r"\graph_{}.pgf".format(name))
+
+
+
+
 
 
 class Beam(Result_Data):
@@ -1945,9 +2023,7 @@ class Beam(Result_Data):
         bellow = 0.0
         # above_counter = 0
         # bellow_counter = 0
-
-
-
+        print(LSC_df.index)
 
         if loading_z not in LSC_df.index:
             for z in z_list:
@@ -1963,6 +2039,7 @@ class Beam(Result_Data):
             dfr.index.name = "z"
             LSC_df =  LSC_df.append(dfr, ignore_index = False)
             LSC_df.to_csv(folder_name + LSC_csv)
+        return LSC_df
 
 
 

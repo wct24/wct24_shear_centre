@@ -282,10 +282,10 @@ def main():
 
     v1 = a.instances['SC_beam-1'].vertices
     e1 = a.instances['SC_beam-1'].edges
-    Csys = a.DatumCsysByThreePoints(origin=v1[4], point1=v1[5], name='end',
-        coordSysType=CARTESIAN,
-        point2=a.instances['SC_beam-1'].InterestingPoint(edge=e1[8],
-        rule=MIDDLE))
+    Csys = a.DatumCsysByThreePoints(name='end', coordSysType=CARTESIAN, origin=(
+        0.0, 0.0, 3.0), point1=(0.0, 0.0, 0.0), line2=(0.0, 9.0, 0.0),
+        isDependent=False)
+
 
     a.ReferencePoint(point=(LoadX, LoadY, list_of_z[LoadZ]))
     r1 = a.referencePoints.values()[0]

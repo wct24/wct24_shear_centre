@@ -13,7 +13,7 @@ encastre_long = Load(r"D:\\shear_centre\\1-Semi-Circle\\0.4_0.02_15.0\\210.0_81.
 
 encastre_short = Load(r"D:\\shear_centre\\1-Semi-Circle\\0.4_0.02_3.0\\210.0_81.0_0.3\\encastre")
 
-fig, ax = plt.subplots(1,2)
+fig, ax = plt.subplots()
 
 
 line1 = encastre_long.SimpleTorqueLoad(0, LoadMagnitude = -0.5).GetAllWholeBeam().stress_magnitude_along_beam()
@@ -21,8 +21,8 @@ line2 = encastre_short.SimpleTorqueLoad(0, LoadMagnitude = -0.5000001).GetAllWho
 
 max_stress = np.amax(line1[1])
 
-ax[0].plot(np.array(line1[0])/15.0,np.array(line1[1])/max_stress , label="Dimensionless Axial Stress", color = "deepskyblue")
-ax[1].plot(np.append(np.array(line2[0]),0)/3.0,np.append(np.array(line2[1]),0.86*max_stress)/max_stress  , label="Dimensionless Axial Stress", color = "deepskyblue")
+ax.plot(np.array(line1[0])/15.0,np.array(line1[1])/max_stress , label="Dimensionless Bimoment Stresses", color = "deepskyblue", linewidth =3)
+# ax[1].plot(np.append(np.array(line2[0]),0)/3.0,np.append(np.array(line2[1]),0.86*max_stress)/max_stress  , label="Dimensionless Axial Stress", color = "deepskyblue")
 
 
 # print(np.array(line1[0])/15.0)
@@ -72,43 +72,43 @@ line2 = encastre_short.SimpleTorqueLoad(0, LoadMagnitude = -0.5000001).GetAllWho
 
 max_warping = np.amax(line1[1])
 
-ax[0].plot(np.array(line1[0])/15.0,np.array(line1[1])/max_warping , color = "darkviolet")
-ax[1].plot(np.array(line2[0])/3.0,np.array(line2[1])/max_warping , color = "darkviolet", label= "Dimensionless Warping")
+ax.plot(np.append(np.array(line1[0])/15.0, 0),np.append(np.array(line1[1])/max_warping,0) , color = "darkviolet", label= "Dimensionless Warping Displacements", linewidth =3)
+# ax[1].plot(np.array(line2[0])/3.0,np.array(line2[1])/max_warping , color = "darkviolet", label= "Dimensionless Warping")
 
 # ax.plot(line2[0],line2[1] , label="Encastre BC - 5m", color = "palegreen")
 # ax.plot(line3[0][200:-1],line3[1][200:-1] , label="Encastre BC - 15m", color = "darkgreen")
 
 
-ax[0].set_ylim(0,1)
-ax[0].set_xlim(0,1)
-ax[0].set_ylabel(r'')
+ax.set_ylim(0,1)
+ax.set_xlim(0,1)
+ax.set_ylabel(r'')
 
-ax[0].set_xlabel(r'$Z / 15$ ', )
-ax[0].grid()
-
-
-ax[1].set_ylim(bottom=0)
-ax[1].set_xlim(0,1)
-ax[1].set_ylim(0,1)
-ax[1].set_ylabel(r'')
-
-ax[1].set_xlabel(r'$Z / 3$ ', )
-ax[1].grid()
+ax.set_xlabel(r'$Z / L$ ', )
+ax.grid()
 
 
+# ax[1].set_ylim(bottom=0)
+# ax[1].set_xlim(0,1)
+# ax[1].set_ylim(0,1)
+# ax[1].set_ylabel(r'')
+
+# ax[1].set_xlabel(r'$Z / 3$ ', )
+# ax[1].grid()
 
 
 
 
-handles, labels = ax[1].get_legend_handles_labels()
 
 
-fig.set_figwidth(6.29921)
-fig.set_dpi(300)
+handles, labels = ax.get_legend_handles_labels()
+
+
+fig.set_figwidth(6.29921*2)
+# fig.set_dpi(300)
 
 plt.tight_layout()
-fig.legend(handles, labels, loc="lower center", prop={'size': 9}, ncol=5 )
-fig.subplots_adjust(bottom=0.2)
+fig.legend(handles, labels, loc="lower center", prop={'size': 20}, ncol=5 )
+fig.subplots_adjust(bottom=0.3)
 
 
 
@@ -118,8 +118,8 @@ print(folder_name)
 if not os.path.exists(folder_name ):
     os.makedirs(folder_name)
 
-plt.savefig(folder_name+r"\graph_1_3.png")
-plt.savefig(folder_name+r"\graph_1_3.pgf")
+plt.savefig(folder_name+r"\graph_1_3_presentation.png")
+# plt.savefig(folder_name+r"\graph_1_3.pgf")
 
 
 
