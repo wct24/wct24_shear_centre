@@ -111,7 +111,7 @@ class Load:
                     server.sendmail(sender_email, receiver_email, message)
 
                 # attempt to reconnect
-                cmd = """putty.exe -load 'Abaqus license' -l 'wct24' -pw 'Wvcjmbp2299!'"""
+                cmd = """putty.exe -load 'Abaqus license' -l 'wct24' -pw '############'"""
                 subprocess.run(["powershell", "-Command", cmd], capture_output=False, creationflags=subprocess.CREATE_NEW_CONSOLE)
                 time.sleep(10)
                 script_info = run(script_command)
